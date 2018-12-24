@@ -60,19 +60,19 @@ definition is_valid_state :: "weight \<Rightarrow> estimator \<Rightarrow> state
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 definition is_future_state :: "state \<Rightarrow> state \<Rightarrow> bool"
   where
-    "is_future_state s0 s1 = (s0 \<supseteq> s1)"
+    "is_future_state s1 s2 = (s1 \<supseteq> s2)"
 
 (* Definition 2.9 *)
 definition equivocation :: "message \<Rightarrow> message \<Rightarrow> bool"
   where
-    "equivocation m0 m1 =
-      (sender m0 = sender m1 \<and> m0 \<noteq> m1 \<and> m0 \<notin> justification(m1) \<and> m1 \<notin> justification(m0))"
+    "equivocation m1 m2 =
+      (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification(m2) \<and> m2 \<notin> justification(m1))"
 
 (* Definition 2.10 *)
 definition equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators s = 
-      {v. \<exists> m0 m1. m0 \<in> s \<and> m1 \<in> s \<and> equivocation m0 m1 \<and> sender m0 = v}"
+      {v. \<exists> m1 m2. m1 \<in> s \<and> m2 \<in> s \<and> equivocation m1 m2 \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
 definition equivocation_fault_weight :: "weight \<Rightarrow> state \<Rightarrow> int"
@@ -98,5 +98,15 @@ lemma monotonic_futures :
    \<and> is_valid_state w e s' \<and> is_valid_state w e s
    \<Longrightarrow> (s' \<in> futures t w s \<longleftrightarrow> futures t w s' \<subseteq> futures t w s)"
    using futures_def is_future_state_def by auto
+
+notation Set.empty ("\<emptyset> ")
+
+(* Theorem 1 *)
+theorem two_party_common_futures :
+  "\<forall> s1 s2. is_faults_lt_threshold t w s1 \<and> is_faults_lt_threshold t w s2
+   \<and> is_valid_state w e s1 \<and> is_valid_state w e s2
+  \<Longrightarrow> is_faults_lt_threshold t w (s1 \<union> s2)
+  \<Longrightarrow> futures t w s1 \<inter> futures t w s2 \<noteq> \<emptyset>"
+  using futures_def is_future_state_def by auto
 
 end
