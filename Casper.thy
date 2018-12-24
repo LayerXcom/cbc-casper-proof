@@ -109,4 +109,12 @@ theorem two_party_common_futures :
   \<Longrightarrow> futures t w s1 \<inter> futures t w s2 \<noteq> \<emptyset>"
   using futures_def is_future_state_def by auto
 
+(* Theorem 2 *)
+theorem n_party_common_futures :
+  "\<forall> s_set. \<forall> s. s \<in> s_set \<and> is_faults_lt_threshold t w s \<and> is_valid_state w e s
+  \<Longrightarrow> is_faults_lt_threshold t w (\<Union> s_set)
+  \<Longrightarrow> futures t w s1 \<inter> futures t w s2 \<noteq> \<emptyset>"
+  by blast
+
+
 end
