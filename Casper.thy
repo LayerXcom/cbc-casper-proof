@@ -135,5 +135,13 @@ lemma forward_consistency :
   \<Longrightarrow> state_property_is_decided t w p s'"
   by (simp add: state_property_is_decided_def)  
 
+(* Lemma 2 *)
+lemma backword_consistency :
+  "\<forall> s' s. is_faults_lt_threshold t w s' \<and> is_faults_lt_threshold t w s
+   \<and> is_valid_state w e s' \<and> is_valid_state w e s \<and> (\<forall> s'. s' \<in> futures t w s) 
+  \<Longrightarrow> state_property_is_decided t w p s'
+  \<Longrightarrow> \<not>state_property_is_decided t w (\<lambda>s. (\<not> p s)) s"
+  by (simp add: state_property_is_decided_def)
+  
 
 end
