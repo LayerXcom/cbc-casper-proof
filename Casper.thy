@@ -133,7 +133,7 @@ lemma forward_consistency :
    \<and> is_valid_state w e s' \<and> is_valid_state w e s \<and> (\<forall> s'. s' \<in> futures t w s) 
   \<Longrightarrow> state_property_is_decided t w p s
   \<Longrightarrow> state_property_is_decided t w p s'"
-  by (simp add: state_property_is_decided_def)  
+  by (simp add: state_property_is_decided_def)
 
 (* Lemma 3 *)
 lemma backword_consistency :
@@ -143,5 +143,13 @@ lemma backword_consistency :
   \<Longrightarrow> \<not>state_property_is_decided t w (\<lambda>s. (\<not> p s)) s"
   by (simp add: state_property_is_decided_def)
   
+(* Theorem 3 *)
+theorem two_party_consensus_safety :
+  "\<forall> s1 s2. is_faults_lt_threshold t w s1 \<and> is_faults_lt_threshold t w s2
+   \<and> is_valid_state w e s1 \<and> is_valid_state w e s2
+  \<Longrightarrow> is_faults_lt_threshold t w (s1 \<union> s2)
+  \<Longrightarrow> \<not>(state_property_is_decided t w p s1 \<and> state_property_is_decided t w (\<lambda>s. (\<not> p s)) s2)"
+  apply (simp add: state_property_is_decided_def)
+  by blast  
 
 end
