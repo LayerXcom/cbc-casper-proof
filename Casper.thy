@@ -116,5 +116,24 @@ theorem n_party_common_futures :
   \<Longrightarrow> futures t w s1 \<inter> futures t w s2 \<noteq> \<emptyset>"
   by blast
 
+(* Section 3.2: Guaranteeing Consistent Decisions *)
+(* Section 3.2.1: Guaranteeing Consistent Decisions on Properties of Protocol States *)
+
+(* Definition 3.2  *)
+type_synonym state_property = "state \<Rightarrow> bool"
+
+(* Definition 3.3  *)
+definition state_property_is_decided :: "threshold \<Rightarrow> weight \<Rightarrow> state_property \<Rightarrow> state \<Rightarrow> bool"
+  where
+    "state_property_is_decided t w p s = (\<forall> s'. s' \<in> futures t w s \<and> p s')"
+
+(* Lemma 2 *)
+lemma forward_consistency :
+  "\<forall> s' s. is_faults_lt_threshold t w s' \<and> is_faults_lt_threshold t w s
+   \<and> is_valid_state w e s' \<and> is_valid_state w e s \<and> (\<forall> s'. s' \<in> futures t w s) 
+  \<Longrightarrow> state_property_is_decided t w p s
+  \<Longrightarrow> state_property_is_decided t w p s'"
+  by (simp add: state_property_is_decided_def)  
+
 
 end
