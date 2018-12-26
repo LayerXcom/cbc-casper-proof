@@ -153,6 +153,7 @@ theorem two_party_consensus_safety :
   by blast  
 
 (* Definition 3.4 *)
+(* NOTE: We can use \<And> to make it closer to the paper? *)
 definition state_property_is_inconsistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
   where
     "state_property_is_inconsistent w e p_set = (\<forall> s. is_valid_state w e s \<and> \<not> (\<forall> p. p \<in> p_set \<and> p s))"
@@ -166,5 +167,13 @@ definition state_property_is_consistent :: "weight \<Rightarrow> estimator \<Rig
 definition state_property_decisions :: "threshold \<Rightarrow> weight \<Rightarrow> state \<Rightarrow> state_property set"
   where 
     "state_property_decisions t w s = {p. state_property_is_decided t w p s}"
+
+(* Theorem 4 *)
+(* NOTE: We can use \<Union> to make it closer to the paper? *)
+theorem n_party_safety_for_state_properties :
+  "\<forall> s_set. \<forall> s. s \<in> s_set \<and> is_faults_lt_threshold t w s \<and> is_valid_state w e s
+  \<Longrightarrow> is_faults_lt_threshold t w (\<Union> s_set)
+  \<Longrightarrow> state_property_is_consistent w e {p. \<exists>s. s \<in> s_set \<and> p \<in> state_property_decisions t w s}" 
+  by blast
 
 end
