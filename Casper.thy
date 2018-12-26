@@ -27,7 +27,7 @@ type_synonym state = "message set"
 
 (* Definition 2.5 *)
 (* NOTE: Here estimator returns only one value, avoiding non-determinism. 
-Also, estimator is parameterized by weight. *)
+Also, we parameterized estimator by weight. *)
 type_synonym estimator = "weight \<Rightarrow> state \<Rightarrow> consensus_value"
 
 
@@ -151,5 +151,20 @@ theorem two_party_consensus_safety :
   \<Longrightarrow> \<not>(state_property_is_decided t w p s1 \<and> state_property_is_decided t w (\<lambda>s. (\<not> p s)) s2)"
   apply (simp add: state_property_is_decided_def)
   by blast  
+
+(* Definition 3.4 *)
+definition state_property_is_inconsistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
+  where
+    "state_property_is_inconsistent w e p_set = (\<forall> s. is_valid_state w e s \<and> \<not> (\<forall> p. p \<in> p_set \<and> p s))"
+
+(* Definition 3.5 *)
+definition state_property_is_consistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
+  where
+    "state_property_is_consistent w e p_set = (\<exists> s. is_valid_state w e s \<and> (\<forall> p. p \<in> p_set \<and> p s))"
+
+(* Definition 3.6 *)
+definition state_property_decisions :: "threshold \<Rightarrow> weight \<Rightarrow> state \<Rightarrow> state_property set"
+  where 
+    "state_property_decisions t w s = {p. state_property_is_decided t w p s}"
 
 end
