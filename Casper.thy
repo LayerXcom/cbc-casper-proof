@@ -154,14 +154,14 @@ theorem two_party_consensus_safety :
 
 (* Definition 3.4 *)
 (* NOTE: We can use \<And> to make it closer to the paper? *)
-definition state_property_is_inconsistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
+definition state_properties_are_inconsistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
   where
-    "state_property_is_inconsistent w e p_set = (\<forall> s. is_valid_state w e s \<and> \<not> (\<forall> p. p \<in> p_set \<and> p s))"
+    "state_properties_are_inconsistent w e p_set = (\<forall> s. is_valid_state w e s \<and> \<not> (\<forall> p. p \<in> p_set \<and> p s))"
 
 (* Definition 3.5 *)
-definition state_property_is_consistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
+definition state_properties_are_consistent :: "weight \<Rightarrow> estimator \<Rightarrow> state_property set \<Rightarrow> bool"
   where
-    "state_property_is_consistent w e p_set = (\<exists> s. is_valid_state w e s \<and> (\<forall> p. p \<in> p_set \<and> p s))"
+    "state_properties_are_consistent w e p_set = (\<exists> s. is_valid_state w e s \<and> (\<forall> p. p \<in> p_set \<and> p s))"
 
 (* Definition 3.6 *)
 definition state_property_decisions :: "threshold \<Rightarrow> weight \<Rightarrow> state \<Rightarrow> state_property set"
@@ -173,7 +173,45 @@ definition state_property_decisions :: "threshold \<Rightarrow> weight \<Rightar
 theorem n_party_safety_for_state_properties :
   "\<forall> s_set. \<forall> s. s \<in> s_set \<and> is_faults_lt_threshold t w s \<and> is_valid_state w e s
   \<Longrightarrow> is_faults_lt_threshold t w (\<Union> s_set)
-  \<Longrightarrow> state_property_is_consistent w e {p. \<exists>s. s \<in> s_set \<and> p \<in> state_property_decisions t w s}" 
+  \<Longrightarrow> state_properties_are_consistent w e {p. \<exists> s. s \<in> s_set \<and> p \<in> state_property_decisions t w s}" 
+  by blast
+
+(* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
+(* Definition 3.7 *)
+type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
+
+(* Definition 3.8 *)
+definition naturally_corresponding_state_property :: "weight \<Rightarrow> estimator \<Rightarrow> consensus_value_property \<Rightarrow> state_property"
+  where 
+    "naturally_corresponding_state_property w e p = (\<lambda>s. \<forall>c. c = e w s \<and> p c)"
+
+(* Definition 3.9 *)
+(* NOTE: Here the type of `c` is inferred correctly? *)
+definition consensus_value_properties_are_consistent :: "consensus_value_property set \<Rightarrow> bool"
+  where
+    "consensus_value_properties_are_consistent p_set = (\<exists> c. \<forall> p. p \<in> p_set \<and> p c)"
+
+(* Lemma 4 *)
+lemma naturally_corresponding_consistency :
+  "\<forall> p_set. state_properties_are_consistent w e {q. \<exists> p. p \<in> p_set \<and> q = naturally_corresponding_state_property w e p}
+    \<Longrightarrow> consensus_value_properties_are_consistent p_set"
+  using state_properties_are_consistent_def by auto
+
+(* Definition 3.10 *)
+definition consensus_value_property_is_decided :: "threshold \<Rightarrow> weight \<Rightarrow> estimator \<Rightarrow> consensus_value_property \<Rightarrow> state \<Rightarrow> bool"
+  where
+    "consensus_value_property_is_decided t w e p s = state_property_is_decided t w (naturally_corresponding_state_property w e p) s "
+
+(* Definition 3.11 *)
+definition consensus_value_property_decisions :: "threshold \<Rightarrow> weight \<Rightarrow> estimator \<Rightarrow> state \<Rightarrow> consensus_value_property set"
+  where
+    "consensus_value_property_decisions t w e s = {p. consensus_value_property_is_decided t w e p s}"
+
+(* Theorem 5 *)
+theorem n_party_safety_for_consensus_value_properties :
+  "\<forall> s_set. \<forall> s. s \<in> s_set \<and> is_faults_lt_threshold t w s \<and> is_valid_state w e s
+  \<Longrightarrow> is_faults_lt_threshold t w (\<Union> s_set)
+  \<Longrightarrow> consensus_value_properties_are_consistent {p. \<exists> s. s \<in> s_set \<and> p \<in> consensus_value_property_decisions t w e s}"
   by blast
 
 end
