@@ -10,7 +10,6 @@ begin
 (* Definition 4.1 Observed validators *)
 definition observed :: "state \<Rightarrow> validator set"
   where
-    (* "observed s = {v. \<exists> m. v = sender m \<and> m \<in> s}" *)
     "observed s = {sender m |m . m \<in> s}"
 
 (* Definition 4.2 *)
