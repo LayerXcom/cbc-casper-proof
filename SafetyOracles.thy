@@ -4,6 +4,9 @@ imports Main ConsensusSafety
 
 begin
 
+(* Section 7: Safety Oracles *)
+(* Section 7.1 Preliminary Definitions *)
+
 (* Definition 7.1 *)
 definition later :: "message \<Rightarrow> message \<Rightarrow> bool"
   where
@@ -12,17 +15,17 @@ definition later :: "message \<Rightarrow> message \<Rightarrow> bool"
 (* Definition 7.2 *)
 definition from_sender :: "validator \<Rightarrow> state \<Rightarrow> message set"
   where
-    "from_sender v s = {m. sender m = v}"
+    "from_sender v s = {m. m \<in> s \<and> sender m = v}"
      
 (* Definition 7.3 *)
 definition later_from :: "message \<Rightarrow> validator \<Rightarrow> state \<Rightarrow> message set"
   where
-    "later_from m v s = {m'. sender m' = v \<and> later m' m}"
+    "later_from m v s = {m'. m \<in> s \<and> sender m' = v \<and> later m' m}"
  
 (* Definition 7.4 *)
 definition latest_messages :: "state \<Rightarrow> validator \<Rightarrow> message set"
   where
-    "latest_messages s v = {m. sender m = v \<and> later_from m v s = \<emptyset>}"
+    "latest_messages s v = {m. m \<in> s \<and> sender m = v \<and> later_from m v s = \<emptyset>}"
 
 (* Definition 7.5 *)
 definition latest_messages_from_honest_validators :: "state \<Rightarrow> validator \<Rightarrow> message set"
