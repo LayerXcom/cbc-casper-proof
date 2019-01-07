@@ -23,10 +23,44 @@ definition later_from :: "message \<Rightarrow> validator \<Rightarrow> state \<
 definition latest_messages :: "state \<Rightarrow> validator \<Rightarrow> message set"
   where
     "latest_messages s v = {m. sender m = v \<and> later_from m v s = \<emptyset>}"
-    
 
 (* Definition 7.5 *)
 definition latest_messages_from_honest_validators :: "state \<Rightarrow> validator \<Rightarrow> message set"
   where
-    "latest_messages_from_honest_validators s v = (if v \<in> equivocating_validators s then \<emptyset>
-      else latest_messages s v)"
+    "latest_messages_from_honest_validators s v = 
+      (if v \<in> equivocating_validators s then \<emptyset> else latest_messages s v)"
+
+(* Definition 7.6 *)
+definition latest_estimates_from_honest_validators :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
+  where
+    "latest_estimates_from_honest_validators s v = 
+      {est m | m. m \<in> latest_messages_from_honest_validators s v}"
+
+(* Definition 7.7 *)
+definition latest_justifications_from_honest_validators :: "state \<Rightarrow> validator \<Rightarrow> state set"
+  where
+    "latest_justifications_from_honest_validators s v = 
+      {justification m | m. m \<in> latest_messages_from_honest_validators s v}"
+
+(* Definition 7.8 *)
+definition agreeing :: "consensus_value_property \<Rightarrow> state \<Rightarrow> validator set"
+  where
+    "agreeing p s = {v. \<forall> c. c \<in> latest_estimates_from_honest_validators s v \<and> p c}"
+
+(* Definition 7.9 *)
+definition disagreeing :: "consensus_value_property \<Rightarrow> state \<Rightarrow> validator set"
+  where
+    "disagreeing p s = {v. \<exists> c. c \<in> latest_estimates_from_honest_validators s v \<and> \<not> p c}"
+
+(* Definition 7.10 *)
+definition weight_mesure :: "weight \<Rightarrow> validator set \<Rightarrow> int"
+  where
+    "weight_mesure w v_set = sum w v_set"
+
+(* Definition 7.11 *)
+type_synonym all_validators = "validator set"
+
+definition majority :: "all_validators \<Rightarrow> weight \<Rightarrow> validator set \<Rightarrow> state \<Rightarrow> bool"
+  where
+    "majority all_v_set w v_set s = (weight_mesure w v_set > (weight_mesure w all_v_set - weight_mesure w (equivocating_validators s)) div 2)"
+   
