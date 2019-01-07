@@ -1,4 +1,4 @@
-theory Casper
+theory ConsensusSafety
 
 imports Main
 
@@ -26,9 +26,8 @@ datatype message =
 type_synonym state = "message set"
 
 (* Definition 2.5 *)
-(* NOTE: Here estimator returns only one value, avoiding non-determinism. 
-Also, we parameterized estimator by weight. *)
-type_synonym estimator = "weight \<Rightarrow> state \<Rightarrow> consensus_value"
+(* NOTE: We parameterized estimator by weight. *)
+type_synonym estimator = "weight \<Rightarrow> state \<Rightarrow> consensus_value set"
 
 
 (* Section 2.2: Protocol Definition *)
@@ -49,7 +48,7 @@ fun justification :: "message \<Rightarrow> state"
 (* Definition 2.7 *)
 fun is_valid :: "weight \<Rightarrow>(estimator \<Rightarrow> (message \<Rightarrow> bool))"
   where
-    "is_valid w e (Message (c, v, s)) = (c = e w (set s))"
+    "is_valid w e (Message (c, v, s)) = (c \<in> e w (set s))"
 
 (* FIXME: Can we construct valid_message type? Currently we assume all states are valid in all the 
 "definition"s and use is_valid_state for all occurrences of state type in lemmas. *)
@@ -183,7 +182,7 @@ type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 (* Definition 3.8 *)
 definition naturally_corresponding_state_property :: "weight \<Rightarrow> estimator \<Rightarrow> consensus_value_property \<Rightarrow> state_property"
   where 
-    "naturally_corresponding_state_property w e p = (\<lambda>s. \<forall>c. c = e w s \<and> p c)"
+    "naturally_corresponding_state_property w e p = (\<lambda>s. \<forall>c. c \<in> e w s \<and> p c)"
 
 (* Definition 3.9 *)
 (* NOTE: Here the type of `c` is inferred correctly? *)
@@ -193,7 +192,7 @@ definition consensus_value_properties_are_consistent :: "consensus_value_propert
 
 (* Lemma 4 *)
 lemma naturally_corresponding_consistency :
-  "\<forall> p_set. state_properties_are_consistent w e {q. \<exists> p. p \<in> p_set \<and> q = naturally_corresponding_state_property w e p}
+  "\<forall> p_set. state_properties_are_consistent w e {naturally_corresponding_state_property w e p | p. p \<in> p_set}
     \<Longrightarrow> consensus_value_properties_are_consistent p_set"
   using state_properties_are_consistent_def by auto
 
