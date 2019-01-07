@@ -193,7 +193,7 @@ definition consensus_value_properties_are_consistent :: "consensus_value_propert
 
 (* Lemma 4 *)
 lemma naturally_corresponding_consistency :
-  "\<forall> p_set. state_properties_are_consistent w e {q. \<exists> p. p \<in> p_set \<and> q = naturally_corresponding_state_property w e p}
+  "\<forall> p_set. state_properties_are_consistent w e {naturally_corresponding_state_property w e p | p. p \<in> p_set}
     \<Longrightarrow> consensus_value_properties_are_consistent p_set"
   using state_properties_are_consistent_def by auto
 
