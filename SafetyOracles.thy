@@ -64,3 +64,23 @@ definition majority :: "all_validators \<Rightarrow> weight \<Rightarrow> valida
   where
     "majority all_v_set w v_set s = (weight_mesure w v_set > (weight_mesure w all_v_set - weight_mesure w (equivocating_validators s)) div 2)"
    
+(* Definition 7.12 *)
+definition majority_driven :: "all_validators \<Rightarrow> weight \<Rightarrow> estimator \<Rightarrow> consensus_value_property \<Rightarrow> bool"
+  where
+    "majority_driven all_v_set w e p = (\<forall> s c. majority all_v_set w (agreeing p s) s \<longrightarrow> c \<in> e w s \<and> p c)"
+
+(* Definition 7.13 *)
+definition max_driven :: "weight \<Rightarrow> estimator \<Rightarrow> consensus_value_property \<Rightarrow> bool"
+  where
+    "max_driven w e p =
+      (\<forall> s c. weight_mesure w (agreeing p s) > weight_mesure w (disagreeing p s) \<longrightarrow> c \<in> e w s \<and> p c)"
+
+(* Definition 7.14 *)
+definition later_disagreeing :: "consensus_value_property \<Rightarrow> message \<Rightarrow> validator \<Rightarrow> state \<Rightarrow> message set"
+  where 
+    "later_disagreeing p m v s = {m'. m' \<in> later_from m v s \<and> \<not> p (est m')}"
+
+(* Definition 7.15 *)
+(* NOTE: Define singleton set here *)
+
+end
