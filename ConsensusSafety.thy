@@ -1,4 +1,4 @@
-theory Casper
+theory ConsensusSafety
 
 imports Main
 
