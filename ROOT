@@ -1,3 +1,5 @@
 session "all" = "HOL" +
   theories [document = false]
-    Casper
+    ConsensusSafety
+    SafetyOracles
+    ExampleProtocols
