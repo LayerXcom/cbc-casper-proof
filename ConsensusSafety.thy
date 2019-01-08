@@ -203,13 +203,13 @@ definition state_property_decisions :: "params \<Rightarrow> state \<Rightarrow>
     "state_property_decisions params \<sigma> = {p. state_property_is_decided params (p, \<sigma>)}"
 
 (* Theorem 4 *)
-(* NOTE: We can use \<Union> to make it closer to the paper? *)
 theorem n_party_safety_for_state_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
-  \<Longrightarrow> state_properties_are_consistent params {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> state_property_decisions params \<sigma>}" 
+  \<Longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
   apply simp
   by (smt Collect_mono_iff W.simps equivocation_fault_weight_def is_faults_lt_threshold_def t.simps)
+
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
 (* Definition 3.7 *)
