@@ -36,13 +36,13 @@ fun latest_messages_from_honest_validators :: "(state *validator) \<Rightarrow> 
 (* Definition 7.6 *)
 fun latest_estimates_from_honest_validators :: "(state * validator) \<Rightarrow> consensus_value set"
   where
-    "latest_estimates_from_honest_validators(\<sigma>, v) = 
-      {est m | m. m \<in> latest_messages_from_honest_validators(\<sigma>, v)}"
+    "latest_estimates_from_honest_validators (\<sigma>, v) = 
+      {est m | m. m \<in> latest_messages_from_honest_validators (\<sigma>, v)}"
 
 (* Definition 7.7 *)
 fun latest_justifications_from_honest_validators :: "(state * validator) \<Rightarrow> state set"
   where
-    "latest_justifications_from_honest_validators(\<sigma>, v) = 
+    "latest_justifications_from_honest_validators (\<sigma>, v) = 
       {justification m | m. m \<in> latest_messages_from_honest_validators (\<sigma>, v)}"
 
 (* Definition 7.8 *)
@@ -68,13 +68,13 @@ fun is_majority :: "params \<Rightarrow> (validator set * state) \<Rightarrow> b
 (* Definition 7.12 *)
 definition is_majority_driven :: "params \<Rightarrow> consensus_value_property \<Rightarrow> bool"
   where
-    "is_majority_driven params p = (\<forall> \<sigma> c. is_majority params (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> c \<in> \<epsilon> params (W params) \<sigma> \<and> p c)"
+    "is_majority_driven params p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> params \<and> is_majority params (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> c \<in> \<epsilon> params \<sigma> \<and> p c)"
 
 (* Definition 7.13 *)
 definition is_max_driven :: "params \<Rightarrow> consensus_value_property \<Rightarrow> bool"
   where
     "is_max_driven params p =
-      (\<forall> \<sigma> c. weight_measure params (agreeing_validators (p, \<sigma>)) > weight_measure params (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> params (W params) \<sigma> \<and> p c)"
+      (\<forall> \<sigma> c. weight_measure params (agreeing_validators (p, \<sigma>)) > weight_measure params (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> params  \<sigma> \<and> p c)"
 
 (* Definition 7.14 *)
 fun later_disagreeing_validators :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
@@ -86,12 +86,6 @@ fun later_disagreeing_validators :: "(consensus_value_property * message * valid
 
 (* Section 7.2: Validator Cliques *)
 
-(* Definition: 7.16 *)
-(* NOTE: Clique with 1 layers *)
-fun is_cliquie :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
- where
-   "is_clique (v_set, p, \<sigma>) = (\<forall> v. v \<in> v_set \<and> (v_set \<subseteq> agreeing_validators (p, latest_justifications_from_honest_validators (\<sigma>, v)))
-     \<and> (\<forall> v'. v' \<in> v_set \<and> later_disagreeing_validators (p, latest_messages_from_honest_validators (latest_justifications_from_honest_validators (\<sigma>, v), v'), \<sigma>) = \<emptyset>))"
-
+(* Definition 7.16: Clique with 1 layers *)
 
 end
