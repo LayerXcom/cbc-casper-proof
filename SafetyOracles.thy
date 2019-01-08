@@ -82,10 +82,47 @@ fun later_disagreeing_validators :: "(consensus_value_property * message * valid
     "later_disagreeing_validators (p, m, v, \<sigma>) = {m'. m' \<in> later_from (m, v, \<sigma>) \<and> \<not> p (est m')}"
 
 (* Definition 7.15 *)
-(* NOTE: Define singleton set here *)
+
+definition at_most_one :: "'a set \<Rightarrow> bool"
+  where
+    "at_most_one s = (\<forall> x y. x \<in> s \<longrightarrow> y \<in> s \<longrightarrow> x = y)"
+
 
 (* Section 7.2: Validator Cliques *)
 
 (* Definition 7.16: Clique with 1 layers *)
+(* FIXME: How to extract an element from a singleton set? #17 *)
+fun is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
+ where
+   "is_clique (v_set, p, \<sigma>) = 
+     (\<forall> v. v \<in> v_set
+      \<and> at_most_one {\<sigma>'. \<sigma>' \<in> latest_justifications_from_honest_validators (\<sigma>, v) \<and> v_set \<subseteq> agreeing_validators (p, \<sigma>')}
+     \<and> (\<forall> v'. v' \<in> v_set
+      \<and> at_most_one {\<sigma>''. \<sigma>'' \<in> latest_justifications_from_honest_validators (\<sigma>, v) 
+        \<and> at_most_one {m. m \<in> latest_messages_from_honest_validators (\<sigma>'', v') 
+          \<and> later_disagreeing_validators (p, m, v', \<sigma>) = \<emptyset>}}))"
+
+
+(* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
+
+(* Definition 7.17 *)
+(* FIXME: Set of tuple #19 *)
+
+fun is_minimal_transition :: "params \<Rightarrow> (state * state) \<Rightarrow> bool"
+  where
+    "is_minimal_transition params (\<sigma>, \<sigma>') = (\<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params \<and> is_future_state (\<sigma>, \<sigma>')
+      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>) \<and> \<sigma>'' \<noteq> \<sigma> \<and> \<sigma>'' \<noteq> \<sigma>'))"
+
+lemma minimal_transition_corresponds_to_recieving_a_single_message :
+  "\<forall> params \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
+  \<longrightarrow> (is_minimal_transition params (\<sigma>, \<sigma>') \<longleftrightarrow> at_most_one {m. m \<in> \<sigma>' - \<sigma>})"
+  apply simp
+  (* TODO *)
+  
+(* Lemma 11: Minimal transitions do not change Later From for any non-sender *)
+lemma later_from_not_affected_by_minimal_transitions :
+  "\<forall> params \<sigma> \<sigma>' m. is_minimal_transition params (\<sigma>, \<sigma>') \<and> m \<in> M params
+  \<longrightarrow> at_most_one {m'. m \<in> \<sigma>' - \<sigma> \<and> (\<forall> v. v \<in> V params - {sender m'} \<longrightarrow> later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))}"
+  (* TODO *)
 
 end
