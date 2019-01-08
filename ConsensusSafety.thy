@@ -95,7 +95,7 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
 definition equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = 
-      {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation(m1, m2) \<and> sender m1 = v}"
+      {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
 definition equivocation_fault_weight :: "params \<Rightarrow> state \<Rightarrow> int"
@@ -114,7 +114,7 @@ definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> b
 (* Definition 3.1 *)
 definition futures :: "params \<Rightarrow> state \<Rightarrow> state set"
   where
-    "futures params \<sigma> = {\<sigma>'. is_faults_lt_threshold params \<sigma>' \<and> is_future_state(\<sigma>', \<sigma>)}"
+    "futures params \<sigma> = {\<sigma>'. is_faults_lt_threshold params \<sigma>' \<and> is_future_state (\<sigma>', \<sigma>)}"
 
 (* Lemma 1 *)
 lemma monotonic_futures :
@@ -224,7 +224,7 @@ lemma naturally_corresponding_consistency :
 (* Definition 3.10 *)
 fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_value_property * state) \<Rightarrow> bool"
   where
-    "consensus_value_property_is_decided params (p, \<sigma>) = state_property_is_decided params ((naturally_corresponding_state_property params p), \<sigma>)"
+    "consensus_value_property_is_decided params (p, \<sigma>) = state_property_is_decided params (naturally_corresponding_state_property params p, \<sigma>)"
 
 (* Definition 3.11 *)
 definition consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
