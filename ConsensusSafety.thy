@@ -245,7 +245,7 @@ definition consensus_value_property_decisions :: "params \<Rightarrow> state \<R
 theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
-  \<Longrightarrow> consensus_value_properties_are_consistent params {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> consensus_value_property_decisions params \<sigma>}"
+  \<Longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
   apply simp
   using n_party_safety_for_state_properties state_properties_are_consistent_def by force
 
