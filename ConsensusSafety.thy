@@ -26,12 +26,14 @@ datatype message =
 type_synonym state = "message set"
 
 (* Definition 2.5 *)
-(* NOTE: We parameterized estimator by weight. *)
-type_synonym estimator = "weight \<Rightarrow> state \<Rightarrow> consensus_value set"
+type_synonym estimator = "state \<Rightarrow> consensus_value set"
+
+(* NOTE: Estimator parameterized by weight. *)
+type_synonym estimator_param = "weight \<Rightarrow> state \<Rightarrow> consensus_value set"
 
 (* CBC Casper parameters *)
 datatype params = 
-  Params "validator set * weight * threshold * consensus_value set * estimator"
+  Params "validator set * weight * threshold * consensus_value set * estimator_param"
 
 fun V :: "params \<Rightarrow> validator set"
   where
@@ -51,7 +53,7 @@ fun C :: "params \<Rightarrow> consensus_value set"
 
 fun \<epsilon> :: "params \<Rightarrow> estimator"
   where
-    "\<epsilon> (Params (_, _, _, _, estimator)) = estimator"
+    "\<epsilon> (Params (_, weight, _, _, estimator_param)) = estimator_param weight"
 
 
 (* Section 2.2: Protocol Definition *)
@@ -72,7 +74,7 @@ fun justification :: "message \<Rightarrow> state"
 (* Definition 2.7 *)
 definition is_valid_message :: "params \<Rightarrow> message \<Rightarrow> bool"
   where
-    "is_valid_message params m = (est m \<in> \<epsilon> params (W params) (justification m))"
+    "is_valid_message params m = (est m \<in> \<epsilon> params (justification m))"
 
 definition is_valid_state :: "params \<Rightarrow> state \<Rightarrow> bool"
   where
@@ -188,12 +190,12 @@ theorem two_party_consensus_safety :
 (* NOTE: We can use \<And> to make it closer to the paper? *)
 definition state_properties_are_inconsistent :: "params \<Rightarrow> state_property set \<Rightarrow> bool"
   where
-    "state_properties_are_inconsistent params p_set = (\<forall> \<sigma>. is_valid_state params \<sigma> \<and> \<not> (\<forall> p. p \<in> p_set \<and> p \<sigma>))"
+    "state_properties_are_inconsistent params p_set = (\<forall> \<sigma>. \<sigma> \<in> \<Sigma> params \<and> \<not> (\<forall> p. p \<in> p_set \<and> p \<sigma>))"
 
 (* Definition 3.5 *)
 definition state_properties_are_consistent :: "params \<Rightarrow> state_property set \<Rightarrow> bool"
   where
-    "state_properties_are_consistent params p_set = (\<exists> \<sigma>. is_valid_state params \<sigma> \<and> (\<forall> p. p \<in> p_set \<and> p \<sigma>))"
+    "state_properties_are_consistent params p_set = (\<exists> \<sigma>. \<sigma> \<in> \<Sigma> params \<and> (\<forall> p. p \<in> p_set \<and> p \<sigma>))"
 
 (* Definition 3.6 *)
 definition state_property_decisions :: "params \<Rightarrow> state \<Rightarrow> state_property set"
@@ -216,24 +218,24 @@ type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 (* Definition 3.8 *)
 definition naturally_corresponding_state_property :: "params \<Rightarrow> consensus_value_property \<Rightarrow> state_property"
   where 
-    "naturally_corresponding_state_property params p = (\<lambda>\<sigma>. \<forall>c. c \<in> \<epsilon> params (W params) \<sigma> \<and> p c)"
+    "naturally_corresponding_state_property params p = (\<lambda>\<sigma>. \<forall>c. c \<in> \<epsilon> params \<sigma> \<and> p c)"
 
 (* Definition 3.9 *)
-(* NOTE: Here the type of `c` is inferred correctly? *)
-definition consensus_value_properties_are_consistent :: "consensus_value_property set \<Rightarrow> bool"
+definition consensus_value_properties_are_consistent :: "params \<Rightarrow> consensus_value_property set \<Rightarrow> bool"
   where
-    "consensus_value_properties_are_consistent p_set = (\<exists> c. \<forall> p. p \<in> p_set \<and> p c)"
+    "consensus_value_properties_are_consistent params p_set = (\<exists> c. c \<in> C params \<and> (\<forall> p. p \<in> p_set \<and> p c))"
 
 (* Lemma 4 *)
 lemma naturally_corresponding_consistency :
   "\<forall> params p_set. state_properties_are_consistent params {naturally_corresponding_state_property params p | p. p \<in> p_set}
-    \<Longrightarrow> consensus_value_properties_are_consistent p_set"
+    \<Longrightarrow> consensus_value_properties_are_consistent params p_set"
   using state_properties_are_consistent_def by auto
 
 (* Definition 3.10 *)
 fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_value_property * state) \<Rightarrow> bool"
   where
-    "consensus_value_property_is_decided params (p, \<sigma>) = state_property_is_decided params (naturally_corresponding_state_property params p, \<sigma>)"
+    "consensus_value_property_is_decided params (p, \<sigma>)
+      = state_property_is_decided params (naturally_corresponding_state_property params p, \<sigma>)"
 
 (* Definition 3.11 *)
 definition consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
@@ -244,7 +246,7 @@ definition consensus_value_property_decisions :: "params \<Rightarrow> state \<R
 theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
-  \<Longrightarrow> consensus_value_properties_are_consistent {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> consensus_value_property_decisions params \<sigma>}"
+  \<Longrightarrow> consensus_value_properties_are_consistent params {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> consensus_value_property_decisions params \<sigma>}"
   apply simp
   using n_party_safety_for_state_properties state_properties_are_consistent_def by force
 
