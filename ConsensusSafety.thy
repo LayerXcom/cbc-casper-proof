@@ -130,7 +130,7 @@ lemma monotonic_futures :
    \<Longrightarrow> (\<sigma>' \<in> futures params \<sigma> \<longleftrightarrow> futures params \<sigma>' \<subseteq> futures params \<sigma>)"
   by fastforce
 
-notation Set.empty ("\<emptyset> ")
+notation Set.empty ("\<emptyset>")
 
 (* Theorem 1 *)
 theorem two_party_common_futures :
@@ -187,7 +187,6 @@ theorem two_party_consensus_safety :
   by auto
 
 (* Definition 3.4 *)
-(* NOTE: We can use \<And> to make it closer to the paper? *)
 definition state_properties_are_inconsistent :: "params \<Rightarrow> state_property set \<Rightarrow> bool"
   where
     "state_properties_are_inconsistent params p_set = (\<forall> \<sigma>. \<sigma> \<in> \<Sigma> params \<and> \<not> (\<forall> p. p \<in> p_set \<and> p \<sigma>))"
