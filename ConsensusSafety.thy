@@ -70,25 +70,27 @@ fun justification :: "message \<Rightarrow> state"
     "justification (Message (_, _, s)) = set s"
 
 (* Definition 2.7 *)
-definition is_valid :: "params \<Rightarrow> message \<Rightarrow> bool"
+definition is_valid_message :: "params \<Rightarrow> message \<Rightarrow> bool"
   where
-    "is_valid params m = (est m \<in> \<epsilon> params (W params) (justification m))"
+    "is_valid_message params m = (est m \<in> \<epsilon> params (W params) (justification m))"
 
-(* NOTE: Currently we assume all state type variables are valid in all the 
-definitions and use `is_valid_state` for all occurrences of state type in lemmas and theorems. *)
 definition is_valid_state :: "params \<Rightarrow> state \<Rightarrow> bool"
   where
-    "is_valid_state params \<sigma> = (\<forall> m \<in> \<sigma>. is_valid params m)"
+    "is_valid_state params \<sigma> = (\<forall> m \<in> \<sigma>. is_valid_message params m)"
+
+fun \<Sigma> :: "params \<Rightarrow> state set"
+  where
+    "\<Sigma> params = {\<sigma>. is_valid_state params \<sigma>}"
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
-    "is_future_state(\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
+    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
 
 (* Definition 2.9 *)
 fun equivocation :: "(message * message) \<Rightarrow> bool"
   where
-    "equivocation(m1, m2) =
+    "equivocation (m1, m2) =
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
@@ -107,37 +109,40 @@ definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> b
   where 
     "is_faults_lt_threshold params \<sigma> = (equivocation_fault_weight params \<sigma> < t params)"
 
+fun \<Sigma>t :: "params \<Rightarrow> state set"
+  where
+    "\<Sigma>t params = {\<sigma>. is_valid_state params \<sigma> \<and> is_faults_lt_threshold params \<sigma>}"
+
 
 (* Section 3: Safety Proof *)
 (* Section 3.1: Guaranteeing Common Futures *)
 
 (* Definition 3.1 *)
-definition futures :: "params \<Rightarrow> state \<Rightarrow> state set"
+fun futures :: "params \<Rightarrow> state \<Rightarrow> state set"
   where
     "futures params \<sigma> = {\<sigma>'. is_faults_lt_threshold params \<sigma>' \<and> is_future_state (\<sigma>', \<sigma>)}"
 
 (* Lemma 1 *)
 lemma monotonic_futures :
-  "\<forall> params \<sigma>' \<sigma>. is_faults_lt_threshold params \<sigma>' \<and> is_faults_lt_threshold params \<sigma>
-   \<and> is_valid_state params \<sigma>' \<and> is_valid_state params \<sigma>
+  "\<forall> params \<sigma>' \<sigma>. \<sigma>' \<sigma> \<in> \<Sigma>t params
    \<Longrightarrow> (\<sigma>' \<in> futures params \<sigma> \<longleftrightarrow> futures params \<sigma>' \<subseteq> futures params \<sigma>)"
-   using futures_def by auto
+  by fastforce
 
 notation Set.empty ("\<emptyset> ")
 
 (* Theorem 1 *)
 theorem two_party_common_futures :
-  "\<forall> params \<sigma>1 \<sigma>2. is_faults_lt_threshold params \<sigma>1 \<and> is_faults_lt_threshold params \<sigma>2
-   \<and> is_valid_state params \<sigma>1 \<and> is_valid_state params \<sigma>2
+  "\<forall> params \<sigma>1 \<sigma>2. \<sigma>1 \<sigma>2 \<in> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<sigma>1 \<union> \<sigma>2)
   \<Longrightarrow> futures params \<sigma>1 \<inter> futures params \<sigma>2 \<noteq> \<emptyset>"
-  using futures_def  by auto
+  by auto
 
 (* Theorem 2 *)
 theorem n_party_common_futures :
-  "\<forall> params \<sigma>_set. \<forall> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> is_faults_lt_threshold params \<sigma> \<and> is_valid_state params s
+  "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
   \<Longrightarrow> futures params \<sigma>1 \<inter> futures params \<sigma>2 \<noteq> \<emptyset>"
+  apply (simp add: is_faults_lt_threshold_def)
   by blast
 
 
@@ -147,6 +152,10 @@ theorem n_party_common_futures :
 (* Definition 3.2  *)
 type_synonym state_property = "state \<Rightarrow> bool"
 
+fun state_property_not :: "state_property \<Rightarrow> state_property"
+  where
+    "state_property_not p = (\<lambda>\<sigma>. (\<not> p \<sigma>))"
+
 (* Definition 3.3  *)
 fun state_property_is_decided :: "params \<Rightarrow> (state_property * state) \<Rightarrow> bool"
   where
@@ -154,26 +163,25 @@ fun state_property_is_decided :: "params \<Rightarrow> (state_property * state) 
 
 (* Lemma 2 *)
 lemma forward_consistency :
-  "\<forall> params \<sigma>' \<sigma>. is_faults_lt_threshold params \<sigma>' \<and> is_faults_lt_threshold params \<sigma>
-   \<and> is_valid_state params \<sigma>' \<and> is_valid_state params \<sigma> \<and> (\<forall> \<sigma>'. \<sigma>' \<in> futures params \<sigma>) 
+  "\<forall> params \<sigma>' \<sigma>. \<sigma>' \<sigma> \<in> \<Sigma>t params
+  \<Longrightarrow> \<sigma>' \<in> futures params \<sigma> 
   \<Longrightarrow> state_property_is_decided params (p, \<sigma>)
   \<Longrightarrow> state_property_is_decided params (p, \<sigma>')"
-  by auto
+  apply simp
+  by (metis W.simps equivocation_fault_weight_def is_faults_lt_threshold_def less_irrefl t.simps) 
 
 (* Lemma 3 *)
 lemma backword_consistency :
-  "\<forall> params \<sigma>' \<sigma>. is_faults_lt_threshold params \<sigma>' \<and> is_faults_lt_threshold params \<sigma>
-   \<and> is_valid_state params \<sigma>' \<and> is_valid_state params \<sigma> \<and> (\<forall> \<sigma>'. \<sigma>' \<in> futures params \<sigma>)
+  "\<forall> params \<sigma>' \<sigma>. \<sigma>' \<sigma> \<in> \<Sigma>t params
   \<Longrightarrow> state_property_is_decided params (p, \<sigma>')
-  \<Longrightarrow> \<not>state_property_is_decided params (\<lambda>\<sigma>''. (\<not> p \<sigma>''), \<sigma>)"
+  \<Longrightarrow> \<not>state_property_is_decided params (state_property_not p, \<sigma>)"
   by auto
   
 (* Theorem 3 *)
 theorem two_party_consensus_safety :
-  "\<forall> params \<sigma>1 \<sigma>2. is_faults_lt_threshold params \<sigma>1 \<and> is_faults_lt_threshold params \<sigma>2
-   \<and> is_valid_state params \<sigma>1 \<and> is_valid_state params \<sigma>2
+  "\<forall> params \<sigma>1 \<sigma>2. \<sigma>1 \<sigma>2 \<in> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<sigma>1 \<union> \<sigma>2)
-  \<Longrightarrow> \<not>(state_property_is_decided params (p, \<sigma>1) \<and> state_property_is_decided params (\<lambda>\<sigma>. (\<not> p \<sigma>), \<sigma>2))"
+  \<Longrightarrow> \<not>(state_property_is_decided params (p, \<sigma>1) \<and> state_property_is_decided params (state_property_not p, \<sigma>2))"
   by auto
 
 (* Definition 3.4 *)
@@ -195,10 +203,11 @@ definition state_property_decisions :: "params \<Rightarrow> state \<Rightarrow>
 (* Theorem 4 *)
 (* NOTE: We can use \<Union> to make it closer to the paper? *)
 theorem n_party_safety_for_state_properties :
-  "\<forall> params \<sigma>_set \<sigma>. \<sigma> \<in> \<sigma>_set \<and> is_faults_lt_threshold params \<sigma> \<and> is_valid_state params \<sigma>
+  "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
   \<Longrightarrow> state_properties_are_consistent params {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> state_property_decisions params \<sigma>}" 
-  by blast
+  apply simp
+  by (smt Collect_mono_iff W.simps equivocation_fault_weight_def is_faults_lt_threshold_def t.simps)
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
 (* Definition 3.7 *)
@@ -233,9 +242,10 @@ definition consensus_value_property_decisions :: "params \<Rightarrow> state \<R
 
 (* Theorem 5 *)
 theorem n_party_safety_for_consensus_value_properties :
-  "\<forall> params \<sigma>_set. \<forall> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> is_faults_lt_threshold params \<sigma> \<and> is_valid_state params \<sigma>
+  "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<Longrightarrow> is_faults_lt_threshold params (\<Union> \<sigma>_set)
   \<Longrightarrow> consensus_value_properties_are_consistent {p. \<exists> \<sigma>. \<sigma> \<in> \<sigma>_set \<and> p \<in> consensus_value_property_decisions params \<sigma>}"
-  by blast
+  apply simp
+  using n_party_safety_for_state_properties state_properties_are_consistent_def by force
 
 end

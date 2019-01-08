@@ -30,7 +30,7 @@ fun latest_messages :: "(state * validator) \<Rightarrow> message set"
 (* Definition 7.5 *)
 fun latest_messages_from_honest_validators :: "(state *validator) \<Rightarrow> message set"
   where
-    "latest_messages_from_honest_validators(\<sigma>, v) = 
+    "latest_messages_from_honest_validators (\<sigma>, v) = 
       (if v \<in> equivocating_validators \<sigma> then \<emptyset> else latest_messages (\<sigma>, v))"
 
 (* Definition 7.6 *)
@@ -86,6 +86,12 @@ fun later_disagreeing_validators :: "(consensus_value_property * message * valid
 
 (* Section 7.2: Validator Cliques *)
 
+(* Definition: 7.16 *)
+(* NOTE: Clique with 1 layers *)
+fun is_cliquie :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
+ where
+   "is_clique (v_set, p, \<sigma>) = (\<forall> v. v \<in> v_set \<and> (v_set \<subseteq> agreeing_validators (p, latest_justifications_from_honest_validators (\<sigma>, v)))
+     \<and> (\<forall> v'. v' \<in> v_set \<and> later_disagreeing_validators (p, latest_messages_from_honest_validators (latest_justifications_from_honest_validators (\<sigma>, v), v'), \<sigma>) = \<emptyset>))"
 
 
 end
