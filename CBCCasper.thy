@@ -125,6 +125,11 @@ lemma estimates_are_valid:
   using is_valid_params_def is_valid_estimator_def
   by blast
 
+lemma \<Sigma>_is_non_empty :
+  "\<forall> params. is_valid_params params
+  \<longrightarrow> is_non_empty (\<Sigma> params)"
+  using is_non_empty_def is_valid_state_def by auto
+
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where

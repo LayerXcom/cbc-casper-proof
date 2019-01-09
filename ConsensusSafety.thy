@@ -108,68 +108,48 @@ fun consensus_value_properties_are_consistent :: "params \<Rightarrow> consensus
   where
     "consensus_value_properties_are_consistent params q_set = (\<exists> c \<in> C params. \<forall> q \<in> q_set. q c)"
 
-
-lemma extend_state_properties_are_consistent_def :
+(* Lemma 4 *)
+lemma proof_line_86 :
   "\<forall> params q_set. is_valid_params params
     \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
-  apply simp
-  done
-
-(* 
-lemma extract_without_lambda :
-  "\<forall> params p_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. p \<sigma>' | p. p \<in> p_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> p_set. p \<sigma>)"
   by simp
-
-lemma extract_lambda :
-  "\<forall> params p_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. p \<sigma>' | p. p \<in> p_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> p_set. (\<lambda>\<sigma>'. p \<sigma>') \<sigma>)"
-  by simp
-
-lemma extract_lambda_abstract :
-  "\<forall> params q_set pg. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. pg params q | q. q \<in> q_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. pg params q') \<sigma>)"
-  by fastforce
- *)
 
 lemma proof_line_87 :
-  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
+  "\<forall> params q_set. is_valid_params params
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
   by fastforce  
 
 lemma proof_line_88 :
-  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q' c)"
+  "\<forall> params q_set. is_valid_params params
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q' c)"
   by blast
 
 lemma proof_line_89 :
-  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
+  "\<forall> params q_set. is_valid_params params
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c)
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
   by blast
 
-
-lemma forall_to_exists :
-  "\<forall> A B.  \<exists> s. \<forall> a \<in> A. \<forall> b \<in> B. P \<longrightarrow> (\<exists> s. \<exists> a \<in> A. \<forall> b \<in> B. P)"
-  by auto
-
-(* 
-lemma forall_to_exists_plus :
-  "\<forall> A B S.  \<exists> s \<in> S. \<forall> a \<in> A. \<forall> b \<in> B. P \<longrightarrow> (\<exists> s \<in> S. \<exists> a \<in> A. \<forall> b \<in> B. P)"
-  sledgehammer
-
-
 lemma proof_line_90 :
-  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
-  apply simp
-  sledgehammer
- 
+  "\<forall> params q_set. is_valid_params params 
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
+  by (meson is_non_empty_def is_valid_estimator_def is_valid_params_def)
 
-lemma proof_line_87_to_89 :
-  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
-  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
-  by (smt proof_line_87)
-
+lemma proof_line_91 :
+  "\<forall> params q_set. is_valid_params params 
+  \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+  \<longrightarrow> (\<exists> c \<in> C params. \<forall> q' \<in> q_set. q' c)"
+  using estimates_are_valid by auto
 
 lemma naturally_corresponding_consistency :
-  "\<forall> params q_set. state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
-    \<longrightarrow> consensus_value_properties_are_consistent params q_set"
-  apply (simp add: proof_line_87_to_89) 
-  
+  "\<forall> params q_set. is_valid_params params
+  \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
+  \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+  using proof_line_87 proof_line_89 proof_line_90 proof_line_91 by auto  
 
 (* Definition 3.10 *)
 fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_value_property * state) \<Rightarrow> bool"
@@ -187,6 +167,6 @@ theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
   \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
- *)
+
 
 end
