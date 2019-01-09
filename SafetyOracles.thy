@@ -1,6 +1,6 @@
 theory SafetyOracles
 
-imports Main ConsensusSafety
+imports Main CBCCasper
 
 begin
 
@@ -56,7 +56,7 @@ fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> 
     "disagreeing_validators (p, \<sigma>) = {v. \<exists> c. c \<in> latest_estimates_from_honest_validators (\<sigma>, v) \<and> \<not> p c}"
 
 (* Definition 7.10 *)
-definition weight_measure :: "params \<Rightarrow> validator set \<Rightarrow> int"
+definition weight_measure :: "params \<Rightarrow> validator set \<Rightarrow> real"
   where
     "weight_measure params v_set = sum (W params) v_set"
 

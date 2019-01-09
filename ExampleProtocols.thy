@@ -1,6 +1,6 @@
 theory ExampleProtocols
 
-imports Main ConsensusSafety
+imports Main CBCCasper
 
 begin
 
