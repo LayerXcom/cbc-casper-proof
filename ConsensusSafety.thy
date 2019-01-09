@@ -161,12 +161,12 @@ fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_valu
 definition consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
   where
     "consensus_value_property_decisions params \<sigma> = {q. consensus_value_property_is_decided params (q, \<sigma>)}"
-
+(* 
 (* Theorem 5 *)
 theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
   \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-
+ *)
 
 end

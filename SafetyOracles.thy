@@ -1,6 +1,6 @@
 theory SafetyOracles
 
-imports Main CBCCasper
+imports Main CBCCasper ConsensusSafety
 
 begin
 
