@@ -158,15 +158,49 @@ fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_valu
       = state_property_is_decided params (naturally_corresponding_state_property params q, \<sigma>)"
 
 (* Definition 3.11 *)
-definition consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
+fun consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
   where
     "consensus_value_property_decisions params \<sigma> = {q. consensus_value_property_is_decided params (q, \<sigma>)}"
-(* 
+
 (* Theorem 5 *)
+lemma proof_line_96 :
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
+  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
+  \<longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+  by auto
+
+lemma proof_line_97 :
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
+  \<longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})
+  \<longrightarrow> state_properties_are_consistent params {p. \<exists> q. p \<in> (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property params q}"
+  by (smt mem_Collect_eq state_properties_are_consistent.simps)
+
+lemma proof_line_98 :
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
+  \<longrightarrow> state_properties_are_consistent params {p. \<exists> q. p \<in> (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property params q}
+  \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
+  by (smt Collect_cong)
+
+lemma proof_line_98_plus :
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
+  \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}
+  \<longrightarrow> consensus_value_properties_are_consistent params {q. q \<in> {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}"
+  apply (simp add: naturally_corresponding_consistency)
+  (* TODO  *)
+(* 
+lemma proof_line_99 :
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
+  \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}
+  \<longrightarrow> consensus_value_properties_are_consistent params {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
+  apply (simp add: naturally_corresponding_consistency)
+  sledgehammer
+
+
 theorem n_party_safety_for_consensus_value_properties :
-  "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
+  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
   \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
- *)
+  apply (simp add: n_party_safety_for_state_properties)
 
+ *)
 end
