@@ -220,44 +220,76 @@ type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 (* Definition 3.8 *)
 fun naturally_corresponding_state_property :: "params \<Rightarrow> consensus_value_property \<Rightarrow> state_property"
   where 
-    "naturally_corresponding_state_property params p = (\<lambda>\<sigma>. \<forall> c \<in> \<epsilon> params \<sigma>. p c)"
+    "naturally_corresponding_state_property params q = (\<lambda>\<sigma>. \<forall> c \<in> \<epsilon> params \<sigma>. q c)"
 
 (* Definition 3.9 *)
 fun consensus_value_properties_are_consistent :: "params \<Rightarrow> consensus_value_property set \<Rightarrow> bool"
   where
-    "consensus_value_properties_are_consistent params p_set = (\<exists> c \<in> C params. \<forall> p \<in> p_set. p c)"
-
-(* Lemma 4 *)
-lemma state_properties_are_consistent_at_common_future :
-  "\<forall> params p_set. \<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {naturally_corresponding_state_property params p | p. p \<in> p_set}. p \<sigma>
-  \<longrightarrow> \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> p \<in> p_set.p c"
+    "consensus_value_properties_are_consistent params q_set = (\<exists> c \<in> C params. \<forall> q \<in> q_set. q c)"
 
 
-lemma naturally_corresponding_consistency :
-  "\<forall> params p_set. state_properties_are_consistent params {naturally_corresponding_state_property params p | p. p \<in> p_set}
-    \<longrightarrow> consensus_value_properties_are_consistent params p_set"
+lemma estimates_are_valid:
+  "\<forall> params c. c \<in> \<epsilon> params \<sigma> \<longrightarrow> c \<in> C params"
+  by (metis C.simps IntE \<epsilon>.elims)  
+
+lemma extend_state_properties_are_consistent_def :
+  "\<forall> params q_set. state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
   apply simp
-  sledgehammer
+  done
+
+(*  
+lemma extract_without_lambda :
+  "\<forall> params p_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. p \<sigma>' | p. p \<in> p_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> p_set. p \<sigma>)"
+  by simp
+
+lemma extract_lambda :
+  "\<forall> params p_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. p \<sigma>' | p. p \<in> p_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> p_set. (\<lambda>\<sigma>'. p \<sigma>') \<sigma>)"
+  by simp
+
+lemma extract_lambda_with_exists :
+  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<exists> c \<in> \<epsilon> params \<sigma>'. q \<sigma>' | q. q \<in> q_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<exists> c \<in> \<epsilon> params \<sigma>'. q \<sigma>') \<sigma>)"
+  apply simp
+
+
+lemma extract_lambda_with_forall :
+  "\<forall> params q_set. (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>) \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)"
+  apply simp  
+
+lemma tmp1 :
+  "\<forall> params q_set. \<exists> \<sigma> \<in> \<Sigma> params. 
+    (\<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>
+    \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c))"
+  apply simp
+
+lemma tmp2 :
+  "\<forall> params q_set. \<exists> \<sigma> \<in> \<Sigma> params. 
+    (\<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>
+    \<longrightarrow> (\<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c))"
+  apply simp
+
+ *)
+lemma naturally_corresponding_consistency :
+  "\<forall> params q_set. state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
+    \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+  apply auto
 
 
 (* Definition 3.10 *)
 fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_value_property * state) \<Rightarrow> bool"
   where
-    "consensus_value_property_is_decided params (p, \<sigma>)
-      = state_property_is_decided params (naturally_corresponding_state_property params p, \<sigma>)"
+    "consensus_value_property_is_decided params (q, \<sigma>)
+      = state_property_is_decided params (naturally_corresponding_state_property params q, \<sigma>)"
 
 (* Definition 3.11 *)
 definition consensus_value_property_decisions :: "params \<Rightarrow> state \<Rightarrow> consensus_value_property set"
   where
-    "consensus_value_property_decisions params \<sigma> = {p. consensus_value_property_is_decided params (p, \<sigma>)}"
+    "consensus_value_property_decisions params \<sigma> = {q. consensus_value_property_is_decided params (q, \<sigma>)}"
 
 (* Theorem 5 *)
 theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t params
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
   \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-  apply simp
-  using n_party_safety_for_state_properties
-  
 
 end
