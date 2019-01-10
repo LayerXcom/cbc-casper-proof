@@ -50,10 +50,6 @@ definition latest_estimates :: "state \<Rightarrow> validator \<Rightarrow> cons
 
 (* Lemma 5: Non-equivocating validators have at most one latest message *)
 lemma non_equivocating_validators_have_at_most_one_latest_message:
-  (* "\<forall> params v. v \<in> V params \<and> v \<notin> equivocating_validators s \<Longrightarrow> card (latest_message s v) \<le> 1" *)
-  (* prove the contrapositive *)
-  "\<forall> params v. v \<in> V params \<and> card (latest_message s v) > 1 \<Longrightarrow> v \<in> equivocating_validators s"
-  apply(simp add: equivocating_validators_def latest_message_def)
-  (* TODO *)
-  sorry
+  "\<forall> params v. v \<in> V params \<and> v \<notin> equivocating_validators s \<Longrightarrow> card (latest_message s v) \<le> 1"
+  using V.simps by blast
 end
