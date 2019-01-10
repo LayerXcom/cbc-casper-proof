@@ -203,4 +203,5 @@ theorem n_party_safety_for_consensus_value_properties :
   apply (simp add: n_party_safety_for_state_properties)
 
  *)
+  sorry
 end
