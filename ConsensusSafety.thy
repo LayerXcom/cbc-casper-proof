@@ -119,7 +119,7 @@ lemma proof_line_87 :
   "\<forall> params q_set. is_valid_params params
   \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
   \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
-  by fastforce  
+  by (metis (mono_tags, lifting) mem_Collect_eq)
 
 lemma proof_line_88 :
   "\<forall> params q_set. is_valid_params params
@@ -137,19 +137,19 @@ lemma proof_line_90 :
   "\<forall> params q_set. is_valid_params params 
   \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
   \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
-  by (meson is_non_empty_def is_valid_estimator_def is_valid_params_def)
+  by (meson equals0I estimates_are_non_empty)
 
 lemma proof_line_91 :
   "\<forall> params q_set. is_valid_params params 
   \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
   \<longrightarrow> (\<exists> c \<in> C params. \<forall> q' \<in> q_set. q' c)"
-  using estimates_are_valid by auto
+  using estimate_is_valid by auto
 
 lemma naturally_corresponding_consistency :
   "\<forall> params q_set. is_valid_params params
   \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
   \<longrightarrow> consensus_value_properties_are_consistent params q_set"
-  using proof_line_87 proof_line_89 proof_line_90 proof_line_91 by auto  
+  using proof_line_87 proof_line_89 proof_line_90 proof_line_91 by auto 
 
 (* Definition 3.10 *)
 fun consensus_value_property_is_decided :: "params \<Rightarrow> (consensus_value_property * state) \<Rightarrow> bool"
@@ -187,6 +187,8 @@ lemma proof_line_98_plus :
   \<longrightarrow> consensus_value_properties_are_consistent params {q. q \<in> {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}"
   apply (simp add: naturally_corresponding_consistency)
   (* TODO  *)
+  oops
+
 (* 
 lemma proof_line_99 :
   "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
@@ -203,5 +205,5 @@ theorem n_party_safety_for_consensus_value_properties :
   apply (simp add: n_party_safety_for_state_properties)
 
  *)
-  sorry
+
 end
