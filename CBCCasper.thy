@@ -9,10 +9,6 @@ begin
 
 notation Set.empty ("\<emptyset>")
 
-definition is_non_empty :: "'a set \<Rightarrow> bool"
-  where
-    "is_non_empty bs = ( \<exists> b. b \<in> bs )"
-
 (* Definition 2.1 ~ 2.5 *)
 datatype validator = Validator int
 
@@ -74,26 +70,26 @@ fun justification :: "message \<Rightarrow> state"
     "justification (Message (_, _, s)) = set s"
 
 (* Definition 2.7 *)
-definition is_valid_message :: "params \<Rightarrow> message \<Rightarrow> bool"
-  where
-    "is_valid_message params m = (est m \<in> \<epsilon> params (justification m))"
+fun 
+  \<Sigma>_i :: "params \<Rightarrow> nat \<Rightarrow> state set" and
+  M_i :: "params \<Rightarrow> nat \<Rightarrow> message set"
+  where 
+    "\<Sigma>_i params 0 = {\<emptyset>}"
+  | "\<Sigma>_i params n = {\<sigma> \<in> Pow (M_i params (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  | "M_i params n = {m. est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> (\<Sigma>_i params n) \<and> est m \<in> \<epsilon> params (justification m)}" 
 
 fun M :: "params \<Rightarrow> message set"
   where
-    "M params = {m. is_valid_message params m}"
-
-definition is_valid_state :: "params \<Rightarrow> state \<Rightarrow> bool"
-  where
-    "is_valid_state params \<sigma> = (\<forall> m \<in> \<sigma>. is_valid_message params m)"
+    "M params =  \<Union> (M_i params `\<nat>)"
 
 fun \<Sigma> :: "params \<Rightarrow> state set"
   where
-    "\<Sigma> params = {\<sigma>. is_valid_state params \<sigma>}"
+    "\<Sigma> params = \<Union> (\<Sigma>_i params `\<nat>)"
 
 (* Definition 2.1 ~ 2.5 *)
 definition is_valid_validators :: "params \<Rightarrow> bool"
   where
-     "is_valid_validators params = (is_non_empty (V params))"
+     "is_valid_validators params = (V params \<noteq> \<emptyset>)"
 
 definition is_valid_weight :: "params \<Rightarrow> bool"
   where
@@ -109,7 +105,7 @@ definition is_valid_consensus_values :: "params \<Rightarrow> bool"
 
 definition is_valid_estimator :: "params \<Rightarrow> bool"
   where
-    "is_valid_estimator params = (\<forall> \<sigma> \<in> \<Sigma> params. is_non_empty (\<epsilon> params \<sigma>) \<and> \<epsilon> params \<sigma> \<subseteq> C params)"
+    "is_valid_estimator params = (\<forall> \<sigma> \<in> \<Sigma> params. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
 
 definition is_valid_params :: "params \<Rightarrow> bool"
   where
@@ -120,15 +116,28 @@ definition is_valid_params :: "params \<Rightarrow> bool"
       \<and> is_valid_consensus_values params
       \<and> is_valid_estimator params)"
 
-lemma estimates_are_valid:
-  "\<forall> params \<sigma> c. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params \<and> c \<in> \<epsilon> params \<sigma> \<longrightarrow> c \<in> C params"
+lemma estimate_is_valid:
+  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
+  \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. c \<in> C params)"
+  using is_valid_params_def is_valid_estimator_def
+  by blast
+
+lemma estimates_are_non_empty:
+  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
+  \<longrightarrow> \<epsilon> params \<sigma> \<noteq> \<emptyset>"
   using is_valid_params_def is_valid_estimator_def
   by blast
 
 lemma \<Sigma>_is_non_empty :
   "\<forall> params. is_valid_params params
-  \<longrightarrow> is_non_empty (\<Sigma> params)"
-  using is_non_empty_def is_valid_state_def by auto
+  \<longrightarrow> \<Sigma> params \<noteq> \<emptyset>"
+  oops
+
+(* NOTE: Issue #32 *)
+lemma \<Sigma>_is_infinite :
+  "\<forall> params. is_valid_params params 
+  \<longrightarrow> infinite (\<Sigma> params)"
+  oops
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
@@ -159,7 +168,7 @@ definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> b
 
 fun \<Sigma>t :: "params \<Rightarrow> state set"
   where
-    "\<Sigma>t params = {\<sigma>. is_valid_state params \<sigma> \<and> is_faults_lt_threshold params \<sigma>}"
+    "\<Sigma>t params = {\<sigma> \<in> \<Sigma> params. is_faults_lt_threshold params \<sigma>}"
 
 
 end
