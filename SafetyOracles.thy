@@ -101,29 +101,25 @@ fun is_clique :: "(validator set * consensus_value_property * state) \<Rightarro
 fun minimal_transitions :: "params \<Rightarrow> (state * state) set"
   where
     "minimal_transitions params = {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params \<and> is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'
-      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma>'' \<noteq> \<sigma> \<and> \<sigma>'' \<noteq> \<sigma>')}"
+      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
 
-
-lemma "single_element" :
-  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longleftrightarrow> is_singleton (B - A)"
-(* 
+lemma "set_difference_and_singleton" :
+  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longleftrightarrow> is_singleton (B - A)" 
 proof -
   have right :
     "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longrightarrow> is_singleton (B - A)"    
-    by (smt DiffD2 Diff_cancel Diff_empty Diff_subset double_diff insert_Diff_if insert_subset is_singletonI' is_singleton_def subsetCE)
+    apply simp
+    by (smt DiffE empty_iff insertCI insertE insert_Diff_if insert_subset is_singletonI' order_refl psubsetI psubset_imp_ex_mem set_diff_eq)
   have left :
     "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> is_singleton (B - A) \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C)"
     by (smt Diff_cancel Diff_eq_empty_iff Diff_insert0 double_diff insert_Diff is_singleton_def)
-    from left right show ?thesis
-    by auto
+  moreover show ?thesis
+    using right left by metis
 qed
- *)
-  sorry
 
 lemma minimal_transition_corresponds_to_recieving_a_single_message :
   "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
   \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longleftrightarrow> is_singleton (\<sigma>' - \<sigma>)"
-  (* TODO *)
   oops
 
 (* Lemma 11: Minimal transitions do not change Later From for any non-sender *)
