@@ -78,11 +78,11 @@ fun
   | "\<Sigma>_i params n = {\<sigma> \<in> Pow (M_i params (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
   | "M_i params n = {m. est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> (\<Sigma>_i params n) \<and> est m \<in> \<epsilon> params (justification m)}" 
 
-fun M :: "params \<Rightarrow> message set"
+definition M :: "params \<Rightarrow> message set"
   where
     "M params =  \<Union> (M_i params `\<nat>)"
 
-fun \<Sigma> :: "params \<Rightarrow> state set"
+definition \<Sigma> :: "params \<Rightarrow> state set"
   where
     "\<Sigma> params = \<Union> (\<Sigma>_i params `\<nat>)"
 
