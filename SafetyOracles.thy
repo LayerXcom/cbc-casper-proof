@@ -103,72 +103,57 @@ fun minimal_transitions :: "params \<Rightarrow> (state * state) set"
     "minimal_transitions params = {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
       \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
 
-(* Temporary lemmas for minimal_transition_implies_recieving_a_single_message *)
-lemma no_intermidiate_implies_difference_is_singleton :
-  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longrightarrow> is_singleton (B - A)"    
-  apply simp
-  by (smt DiffD1 DiffD2 Diff_eq_empty_iff Diff_insert_absorb Diff_subset double_diff insert_subset is_singleton_def psubsetI psubset_imp_ex_mem)
-
-lemma difference_is_singleton_implies_no_intermidiate :
-  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> is_singleton (B - A) \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C)"
-  by (smt Diff_cancel Diff_eq_empty_iff Diff_insert0 double_diff insert_Diff is_singleton_def)
-
-lemma "set_difference_and_singleton" :
-  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longleftrightarrow> is_singleton (B - A)"
-  using no_intermidiate_implies_difference_is_singleton difference_is_singleton_implies_no_intermidiate by metis
-
-lemma no_intermidiate_implies_difference_is_singleton_with_set :
-  "\<forall> \<sigma> \<sigma>' M. \<sigma> \<in> Pow M \<and> \<sigma>' \<in> Pow M 
-  \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>' 
-  \<longrightarrow> (\<nexists> \<sigma>''. \<sigma>'' \<in> Pow M \<and> \<sigma> \<subseteq> \<sigma>'' \<and> \<sigma>'' \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>''\<noteq> \<sigma>')
-  \<longrightarrow> is_singleton {m. m \<in> M \<inter> \<sigma>'- \<sigma>}"
-  by (metis Collect_mem_eq Int_absorb2  Pow_iff inf_commute no_intermidiate_implies_difference_is_singleton subset_trans)
+lemma state_is_subset_of_M :
+  "\<forall> params. is_valid_params params
+  \<longrightarrow> (\<forall> \<sigma>. \<sigma> \<in> \<Sigma> params \<and> \<sigma> \<subseteq> M params)"
+  apply (simp add: \<Sigma>_def M_def)
+  sorry
 
 lemma state_difference_is_valid_message :
   "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params \<and> \<sigma>' \<in> \<Sigma> params
   \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
   \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M params"
-  apply (simp add: \<Sigma>_def M_def)
-sorry
+  using state_is_subset_of_M by blast
 
-lemma "A \<subseteq> B \<and> is_singleton {a. a \<in> A \<inter> B} \<longrightarrow> is_singleton A"
-  by (metis Collect_mem_eq inf.orderE)
+(* Lemma for minimal_transition_implies_receiving_a_single_message *)
+lemma no_intermidiate_implies_difference_is_singleton :
+  "\<forall> A B. A \<subseteq> B \<and> A \<noteq> B \<longrightarrow> (\<nexists> C. A \<subseteq> C \<and> C \<subseteq> B \<and> A \<noteq> C \<and> B \<noteq> C) \<longrightarrow> is_singleton (B - A)"
+  apply simp
+  by (smt DiffD1 DiffD2 Diff_eq_empty_iff Diff_insert_absorb Diff_subset double_diff insert_subset is_singleton_def psubsetI psubset_imp_ex_mem)
 
-(* A minimal transition corresponds to recieving a single new message with justification drawn from the initial
+(* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
-lemma minimal_transition_implies_recieving_a_single_message :
+lemma minimal_transition_implies_receiving_a_single_message :
   "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
-  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-proof -
-  have lemma1 :
+  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (M params \<inter> \<sigma>'- \<sigma>)"
+proof (rule ccontr)
+  assume "\<not> (\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
+  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (M params \<inter> \<sigma>'- \<sigma>))"
+  have
     "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
-    \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (M params \<inter> \<sigma>'- \<sigma>)"
-  proof -
-    have minimal_transition_implies_no_intermidiate :
-      "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
-      \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params 
-      \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>' \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> \<sigma> \<subseteq> \<sigma>'' \<and> \<sigma>'' \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>''\<noteq> \<sigma>')"
-      by simp
-    have no_intermidiate_implies_single_message :
-      "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params 
-      \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>' 
-      \<longrightarrow> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> params \<and> \<sigma> \<subseteq> \<sigma>'' \<and> \<sigma>'' \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>''\<noteq> \<sigma>')
-      \<longrightarrow> is_singleton (M params \<inter> \<sigma>'- \<sigma>)"
-      (* TODO  *)
-      sorry
-    moreover show ?thesis
-      sorry  
-  have lemma2 : 
+    \<longrightarrow> \<not> is_singleton (M params \<inter> \<sigma>'- \<sigma>) \<longrightarrow> (M params \<inter> \<sigma>'- \<sigma>) = \<emptyset>
+          \<or> (\<exists> m1 m2. m1 \<in> (M params \<inter> \<sigma>'- \<sigma>) \<and> m2 \<in> (M params \<inter> \<sigma>'- \<sigma>) \<and> m1 \<noteq> m2)"
+    by (meson is_singletonI')
+  moreover have
     "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
-    \<longrightarrow> is_singleton {m \<in> M params \<inter> \<sigma>'- \<sigma>} \<longrightarrow> is_singleton (\<sigma>' - \<sigma>)"
-    using state_difference_is_valid_message
-  oops
+    \<longrightarrow> (M params \<inter> \<sigma>'- \<sigma>) = \<emptyset> \<and> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> False"
+    by (simp add: Int_absorb2 inf_commute state_is_subset_of_M)
+  moreover have
+    "\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
+    \<longrightarrow> (\<exists> m1 m2. m1 \<in> (M params \<inter> \<sigma>'- \<sigma>) \<and> m2 \<in> (M params \<inter> \<sigma>'- \<sigma>) \<and> m1 \<noteq> m2) \<and> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> False"
+    by (smt Int_absorb2 \<open>\<not> (\<forall> params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params
+  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (M params \<inter> \<sigma>'- \<sigma>))\<close> inf.idem inf_commute is_future_state.simps mem_Collect_eq minimal_transitions.simps no_intermidiate_implies_difference_is_singleton prod.inject state_is_subset_of_M)  
+  ultimately show False
+    by (meson \<open>\<not> (\<forall>params \<sigma> \<sigma>'. is_valid_params params \<and> \<sigma> \<in> \<Sigma>t params \<and> \<sigma>' \<in> \<Sigma>t params \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions params \<longrightarrow> is_singleton (M params \<inter> \<sigma>' - \<sigma>))\<close>)
+qed
+
+
 
 (* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
 lemma later_from_not_affected_by_minimal_transitions :
   "\<forall> params \<sigma> \<sigma>' m. is_valid_params params \<and> (\<sigma>, \<sigma>') \<in> minimal_transitions params
-  \<longrightarrow> m = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> (\<forall> v \<in> V params - {sender m}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
+  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
+  \<longrightarrow> (\<forall> v \<in> V params - {sender m'}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
   oops
 
 (* Definition 7.18: One layer clique oracle threshold size *) 
