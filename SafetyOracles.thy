@@ -171,4 +171,9 @@ lemma later_from_not_affected_by_minimal_transitions :
   \<longrightarrow> (\<forall> v \<in> V params - {sender m}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
   oops
 
+(* Definition 7.18: One layer clique oracle threshold size *) 
+fun gt_threshold :: "params \<Rightarrow> (validator set * state) \<Rightarrow> bool"
+  where
+    "gt_threshold params (v_set, \<sigma>) = (weight_measure params v_set > (weight_measure params v_set) div 2 + t params - weight_measure params (equivocating_validators \<sigma>))"
+
 end
