@@ -174,6 +174,13 @@ lemma later_from_not_affected_by_minimal_transitions :
 (* Definition 7.18: One layer clique oracle threshold size *) 
 fun gt_threshold :: "params \<Rightarrow> (validator set * state) \<Rightarrow> bool"
   where
-    "gt_threshold params (v_set, \<sigma>) = (weight_measure params v_set > (weight_measure params v_set) div 2 + t params - weight_measure params (equivocating_validators \<sigma>))"
+    "gt_threshold params (v_set, \<sigma>)
+       = (weight_measure params v_set > (weight_measure params v_set) div 2 + t params - weight_measure params (equivocating_validators \<sigma>))"
+
+(* Definition 7.19: Clique oracle with 1 layers *)
+fun is_clique_oracle :: "params \<Rightarrow> (validator set * state * consensus_value_property) \<Rightarrow> bool"
+  where
+    "is_clique_oracle params (v_set, \<sigma>, p)
+       = (is_clique (v_set - (equivocating_validators \<sigma>), p, \<sigma>) \<and> gt_threshold params (v_set - (equivocating_validators \<sigma>), \<sigma>))"
 
 end
