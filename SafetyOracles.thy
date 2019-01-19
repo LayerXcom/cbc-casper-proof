@@ -129,7 +129,16 @@ proof -
   moreover have
     "\<exists> n \<in> \<nat>. m \<in> M_i params (n - 1)
     \<Longrightarrow> \<exists> n'\<in> \<nat>. m \<in> M_i params n'"
-    sorry
+  proof -
+    assume "\<exists> n \<in> \<nat>. m \<in> M_i params (n - 1)"
+    then obtain n :: nat where "n \<in> \<nat>" "m \<in> M_i params (n - 1)" by auto
+    show ?thesis
+      apply auto
+      using \<open>m \<in> M_i params (n - 1)\<close> apply auto[1]
+      using \<open>m \<in> M_i params (n - 1)\<close> apply auto[1]
+      apply (metis (no_types, lifting) M_i.simps \<open>m \<in> M_i params (n - 1)\<close> id_apply mem_Collect_eq of_nat_eq_id of_nat_in_Nats)
+      using \<open>m \<in> M_i params (n - 1)\<close> by auto
+  qed  
   moreover have
     "\<exists> n \<in> \<nat>. m \<in> M_i params n
     \<Longrightarrow> m \<in> M params"
@@ -154,7 +163,13 @@ lemma state_transition_by_message_receiving :
   "\<forall> params \<sigma> m. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params \<and> m \<in> M params
   \<longrightarrow>  \<sigma> \<union> {m} \<in> \<Sigma> params"
   apply simp
-  sorry
+  sorry 
+
+
+lemma
+  fixes P :: "nat \<Rightarrow> bool"
+  shows "\<exists> n \<in> \<nat>. P (n - 1) \<and> n > 0 \<Longrightarrow> \<exists> n'\<in> \<nat>. P n'"
+  by (metis Nats_cases add_eq_if diff_Suc_1 diff_self_eq_0 gr0_conv_Suc of_nat_0_less_iff of_nat_Suc of_nat_in_Nats zero_neq_one)
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
