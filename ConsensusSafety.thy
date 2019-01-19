@@ -113,39 +113,40 @@ lemma naturally_corresponding_consistency :
   "\<forall> params q_set. is_valid_params params
   \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
   \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+  apply (rule, rule, rule)
 proof -
-  have proof_line_86 :
-  "\<forall> params q_set. is_valid_params params
-    \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
+  fix params q_set
+  assume hyp: "is_valid_params params"
+
+  have 
+    "state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
-  by simp
-  have proof_line_87 :
-    "\<forall> params q_set. is_valid_params params
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
+    by simp
+  moreover have
+    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
     by (metis (mono_tags, lifting) mem_Collect_eq)
-  have proof_line_88 :
-    "\<forall> params q_set. is_valid_params params
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)
+  moreover have
+    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q' c)"
     by blast
-  have proof_line_89 :
-    "\<forall> params q_set. is_valid_params params
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c)
+  moreover have
+    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c)
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
     by blast
-  have proof_line_90 :
-    "\<forall> params q_set. is_valid_params params 
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+  moreover have
+    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
+    using hyp
     by (meson equals0I estimates_are_non_empty)
-  have proof_line_91 :
-    "\<forall> params q_set. is_valid_params params 
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+  moreover have
+    "(\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
     \<longrightarrow> (\<exists> c \<in> C params. \<forall> q' \<in> q_set. q' c)"
-    using estimate_is_valid by auto  
-  moreover show ?thesis
-    using proof_line_87 proof_line_89 proof_line_90 proof_line_91 by auto 
+    using estimate_is_valid hyp by auto  
+  ultimately show
+    "state_properties_are_consistent params {naturally_corresponding_state_property params q |q. q \<in> q_set}
+    \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+    by simp
 qed
 
 (* Definition 3.10 *)
@@ -164,36 +165,37 @@ theorem n_party_safety_for_consensus_value_properties :
   "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
   \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+  apply (rule, rule, rule)
 proof -
-  have proof_line_96 :
-    "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-    \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
+  fix params \<sigma>_set
+  assume hyp: "is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params"
+
+  have
+    "\<Union> \<sigma>_set \<in> \<Sigma>t params
     \<longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     by auto
-  have proof_line_97 :
-    "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-    \<longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})
+  moreover have
+    "state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})
     \<longrightarrow> state_properties_are_consistent params {p. \<exists> q. p \<in> (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property params q}"
     by (smt mem_Collect_eq state_properties_are_consistent.simps)
-  have proof_line_98 :
-    "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-    \<longrightarrow> state_properties_are_consistent params {p. \<exists> q. p \<in> (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property params q}
+  moreover have
+    "state_properties_are_consistent params {p. \<exists> q. p \<in> (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property params q}
     \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
     by (smt Collect_cong)
-  have proof_line_98_plus :
-    "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-    \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}
+  moreover have
+    "state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}
     \<longrightarrow> consensus_value_properties_are_consistent params {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
-    using naturally_corresponding_consistency
+    using naturally_corresponding_consistency hyp
     by blast
-  have proof_line_99 :
-    "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-    \<longrightarrow> consensus_value_properties_are_consistent params {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}
+  moreover have
+    "consensus_value_properties_are_consistent params {q. naturally_corresponding_state_property params q \<in> \<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}
     \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     apply simp
     by (smt mem_Collect_eq)
-  moreover show ?thesis
-    using proof_line_96 proof_line_97 proof_line_98 proof_line_98_plus proof_line_99 by auto
+  ultimately show
+    "\<Union> \<sigma>_set \<in> \<Sigma>t params
+    \<longrightarrow> consensus_value_properties_are_consistent params (\<Union> {consensus_value_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+    by simp
 qed
 
 end
