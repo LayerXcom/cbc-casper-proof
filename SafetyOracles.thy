@@ -159,17 +159,47 @@ lemma state_difference_is_valid_message :
   \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M params"
   using state_is_subset_of_M by blast
 
+lemma "valid_state" :
+  "\<forall> params \<sigma> . is_valid_params params
+  \<longrightarrow> \<sigma> \<in> \<Sigma> params
+  \<longrightarrow> (\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i params (n - 1)) \<and> (\<forall> m \<in> \<sigma>. justification m \<subseteq> \<sigma>))" 
+  apply (simp add: \<Sigma>_def)
+  by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI)
+
+lemma "valid_message" :
+  "\<forall> params m . is_valid_params params
+  \<longrightarrow> m \<in> M params
+  \<longrightarrow> (\<exists> n \<in> \<nat>. m \<in> M_i params (n - 1))"
+  apply (simp add: M_def \<Sigma>_i.elims)
+  by (metis Nats_1 Nats_add One_nat_def diff_Suc_1 plus_1_eq_Suc)
+
+(* FIXME *)
+lemma state_transition_by_valid_message :
+  "\<forall> params \<sigma> m. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params \<and> m \<in> M params
+  \<longrightarrow> justification m \<subseteq> \<sigma> \<union> {m} 
+  \<longrightarrow>  \<sigma> \<union> {m} \<in> \<Sigma> params"
+proof -
+  fix params \<sigma> m
+  assume "is_valid_params params" "\<sigma> \<in> \<Sigma> params" "m \<in> M params"
+  have
+    "\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i params (n - 1))"
+    using \<open>\<sigma> \<in> \<Sigma> params\<close> \<open>is_valid_params params\<close> valid_state by blast
+  moreover have 
+    "\<exists> n \<in> \<nat>. m \<in> M_i params (n - 1)"
+    using \<open>m \<in> M params\<close> \<open>is_valid_params params\<close> valid_message by auto
+  moreover have
+    "\<sigma> \<union> {m} \<subseteq> M params"
+    using Nats_1 \<open>\<sigma> \<in> \<Sigma> params\<close> \<open>is_valid_params params\<close> \<open>m \<in> M params\<close> state_is_subset_of_M by fastforce   
+  ultimately have
+    "\<exists> n \<in> \<nat>. \<sigma> \<union> {m} \<in> Pow (M_i params (n - 1))"
+oops
+
+(* FIXME *)
 lemma state_transition_by_message_receiving :
   "\<forall> params \<sigma> m. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params \<and> m \<in> M params
   \<longrightarrow>  \<sigma> \<union> {m} \<in> \<Sigma> params"
   apply simp
-  sorry 
-
-
-lemma
-  fixes P :: "nat \<Rightarrow> bool"
-  shows "\<exists> n \<in> \<nat>. P (n - 1) \<and> n > 0 \<Longrightarrow> \<exists> n'\<in> \<nat>. P n'"
-  by (metis Nats_cases add_eq_if diff_Suc_1 diff_self_eq_0 gr0_conv_Suc of_nat_0_less_iff of_nat_Suc of_nat_in_Nats zero_neq_one)
+sorry 
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
