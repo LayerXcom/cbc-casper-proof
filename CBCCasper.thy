@@ -24,38 +24,7 @@ datatype message =
 
 type_synonym state = "message set"
 
-type_synonym estimator = "state \<Rightarrow> consensus_value set"
-
-(* NOTE: Estimator is parameterized by weight. *)
-type_synonym estimator_param = "weight \<Rightarrow> estimator"
-
-(* CBC Casper parameters *)
-datatype params = 
-  Params "validator set * weight * threshold * consensus_value set * estimator_param"
-
-fun V :: "params \<Rightarrow> validator set"
-  where
-    "V (Params (v_set, _, _, _, _)) = v_set"
-
-fun W :: "params \<Rightarrow> weight"
-  where
-    "W (Params (_, w, _, _, _)) = w"
-
-fun t :: "params \<Rightarrow> threshold"
-  where
-    "t (Params (_, _, threshold, _, _)) = threshold"
-
-fun C :: "params \<Rightarrow> consensus_value set"
-  where
-    "C (Params (_, _, _, c_set, _)) = c_set"
-
-fun \<epsilon> :: "params \<Rightarrow> estimator"
-  where
-    "\<epsilon> (Params (_, w, _, _, e)) = e w"
-
-
 (* Section 2.2: Protocol Definition *)
-
 (* Definition 2.6 *)
 fun sender :: "message \<Rightarrow> validator"
   where
@@ -68,6 +37,23 @@ fun est :: "message \<Rightarrow> consensus_value"
 fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
+
+locale Protocol =
+  fixes V :: "validator set"
+  and W
+  and threshould
+  and consensus
+  and estimator
+  and \<Sigma>
+  and M :: "message set"
+
+  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
+  and threshould_type: "0 \<le> threshould" "threshould < Sum (W ` V)"
+  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> estimator s \<in> Pow consensus - \<emptyset>"
+
+  assumes \<Sigma>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> finite s \<and> s \<subseteq> justfication ` M"
+  and M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> consensus \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+
 
 (* Definition 2.7 *)
 fun 
