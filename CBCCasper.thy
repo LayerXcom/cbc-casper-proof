@@ -10,13 +10,13 @@ begin
 notation Set.empty ("\<emptyset>")
 
 (* Definition 2.1 ~ 2.5 *)
-datatype validator = Validator int
+typedecl validator
 
 type_synonym weight = "validator \<Rightarrow> real"
 
 type_synonym threshold = real
 
-datatype consensus_value = Consensus_value int
+typedecl consensus_value
 
 (* NOTE: list is used here because set can not be used for recursive definition. *)
 datatype message =
