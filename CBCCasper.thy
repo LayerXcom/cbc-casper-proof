@@ -151,15 +151,15 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
-definition equivocating_validators :: "state \<Rightarrow> validator set"
+definition equivocating_validators :: "params \<Rightarrow> state \<Rightarrow> validator set"
   where
-    "equivocating_validators \<sigma> = 
-      {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+    "equivocating_validators params \<sigma> = 
+      {v \<in> V params. \<exists> m1 m2. {m1, m2} \<subseteq> M params \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
 definition equivocation_fault_weight :: "params \<Rightarrow> state \<Rightarrow> real"
   where
-    "equivocation_fault_weight params \<sigma> = sum (W params) (equivocating_validators \<sigma>)"
+    "equivocation_fault_weight params \<sigma> = sum (W params) (equivocating_validators params \<sigma>)"
 
 (* Definition 2.12 *)
 definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> bool"

@@ -10,7 +10,7 @@ begin
 (* Definition 3.1 *)
 fun futures :: "params \<Rightarrow> state \<Rightarrow> state set"
   where
-    "futures params \<sigma> = {\<sigma>'. is_faults_lt_threshold params \<sigma>' \<and> is_future_state (\<sigma>', \<sigma>)}"
+    "futures params \<sigma> = {\<sigma>' \<in> \<Sigma>t params. is_faults_lt_threshold params \<sigma>' \<and> is_future_state (\<sigma>', \<sigma>)}"
 
 (* Lemma 1 *)
 lemma monotonic_futures :
