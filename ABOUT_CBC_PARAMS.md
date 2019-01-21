@@ -2,9 +2,8 @@
 ## `params` as a global configuration
 Each member of the CBC Casper family of protocols is going to be identified by five "parameters" (See section 2.1 of the paper) and the asynchronous safety is proved for arbitray parameters.
 
-To leverage this feature, we defined `params` type and `is_valid_params` function so that we can prove lemmas and theorems for all valid parameters. 
+To leverage this feature, we defined `params` type and `is_valid_params` function so that we can prove lemmas and theorems for all valid parameters like:
 
-e.g.
 ```
 (* Lemma 1 *)
 lemma monotonic_futures :
@@ -12,38 +11,34 @@ lemma monotonic_futures :
    ⟶ σ' ∈ futures params σ ⟷ futures params σ' ⊆ futures params σ"
 ```
 
+We can extract each parameter by functions defined in [CBCCasper.thy] which receives `params` and returns a certain parameter. For example, this function returns the validator set.
+
+```
+fun V :: "params ⇒ validator set"
+  where
+    "V (Params (v_set, _, _, _, _)) = v_set"
+```
 
 ## Sets dependent on the parameters
-Isabelle don't support dependent types.
+Isabelle doesn't support dependent types so we can't define `M` (messages) and `Σ` (states) as types because they depends on `params`. Therefore, we defined functions which receives `params` and returns sets corresponding to `M` and `Σ` in [CBCCasper.thy].
 
-Therefore, corresponding sets are defined in [CBCCasper.thy] and `message`, `state`, etc. types in function definitions are assumes that they are used for correct values.
+Note that `validator`, `consensus_value`, `message` and `state` types are different from the "valid" sets returned by `V`, `C`, `M` and `Σ`. Fow now, functions defined to receive these types assumes that they are used only for elements exist in these "valid" sets. We can fix these functions so that they return `undefined` if they receives invalid values.
 
-We need to take care that in these (essentially same) cases, variables need to be limited to the sets.
+We need to take care that in these (essentially same) cases, variables need to be limited to the sets even when it's clear from the context.
 
 (1) Quantify variables
 (2) Construct a set
 
-even when it's clear from the context that they belongs to a certain set.
-
-For example, here
+For example, here it's assumed that `σ` is in `Σ params` and `σ'` is limited to the one in the set `Σt params`.
 ```
-(* Definition 4.6: Latest Message *)
-definition latest_message :: "params ⇒ state ⇒ (validator ⇒ state)"
+(* Definition 3.1 *)
+fun futures :: "params ⇒ state ⇒ state set"
   where
-    "latest_message params σ v = {m ∈ M params. m ∈ from_sender params (v, σ) ∧ later_from params (m, v, σ) = ∅}"
+    "futures params σ = {σ' ∈ Σt params. is_faults_lt_threshold params σ' ∧ is_future_state (σ', σ)}"
 ```
 
-However, for simplicity, we omit th
+As exceptions, for simplicity, we omit these requirements when we use `sender`, `est`, `justification` amd `ε` because it's obvious they returns valid values when they received valid messages. For example, 
 
-About `sender`, `est` etc.
-```
-(* Definition 4.1: Observed validators *)
-definition observed :: "state ⇒ validator set"
-  where
-    "observed σ = {sender m | m. m ∈ σ}"
-```
-
-Also, `ε params σ`
 ```
 (* Definition 7.12 *)
 definition is_majority_driven :: "params ⇒ consensus_value_property ⇒ bool"
