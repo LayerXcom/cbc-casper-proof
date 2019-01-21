@@ -49,7 +49,11 @@ fun blockchain_membership :: "ghost_params \<Rightarrow> (block * block) \<Right
     "blockchain_membership gparams (b1, b2) = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor gparams b2 n))"
 
 (* Definition 4.27: Score of a block *)
-fun score :: "block * state \<Rightarrow> real"
+(* TODO *)
+(*
+fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow> real"
   where
-    "score (b, \<sigma>) = 0.0" (* TODO *)
+    "score params gparams (b, \<sigma>) = sum (W params) ({\<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_message \<sigma> v) \<and> (blockchain_membership gparams (b b'))})"
+end
+*)
 end
