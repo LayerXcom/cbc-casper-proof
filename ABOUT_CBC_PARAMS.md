@@ -1,6 +1,17 @@
 # About CBC Casper parameters
 ## `params` as a global configuration
-TODO
+Each member of the CBC Casper family of protocols is going to be identified by five "parameters" (See section 2.1 of the paper) and the asynchronous safety is proved for arbitray parameters.
+
+To leverage this feature, we defined `params` type and `is_valid_params` function so that we can prove lemmas and theorems for all valid parameters. 
+
+e.g.
+```
+(* Lemma 1 *)
+lemma monotonic_futures :
+  "∀ params σ' σ. is_valid_params params ∧ σ' ∈ Σt params ∧ σ ∈ Σt params
+   ⟶ σ' ∈ futures params σ ⟷ futures params σ' ⊆ futures params σ"
+```
+
 
 ## Sets dependent on the parameters
 Isabelle don't support dependent types.
