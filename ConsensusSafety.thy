@@ -8,28 +8,28 @@ begin
 (* Section 3.1: Guaranteeing Common Futures *)
 
 (* Definition 3.1 *)
-fun futures :: "params \<Rightarrow> state \<Rightarrow> state set"
+fun (in Protocol) futures :: "state \<Rightarrow> state set"
   where
-    "futures params \<sigma> = {\<sigma>'. is_faults_lt_threshold params \<sigma>' \<and> is_future_state (\<sigma>', \<sigma>)}"
+    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>', \<sigma>)}"
 
 (* Lemma 1 *)
-lemma monotonic_futures :
-  "\<forall> params \<sigma>' \<sigma>. is_valid_params params \<and> \<sigma>' \<in> \<Sigma>t params \<and> \<sigma> \<in> \<Sigma>t params
-   \<longrightarrow> \<sigma>' \<in> futures params \<sigma> \<longleftrightarrow> futures params \<sigma>' \<subseteq> futures params \<sigma>"
-  by fastforce
+lemma (in Protocol) monotonic_futures :
+  "\<forall> \<sigma>' \<sigma>. is_valid_params \<and> \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t
+   \<longrightarrow> \<sigma>' \<in> futures \<sigma> \<longleftrightarrow> futures \<sigma>' \<subseteq> futures \<sigma>"
+  by auto
 
 (* Theorem 1 *)
-theorem two_party_common_futures :
-  "\<forall> params \<sigma>1 \<sigma>2. is_valid_params params \<and> \<sigma>1 \<in> \<Sigma>t params \<and> \<sigma>2 \<in> \<Sigma>t params
-  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t params
-  \<longrightarrow> futures params \<sigma>1 \<inter> futures params \<sigma>2 \<noteq> \<emptyset>"
+theorem (in Protocol) two_party_common_futures :
+  "\<forall> \<sigma>1 \<sigma>2. is_valid_params \<and> \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
+  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t
+  \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
   by auto
 
 (* Theorem 2 *)
-theorem n_party_common_futures :
-  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
-  \<longrightarrow> \<Inter> {futures params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
+theorem (in Protocol) n_party_common_futures :
+  "\<forall> \<sigma>_set. is_valid_params \<and> \<sigma>_set \<subseteq> \<Sigma>t
+  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
   by auto
 
 (* Section 3.2: Guaranteeing Consistent Decisions *)
@@ -43,56 +43,56 @@ fun state_property_not :: "state_property \<Rightarrow> state_property"
     "state_property_not p = (\<lambda>\<sigma>. (\<not> p \<sigma>))"
 
 (* Definition 3.3  *)
-fun state_property_is_decided :: "params \<Rightarrow> (state_property * state) \<Rightarrow> bool"
+fun (in Protocol) state_property_is_decided :: "(state_property * state) \<Rightarrow> bool"
   where
-    "state_property_is_decided params (p, \<sigma>) = (\<forall> \<sigma>' \<in> futures params \<sigma> . p \<sigma>')"
+    "state_property_is_decided (p, \<sigma>) = (\<forall> \<sigma>' \<in> futures \<sigma> . p \<sigma>')"
 
 (* Lemma 2 *)
-lemma forward_consistency :
-  "\<forall> params \<sigma>' \<sigma>. is_valid_params params \<and> \<sigma>' \<in> \<Sigma>t params \<and> \<sigma> \<in> \<Sigma>t params
-  \<longrightarrow> \<sigma>' \<in> futures params \<sigma> 
-  \<longrightarrow> state_property_is_decided params (p, \<sigma>)
-  \<longrightarrow> state_property_is_decided params (p, \<sigma>')"
+lemma (in Protocol) forward_consistency :
+  "\<forall> \<sigma>' \<sigma>. is_valid_params \<and> \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t
+  \<longrightarrow> \<sigma>' \<in> futures \<sigma> 
+  \<longrightarrow> state_property_is_decided (p, \<sigma>)
+  \<longrightarrow> state_property_is_decided (p, \<sigma>')"
   apply simp
   by auto
 
 (* Lemma 3 *)
-lemma backword_consistency :
-  "\<forall> params \<sigma>' \<sigma>. is_valid_params params \<and> \<sigma>' \<in> \<Sigma>t params \<and> \<sigma> \<in> \<Sigma>t params
-  \<longrightarrow> \<sigma>' \<in> futures params \<sigma> 
-  \<longrightarrow> state_property_is_decided params (p, \<sigma>')
-  \<longrightarrow> \<not>state_property_is_decided params (state_property_not p, \<sigma>)"
+lemma (in Protocol) backword_consistency :
+  "\<forall> \<sigma>' \<sigma>. is_valid_params \<and> \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t
+  \<longrightarrow> \<sigma>' \<in> futures \<sigma> 
+  \<longrightarrow> state_property_is_decided (p, \<sigma>')
+  \<longrightarrow> \<not>state_property_is_decided (state_property_not p, \<sigma>)"
   apply simp
   by auto
   
 (* Theorem 3 *)
-theorem two_party_consensus_safety :
-  "\<forall> params \<sigma>1 \<sigma>2. is_valid_params params \<and> \<sigma>1 \<in> \<Sigma>t params \<and> \<sigma>2 \<in> \<Sigma>t params
-  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t params
-  \<longrightarrow> \<not>(state_property_is_decided params (p, \<sigma>1) \<and> state_property_is_decided params (state_property_not p, \<sigma>2))"
+theorem (in Protocol) two_party_consensus_safety :
+  "\<forall> \<sigma>1 \<sigma>2. is_valid_params \<and> \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
+  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t
+  \<longrightarrow> \<not>(state_property_is_decided (p, \<sigma>1) \<and> state_property_is_decided (state_property_not p, \<sigma>2))"
   by auto
 
 (* Definition 3.4 *)
-fun state_properties_are_inconsistent :: "params \<Rightarrow> state_property set \<Rightarrow> bool"
+fun (in Protocol) state_properties_are_inconsistent :: "state_property set \<Rightarrow> bool"
   where
-    "state_properties_are_inconsistent params p_set = (\<forall> \<sigma> \<in> \<Sigma> params. \<not> (\<forall> p \<in> p_set. p \<sigma>))"
+    "state_properties_are_inconsistent p_set = (\<forall> \<sigma> \<in> \<Sigma> protocol. \<not> (\<forall> p \<in> p_set. p \<sigma>))"
 
 (* Definition 3.5 *)
-fun state_properties_are_consistent :: "params \<Rightarrow> state_property set \<Rightarrow> bool"
+fun (in Protocol) state_properties_are_consistent :: "state_property set \<Rightarrow> bool"
   where
-    "state_properties_are_consistent params p_set = (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> p_set. p \<sigma>)"
+    "state_properties_are_consistent p_set = (\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> p \<in> p_set. p \<sigma>)"
 
 (* Definition 3.6 *)
-fun state_property_decisions :: "params \<Rightarrow> state \<Rightarrow> state_property set"
+fun (in Protocol) state_property_decisions :: "state \<Rightarrow> state_property set"
   where 
-    "state_property_decisions params \<sigma> = {p. state_property_is_decided params (p, \<sigma>)}"
+    "state_property_decisions \<sigma> = {p. state_property_is_decided (p, \<sigma>)}"
 
 (* Theorem 4 *)
-theorem n_party_safety_for_state_properties :
-  "\<forall> params \<sigma>_set. is_valid_params params \<and> \<sigma>_set \<subseteq> \<Sigma>t params
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t params
-  \<longrightarrow> state_properties_are_consistent params (\<Union> {state_property_decisions params \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
-  by auto 
+theorem (in Protocol) n_party_safety_for_state_properties :
+  "\<forall> \<sigma>_set. is_valid_params \<and> \<sigma>_set \<subseteq> \<Sigma>t
+  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
+  sorry
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
 (* Definition 3.7 *)
