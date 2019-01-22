@@ -89,8 +89,7 @@ fun (in Protocol) state_property_decisions :: "state \<Rightarrow> state_propert
 
 (* Theorem 4 *)
 theorem (in Protocol) n_party_safety_for_state_properties :
-  "\<forall> \<sigma>_set. is_valid_params \<and> \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
   \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
   sorry
 
