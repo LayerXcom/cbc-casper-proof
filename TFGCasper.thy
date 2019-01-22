@@ -7,7 +7,9 @@ begin
 (* Section 4.4: Casper the Friendly GHOST *)
 
 (* Definition 4.23: Blocks *)
-typedecl block
+(* typedecl block *)
+
+type_synonym block = consensus_value
 
 type_synonym genesis = block
 
@@ -49,11 +51,26 @@ fun blockchain_membership :: "ghost_params \<Rightarrow> (block * block) \<Right
     "blockchain_membership gparams (b1, b2) = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor gparams b2 n))"
 
 (* Definition 4.27: Score of a block *)
-(* TODO *)
-(*
 fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow> real"
   where
-    "score params gparams (b, \<sigma>) = sum (W params) ({\<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_message \<sigma> v) \<and> (blockchain_membership gparams (b b'))})"
-end
-*)
+    "score params gparams (b, \<sigma>) = sum (W params) ({v. \<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_estimates \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
+
+(* Definition 4.28: Children *)
+fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block set"
+  where
+    "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}"
+
+(* Definition 4.29: Best Children *)
+fun is_children :: "ghost_params \<Rightarrow> block \<Rightarrow> block * state \<Rightarrow> bool"
+  where
+    "is_children gparams b1 (b2, \<sigma>) = (b1 \<in> children gparams (b2, \<sigma>))"
+
+fun best_children :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow>  block set"
+  where
+    "best_children params gparams (b, \<sigma>) = {b'. \<forall> b'.
+    (b' \<in> children gparams (b, \<sigma>)) \<and> 
+    \<not> (\<exists> b''. (b'' \<in> children gparams (b, \<sigma>)) \<and> (score params gparams (b'', \<sigma>)) > (score params gparams (b', \<sigma>)))}"
+
+(* Definition 4.30: GHOST *)
+
 end
