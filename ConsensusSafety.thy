@@ -98,53 +98,53 @@ theorem (in Protocol) n_party_safety_for_state_properties :
 type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 
 (* Definition 3.8 *)
-fun naturally_corresponding_state_property :: "params \<Rightarrow> consensus_value_property \<Rightarrow> state_property"
+fun (in Protocol) naturally_corresponding_state_property :: "consensus_value_property \<Rightarrow> state_property"
   where 
-    "naturally_corresponding_state_property params q = (\<lambda>\<sigma>. \<forall> c \<in> \<epsilon> params \<sigma>. q c)"
+    "naturally_corresponding_state_property q = (\<lambda>\<sigma>. \<forall> c \<in> \<epsilon> params \<sigma>. q c)"
 
 (* Definition 3.9 *)
-fun consensus_value_properties_are_consistent :: "params \<Rightarrow> consensus_value_property set \<Rightarrow> bool"
+fun (in Protocol) consensus_value_properties_are_consistent :: "consensus_value_property set \<Rightarrow> bool"
   where
-    "consensus_value_properties_are_consistent params q_set = (\<exists> c \<in> C params. \<forall> q \<in> q_set. q c)"
+    "consensus_value_properties_are_consistent q_set = (\<exists> c \<in> C params. \<forall> q \<in> q_set. q c)"
 
 (* Lemma 4 *)
-lemma naturally_corresponding_consistency :
-  "\<forall> params q_set. is_valid_params params
-  \<longrightarrow> state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
-  \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+lemma (in Protocol) naturally_corresponding_consistency :
+  "\<forall> q_set. is_valid_params
+  \<longrightarrow> state_properties_are_consistent {naturally_corresponding_state_property q | q. q \<in> q_set}
+  \<longrightarrow> consensus_value_properties_are_consistent q_set"
   apply (rule, rule, rule)
 proof -
-  fix params q_set
-  assume hyp: "is_valid_params params"
+  fix q_set
+  assume hyp: "is_valid_params"
 
   have 
-    "state_properties_are_consistent params {naturally_corresponding_state_property params q | q. q \<in> q_set}
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
+    "state_properties_are_consistent {naturally_corresponding_state_property q | q. q \<in> q_set}
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
     by simp
   moreover have
-    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
+    "(\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q' c) \<sigma>)"
     by (metis (mono_tags, lifting) mem_Collect_eq)
   moreover have
-    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q' \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q' c)"
+    "(\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> q \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> params \<sigma>'. q c) \<sigma>)
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> q' \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q' c)"
     by blast
   moreover have
-    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c)
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
+    "(\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> q \<in> q_set. \<forall> c \<in> \<epsilon> params \<sigma>. q c)
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
     by blast
   moreover have
-    "(\<exists> \<sigma> \<in> \<Sigma> params. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
-    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
+    "(\<exists> \<sigma> \<in> \<Sigma> protocol. \<forall> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+    \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma> protocol. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q' \<in> q_set. q' c)"
     using hyp
     by (meson equals0I estimates_are_non_empty)
   moreover have
-    "(\<exists> \<sigma> \<in> \<Sigma> params. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
+    "(\<exists> \<sigma> \<in> \<Sigma> protocol. \<exists> c \<in> \<epsilon> params \<sigma>. \<forall> q \<in> q_set. q c)
     \<longrightarrow> (\<exists> c \<in> C params. \<forall> q' \<in> q_set. q' c)"
     using estimate_is_valid hyp by auto  
   ultimately show
-    "state_properties_are_consistent params {naturally_corresponding_state_property params q |q. q \<in> q_set}
-    \<longrightarrow> consensus_value_properties_are_consistent params q_set"
+    "state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set}
+    \<Longrightarrow> consensus_value_properties_are_consistent q_set"
     by simp
 qed
 
