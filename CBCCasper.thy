@@ -38,24 +38,27 @@ fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
 
+record params =
+  V :: "validator set"
+  W :: weight
+  t :: threshold
+  C :: "consensus_value set"
+  \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+
 locale Protocol =
-  fixes V :: "validator set"
-  and W
-  and threshould
-  and consensus
-  and estimator
-  and \<Sigma>
+  fixes params :: "'p params_scheme" (structure)
+  and \<Sigma> :: "state set"
   and M :: "message set"
 
-  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
-  and threshould_type: "0 \<le> threshould" "threshould < Sum (W ` V)"
-  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> estimator s \<in> Pow consensus - \<emptyset>"
+  assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
+  and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
+  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
 
-  assumes \<Sigma>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> finite s \<and> s \<subseteq> justfication ` M"
-  and M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> consensus \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+  assumes \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
+  and M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> \<Sigma>"
 
+(* \<Sigma>, M Construction *)
 
-(* Definition 2.7 *)
 fun 
   \<Sigma>_i :: "params \<Rightarrow> nat \<Rightarrow> state set" and
   M_i :: "params \<Rightarrow> nat \<Rightarrow> message set"
@@ -64,13 +67,35 @@ fun
   | "\<Sigma>_i params n = {\<sigma> \<in> Pow (M_i params (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
   | "M_i params n = {m. est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> (\<Sigma>_i params n) \<and> est m \<in> \<epsilon> params (justification m)}" 
 
-fun M :: "params \<Rightarrow> message set"
+fun Mc :: "params \<Rightarrow> message set"
   where
-    "M params =  \<Union> (M_i params `\<nat>)"
+    "Mc params = (\<Union>i\<in>\<nat>. M_i params i)"
 
-fun \<Sigma> :: "params \<Rightarrow> state set"
+fun \<Sigma>c :: "params \<Rightarrow> state set"
   where
-    "\<Sigma> params = \<Union> (\<Sigma>_i params `\<nat>)"
+    "\<Sigma>c params = (\<Union>i\<in>\<nat>. \<Sigma>_i params i)"
+
+lemma ConstructiveProtocol:
+  assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
+  and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
+  and estimator_type: "\<And>s. s \<in> \<Sigma>c params \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
+  shows "Protocol params (\<Sigma>c params) (Mc params)"
+  unfolding Protocol_def
+  apply rule+
+  apply (simp add: W_type)
+  apply (simp add: threshould_type)
+  apply rule
+  using estimator_type apply auto[1]
+  apply rule
+  defer
+  apply simp
+(*
+statement: \<Sigma>c params \<subseteq> {s \<in> Pow (Mc params). finite s}
+\<Sigma>c = \<Union>\<Sigma>i = \<Sigma>0 \<union> \<Union>\<Sigma>(n+1)
+   \<subseteq> {\<emptyset>} \<union> \<Union>Pfin Mn
+   \<subseteq> \<Union>Pfin Mn  \<leftarrow> ?
+*)
+  sorry
 
 (* Definition 2.1 ~ 2.5 *)
 definition is_valid_validators :: "params \<Rightarrow> bool"
