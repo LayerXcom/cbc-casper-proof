@@ -98,56 +98,54 @@ statement: \<Sigma>c params \<subseteq> {s \<in> Pow (Mc params). finite s}
   sorry
 
 (* Definition 2.1 ~ 2.5 *)
-definition is_valid_validators :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_validators :: "bool"
   where
-     "is_valid_validators params = (V params \<noteq> \<emptyset>)"
+     "is_valid_validators = (V params \<noteq> \<emptyset>)"
 
-definition is_valid_weight :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_weight :: "bool"
   where
-    "is_valid_weight params = (\<forall> v \<in> V params. 0 \<le> W params v)"
+    "is_valid_weight = (\<forall> v \<in> V params. 0 \<le> W params v)"
 
-definition is_valid_threshold :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_threshold :: "bool"
   where
-    "is_valid_threshold params = (0 \<le> t params \<and> t params < sum (W params) (V params))"
+    "is_valid_threshold = (0 \<le> t params \<and> t params < sum (W params) (V params))"
 
-definition is_valid_consensus_values :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_consensus_values :: "bool"
   where
-     "is_valid_consensus_values params = (card (C params) > 1)"
+     "is_valid_consensus_values = (card (C params) > 1)"
 
-definition is_valid_estimator :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_estimator :: "bool"
   where
-    "is_valid_estimator params = (\<forall> \<sigma> \<in> \<Sigma> params. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
+    "is_valid_estimator = (\<forall> \<sigma> \<in> \<Sigma>. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
 
-definition is_valid_params :: "params \<Rightarrow> bool"
+definition (in Protocol) is_valid_params :: "bool"
   where
-    "is_valid_params params = (
-      is_valid_validators params
-      \<and> is_valid_weight params
-      \<and> is_valid_threshold params
-      \<and> is_valid_consensus_values params
-      \<and> is_valid_estimator params)"
+    "is_valid_params = (
+      is_valid_validators
+      \<and> is_valid_weight
+      \<and> is_valid_threshold
+      \<and> is_valid_consensus_values
+      \<and> is_valid_estimator)"
 
-lemma estimate_is_valid:
-  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
+lemma (in Protocol) estimate_is_valid:
+  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma>
   \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. c \<in> C params)"
   using is_valid_params_def is_valid_estimator_def
   by blast
 
-lemma estimates_are_non_empty:
-  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
+lemma (in Protocol) estimates_are_non_empty:
+  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma>
   \<longrightarrow> \<epsilon> params \<sigma> \<noteq> \<emptyset>"
   using is_valid_params_def is_valid_estimator_def
   by blast
 
-lemma \<Sigma>_is_non_empty :
-  "\<forall> params. is_valid_params params
-  \<longrightarrow> \<Sigma> params \<noteq> \<emptyset>"
+lemma (in Protocol) \<Sigma>_is_non_empty :
+  "is_valid_params \<longrightarrow> \<Sigma> \<noteq> \<emptyset>"
   oops
 
 (* NOTE: Issue #32 *)
-lemma \<Sigma>_is_infinite :
-  "\<forall> params. is_valid_params params 
-  \<longrightarrow> infinite (\<Sigma> params)"
+lemma (in Protocol) \<Sigma>_is_infinite :
+  "is_valid_params \<longrightarrow> infinite \<Sigma>"
   oops
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
@@ -168,18 +166,18 @@ definition equivocating_validators :: "state \<Rightarrow> validator set"
       {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
-definition equivocation_fault_weight :: "params \<Rightarrow> state \<Rightarrow> real"
+definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
-    "equivocation_fault_weight params \<sigma> = sum (W params) (equivocating_validators \<sigma>)"
+    "equivocation_fault_weight \<sigma> = sum (W params) (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
-definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> bool"
+definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
-    "is_faults_lt_threshold params \<sigma> = (equivocation_fault_weight params \<sigma> < t params)"
+    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t params)"
 
-fun \<Sigma>t :: "params \<Rightarrow> state set"
+definition (in Protocol) \<Sigma>t :: "state set"
   where
-    "\<Sigma>t params = {\<sigma> \<in> \<Sigma> params. is_faults_lt_threshold params \<sigma>}"
+    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}"
 
 
 end
