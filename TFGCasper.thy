@@ -58,13 +58,11 @@ fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Ri
 (* Definition 4.28: Children *)
 fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block set"
   where
-    "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}"
+    "children gparams (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> (\<Union> {b''. \<forall> b''. b'' = {est m}}) \<and> (b \<in> prev gparams b')}"
+    (* same meaning? *)
+    (* "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}" *)
 
 (* Definition 4.29: Best Children *)
-fun is_children :: "ghost_params \<Rightarrow> block \<Rightarrow> block * state \<Rightarrow> bool"
-  where
-    "is_children gparams b1 (b2, \<sigma>) = (b1 \<in> children gparams (b2, \<sigma>))"
-
 fun best_children :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow>  block set"
   where
     "best_children params gparams (b, \<sigma>) = {b'. \<forall> b'.
@@ -72,5 +70,13 @@ fun best_children :: "params \<Rightarrow> ghost_params \<Rightarrow> block * st
     \<not> (\<exists> b''. (b'' \<in> children gparams (b, \<sigma>)) \<and> (score params gparams (b'', \<sigma>)) > (score params gparams (b', \<sigma>)))}"
 
 (* Definition 4.30: GHOST *)
+fun GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * state => block set"
+  where
+    "GHOST params gparams (b_set, \<sigma>) =  
+    \<comment> \<open> TODO
+    (\<Union> {s. \<forall> b. s = GHOST params gparams ((best_children params gparams (b, \<sigma>)), \<sigma>) \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) \<noteq> \<emptyset>)})
+    \<union>
+    \<close>
+    (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) = \<emptyset>)})"
 
 end
