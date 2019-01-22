@@ -45,17 +45,22 @@ record params =
   C :: "consensus_value set"
   \<epsilon> :: "message set \<Rightarrow> consensus_value set"
 
+record Protocol =
+  parameters :: params
+  \<Sigma> :: "state set"
+  M :: "message set"
+
 locale Protocol =
-  fixes params :: "'p params_scheme" (structure)
-  and \<Sigma> :: "state set"
-  and M :: "message set"
+  fixes protocol :: "'p Protocol_scheme" (structure)
+  and params
+  defines params_def: "params \<equiv> parameters protocol"
 
   assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
   and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
-  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
+  and estimator_type: "\<And>s. s \<in> \<Sigma> protocol \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
 
-  assumes \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
-  and M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> \<Sigma>"
+  assumes \<Sigma>_type: "\<Sigma> protocol \<subseteq> {s. s \<in> Pow (M protocol) \<and> finite s}"
+  and M_type: "\<And>m. m \<in> M protocol \<Longrightarrow> est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> \<Sigma> protocol"
 
 (* \<Sigma>, M Construction *)
 
@@ -75,12 +80,19 @@ fun \<Sigma>c :: "params \<Rightarrow> state set"
   where
     "\<Sigma>c params = (\<Union>i\<in>\<nat>. \<Sigma>_i params i)"
 
-lemma ConstructiveProtocol:
+definition ConstructiveProtocol where
+  "ConstructiveProtocol params = \<lparr>
+    parameters = params,
+    \<Sigma> = \<Sigma>c params,
+    M = Mc params
+  \<rparr>"
+
+lemma ConstructiveProtocol_protocol:
   assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
   and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
   and estimator_type: "\<And>s. s \<in> \<Sigma>c params \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
-  shows "Protocol params (\<Sigma>c params) (Mc params)"
-  unfolding Protocol_def
+  shows "Protocol (ConstructiveProtocol params)"
+  unfolding Protocol_def ConstructiveProtocol_def
   apply rule+
   apply (simp add: W_type)
   apply (simp add: threshould_type)
@@ -116,7 +128,7 @@ definition (in Protocol) is_valid_consensus_values :: "bool"
 
 definition (in Protocol) is_valid_estimator :: "bool"
   where
-    "is_valid_estimator = (\<forall> \<sigma> \<in> \<Sigma>. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
+    "is_valid_estimator = (\<forall> \<sigma> \<in> \<Sigma> protocol. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
 
 definition (in Protocol) is_valid_params :: "bool"
   where
@@ -128,24 +140,24 @@ definition (in Protocol) is_valid_params :: "bool"
       \<and> is_valid_estimator)"
 
 lemma (in Protocol) estimate_is_valid:
-  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma>
+  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma> protocol
   \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. c \<in> C params)"
   using is_valid_params_def is_valid_estimator_def
   by blast
 
 lemma (in Protocol) estimates_are_non_empty:
-  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma>
+  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma> protocol
   \<longrightarrow> \<epsilon> params \<sigma> \<noteq> \<emptyset>"
   using is_valid_params_def is_valid_estimator_def
   by blast
 
 lemma (in Protocol) \<Sigma>_is_non_empty :
-  "is_valid_params \<longrightarrow> \<Sigma> \<noteq> \<emptyset>"
+  "is_valid_params \<longrightarrow> \<Sigma> protocol \<noteq> \<emptyset>"
   oops
 
 (* NOTE: Issue #32 *)
 lemma (in Protocol) \<Sigma>_is_infinite :
-  "is_valid_params \<longrightarrow> infinite \<Sigma>"
+  "is_valid_params \<longrightarrow> infinite (\<Sigma> protocol)"
   oops
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
@@ -177,7 +189,7 @@ definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
 
 definition (in Protocol) \<Sigma>t :: "state set"
   where
-    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}"
+    "\<Sigma>t = {\<sigma> \<in> \<Sigma> protocol. is_faults_lt_threshold \<sigma>}"
 
 
 end
