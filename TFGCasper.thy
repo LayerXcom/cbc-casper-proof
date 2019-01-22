@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper ExampleProtocols
+imports Main HOL.Real CBCCasper ConsensusSafety ExampleProtocols
 
 begin
 
@@ -53,7 +53,7 @@ fun blockchain_membership :: "ghost_params \<Rightarrow> (block * block) \<Right
 (* Definition 4.27: Score of a block *)
 fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow> real"
   where
-    "score params gparams (b, \<sigma>) = sum (W params) ({v. \<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_estimates \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
+    "score params gparams (b, \<sigma>) = sum (W params) ({v. \<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
 
 (* Definition 4.28: Children *)
 fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block set"
@@ -78,5 +78,11 @@ fun GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * stat
     \<union>
     \<close>
     (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) = \<emptyset>)})"
+
+(* Definition 4.31: Casper the Friendly Ghost *)
+(* TODO *)
+
+(* Definition 4.32: Example non-trivial properties of consensus values *)
+(* TODO *)
 
 end

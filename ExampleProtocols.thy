@@ -52,4 +52,39 @@ definition latest_estimates :: "state \<Rightarrow> validator \<Rightarrow> cons
 lemma non_equivocating_validators_have_at_most_one_latest_message:
   "\<forall> params v. v \<in> V params \<and> v \<notin> equivocating_validators \<sigma> \<Longrightarrow> card (latest_message \<sigma> v) \<le> 1"
   using V.simps by blast
+
+(* Definition 4.10 *)
+(* TODO *)
+
+(* Lemma 6 *)
+(* TODO *)
+
+(* Lemma 7 *)
+(* TODO *)
+
+(* Lemma 8 *)
+(* TODO *)
+
+(* Lemma 9 *)
+(* TODO *)
+
+(* Lemma 10 *)
+(* TODO *)
+
+(* Definition 4.11: Latest messages from non-Equivocating validators *)
+definition latest_messages_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> message set"
+  where
+    "latest_messages_from_non_equivocating_validators \<sigma> v = (if v \<in> equivocating_validators \<sigma> then \<emptyset> else latest_message \<sigma> v)"
+
+(* Definition 4.12: Latest honest message driven estimator *)
+(* TODO *)
+
+(* Definition 4.13: Latest estimates from non-Equivocating validators *)
+definition latest_estimates_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
+  where
+    "latest_estimates_from_non_equivocating_validators \<sigma> v = {est m | m. m \<in> latest_messages_from_non_equivocating_validators \<sigma> v}"
+
+(* Definition 4.14: Latest honest estimate dricen estimator *)
+(* TODO *)
+
 end
