@@ -90,8 +90,40 @@ fun (in Protocol) state_property_decisions :: "state \<Rightarrow> state_propert
 (* Theorem 4 *)
 theorem (in Protocol) n_party_safety_for_state_properties :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
-  sorry
+  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+  apply rule+
+proof-
+  fix \<sigma>_set
+  assume \<sigma>_set: "\<sigma>_set \<subseteq> \<Sigma>t"
+
+  assume "\<Union> \<sigma>_set \<in> \<Sigma>t"
+  hence "\<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
+    using \<sigma>_set by auto
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<sigma> \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}"
+    using \<open>\<Union>\<sigma>_set \<in> \<Sigma>t\<close> by fastforce
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s"
+    by blast
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. (\<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s) \<and> (\<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s \<longrightarrow> (\<forall>p. state_property_is_decided (p,s) \<longrightarrow> state_property_is_decided (p,\<sigma>)))"
+    by (simp add: subset_eq)
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. (\<forall>p. state_property_is_decided (p,s) \<longrightarrow> state_property_is_decided (p,\<sigma>))"
+    by blast
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. (\<forall>p \<in> state_property_decisions s. state_property_is_decided (p,\<sigma>))"
+    by simp
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. state_property_is_decided (p,\<sigma>)"
+  proof-
+    obtain \<sigma> where "\<sigma> \<in> \<Sigma>t" "\<forall>s\<in>\<sigma>_set. (\<forall>p \<in> state_property_decisions s. state_property_is_decided (p,\<sigma>))"
+      using \<open>\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. \<forall>p\<in>state_property_decisions s. state_property_is_decided (p, \<sigma>)\<close> by blast
+    have "\<forall>p\<in>\<Union>{state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. state_property_is_decided (p,\<sigma>)"
+      using \<open>\<forall>s\<in>\<sigma>_set. \<forall>p\<in>state_property_decisions s. state_property_is_decided (p, \<sigma>)\<close> by fastforce
+    thus ?thesis
+      using \<open>\<sigma> \<in> \<Sigma>t\<close> by blast
+  qed
+  hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. \<forall>\<sigma>'\<in>futures \<sigma>. p \<sigma>'"
+    by simp
+  show "state_properties_are_consistent (\<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set})"
+    by (metis (mono_tags, lifting) \<Sigma>t_def \<open>\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}. \<forall>\<sigma>'\<in>futures \<sigma>. p \<sigma>'\<close> mem_Collect_eq monotonic_futures order_refl state_properties_are_consistent.simps)
+qed
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
 (* Definition 3.7 *)
