@@ -73,55 +73,11 @@ lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender 
 
 end
 
-(* Definition 2.1 ~ 2.5 *)
-definition (in Protocol) is_valid_validators :: "bool"
-  where
-     "is_valid_validators = (V params \<noteq> \<emptyset>)"
-
-definition (in Protocol) is_valid_weight :: "bool"
-  where
-    "is_valid_weight = (\<forall> v \<in> V params. 0 \<le> W params v)"
-
-definition (in Protocol) is_valid_threshold :: "bool"
-  where
-    "is_valid_threshold = (0 \<le> t params \<and> t params < sum (W params) (V params))"
-
-definition (in Protocol) is_valid_consensus_values :: "bool"
-  where
-     "is_valid_consensus_values = (card (C params) > 1)"
-
-definition (in Protocol) is_valid_estimator :: "bool"
-  where
-    "is_valid_estimator = (\<forall> \<sigma> \<in> \<Sigma> protocol. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
-
-definition (in Protocol) is_valid_params :: "bool"
-  where
-    "is_valid_params = (
-      is_valid_validators
-      \<and> is_valid_weight
-      \<and> is_valid_threshold
-      \<and> is_valid_consensus_values
-      \<and> is_valid_estimator)"
-
-lemma (in Protocol) estimate_is_valid:
-  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma> protocol
-  \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. c \<in> C params)"
-  using is_valid_params_def is_valid_estimator_def
-  by blast
-
-lemma (in Protocol) estimates_are_non_empty:
-  "\<forall>\<sigma>. is_valid_params \<and> \<sigma> \<in> \<Sigma> protocol
-  \<longrightarrow> \<epsilon> params \<sigma> \<noteq> \<emptyset>"
-  using is_valid_params_def is_valid_estimator_def
-  by blast
-
-lemma (in Protocol) \<Sigma>_is_non_empty :
-  "is_valid_params \<longrightarrow> \<Sigma> protocol \<noteq> \<emptyset>"
+lemma (in Protocol) \<Sigma>_is_non_empty : "\<Sigma> \<noteq> \<emptyset>"
   oops
 
 (* NOTE: Issue #32 *)
-lemma (in Protocol) \<Sigma>_is_infinite :
-  "is_valid_params \<longrightarrow> infinite (\<Sigma> protocol)"
+lemma (in Protocol) \<Sigma>_is_infinite : "infinite \<Sigma>"
   oops
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
@@ -144,16 +100,16 @@ definition equivocating_validators :: "state \<Rightarrow> validator set"
 (* Definition 2.11 *)
 definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
-    "equivocation_fault_weight \<sigma> = sum (W params) (equivocating_validators \<sigma>)"
+    "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
 definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
-    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t params)"
+    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
 definition (in Protocol) \<Sigma>t :: "state set"
   where
-    "\<Sigma>t = {\<sigma> \<in> \<Sigma> protocol. is_faults_lt_threshold \<sigma>}"
+    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}"
 
 
 end
