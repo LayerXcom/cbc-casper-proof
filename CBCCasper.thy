@@ -57,7 +57,7 @@ locale Protocol =
 
   assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
   and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
-  and estimator_type: "\<And>s. s \<in> \<Sigma> protocol \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - \<emptyset>"
+  and estimator_type: "\<And>s. s \<in> \<Sigma> protocol \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - {\<emptyset>}"
 
   assumes \<Sigma>_type: "\<Sigma> protocol \<subseteq> {s. s \<in> Pow (M protocol) \<and> finite s}"
   and M_type: "\<And>m. m \<in> M protocol \<Longrightarrow> est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> \<Sigma> protocol"
