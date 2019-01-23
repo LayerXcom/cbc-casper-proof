@@ -38,41 +38,37 @@ fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
 
-record params =
-  V :: "validator set"
-  W :: weight
-  t :: threshold
-  C :: "consensus_value set"
-  \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+(* \<Sigma>, M Construction
+   NB: we cannot refer to the definitions from locale to its context *)
+fun
+  \<Sigma>_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> state set" and
+  M_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> message set"
+  where 
+    "\<Sigma>_i (V,C,\<epsilon>) 0 = {\<emptyset>}"
+  | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
 locale Protocol =
-  fixes params :: "'p params_scheme" (structure)
+  fixes V :: "validator set"
+  and W :: weight
+  and t :: threshold
+  and C :: "consensus_value set"
+  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+  and \<Sigma> :: "state set"
+  and M :: "message set"
 
-  assumes W_type: "\<And>w. w \<in> range (W params) \<Longrightarrow> w > 0"
-  and threshould_type: "0 \<le> t params" "t params < Sum (W params ` V params)"
-  and estimator_type: "\<And>s. s \<in> \<Sigma> protocol \<Longrightarrow> \<epsilon> params s \<in> Pow (C params) - {\<emptyset>}"
+  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
+  and threshould_type: "0 \<le> t" "t < Sum (W ` V)"
+  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
+
+  assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
+  and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
 begin
-
-fun 
-  \<Sigma>_i :: "nat \<Rightarrow> state set" and
-  M_i :: "nat \<Rightarrow> message set"
-  where 
-    "\<Sigma>_i 0 = {\<emptyset>}"
-  | "\<Sigma>_i n = {\<sigma> \<in> Pow (M_i (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
-  | "M_i n = {m. est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> (\<Sigma>_i n) \<and> est m \<in> \<epsilon> params (justification m)}" 
-
-definition M :: "message set"
-  where
-    "M = (\<Union>i\<in>\<nat>. M_i i)"
-
-definition \<Sigma> :: "state set"
-  where
-    "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i i)"
 
 lemma \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
   sorry
 
-lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> \<Sigma>"
+lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
   sorry
 
 end
