@@ -193,39 +193,29 @@ theorem (in Protocol) n_party_safety_for_consensus_value_properties :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
   \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
   \<longrightarrow> consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-  apply (rule, rule)
-(*
+  apply (rule, rule, rule)
 proof -
   fix \<sigma>_set
+  assume "\<sigma>_set \<subseteq> \<Sigma>t"
 
-  have
-    "\<Union> \<sigma>_set \<in> \<Sigma>t
-    \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-    by auto
-  moreover have
-    "state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})
-    \<longrightarrow> state_properties_are_consistent {p. \<exists> q. p \<in> (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property q}"
-    by (smt mem_Collect_eq state_properties_are_consistent.simps)
-  moreover have
-    "state_properties_are_consistent {p. \<exists> q. p \<in> (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}) \<and> p = naturally_corresponding_state_property q}
-    \<longrightarrow> state_properties_are_consistent {naturally_corresponding_state_property q | q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
+  assume "\<Union> \<sigma>_set \<in> \<Sigma>t"
+  hence "state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+    using \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> n_party_safety_for_state_properties by auto
+  hence "state_properties_are_consistent {p \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. \<exists> q. p = naturally_corresponding_state_property q}"
+    sorry
+  hence "state_properties_are_consistent {naturally_corresponding_state_property q | q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
     by (smt Collect_cong)
-  moreover have
-    "state_properties_are_consistent {naturally_corresponding_state_property q | q. q \<in> {q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}}
-    \<longrightarrow> consensus_value_properties_are_consistent {q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
-    using naturally_corresponding_consistency hyp
-    by blast
-  moreover have
-    "consensus_value_properties_are_consistent {q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}
-    \<longrightarrow> consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-    apply simp
-    by (smt mem_Collect_eq)
-  ultimately show
-    "\<Union> \<sigma>_set \<in> \<Sigma>t params
-    \<longrightarrow> consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+  hence "consensus_value_properties_are_consistent {q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
+    using naturally_corresponding_consistency
+  proof -
+    show ?thesis
+      by (metis (no_types) Setcompr_eq_image \<open>\<forall>q_set. state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set} \<longrightarrow> consensus_value_properties_are_consistent q_set\<close> \<open>state_properties_are_consistent {naturally_corresponding_state_property q |q. naturally_corresponding_state_property q \<in> \<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}}\<close> setcompr_eq_image)
+  qed
+  hence "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+    sorry
+  thus
+    "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     by simp
 qed
-*)
-  sorry
 
 end
