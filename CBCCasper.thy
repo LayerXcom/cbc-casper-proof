@@ -71,6 +71,8 @@ lemma \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
 lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
   sorry
 
+lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using estimator_type by auto
 end
 
 lemma (in Protocol) \<Sigma>_is_non_empty : "\<Sigma> \<noteq> \<emptyset>"
