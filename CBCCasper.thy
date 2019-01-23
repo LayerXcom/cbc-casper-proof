@@ -69,7 +69,9 @@ lemma \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
   sorry
 
 lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
-  sorry
+  unfolding M_def \<Sigma>_def
+  apply auto
+  done
 
 lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
   using estimator_type by auto
