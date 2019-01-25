@@ -80,7 +80,9 @@ fun GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * stat
     (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) = \<emptyset>)})"
 
 (* Definition 4.31: Casper the Friendly Ghost *)
-(* TODO *)
+fun estimator :: "params \<Rightarrow> ghost_params \<Rightarrow> state \<Rightarrow> block set"
+  where
+    "estimator params gparams \<sigma> = GHOST params gparams ({g gparams}, \<sigma>)"
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
 fun P :: "params \<Rightarrow> ghost_params \<Rightarrow> consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
