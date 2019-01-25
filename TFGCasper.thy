@@ -83,6 +83,8 @@ fun GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * stat
 (* TODO *)
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
-(* TODO *)
+fun P :: "params \<Rightarrow> ghost_params \<Rightarrow> consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
+  where
+    "P params gparams p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = True) \<and> \<not> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = False) }"
 
 end
