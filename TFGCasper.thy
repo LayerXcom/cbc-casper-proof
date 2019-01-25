@@ -70,14 +70,13 @@ fun best_children :: "params \<Rightarrow> ghost_params \<Rightarrow> block * st
     \<not> (\<exists> b''. (b'' \<in> children gparams (b, \<sigma>)) \<and> (score params gparams (b'', \<sigma>)) > (score params gparams (b', \<sigma>)))}"
 
 (* Definition 4.30: GHOST *)
-fun GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * state => block set"
+function GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * state => block set"
   where
     "GHOST params gparams (b_set, \<sigma>) =  
-    \<comment> \<open> TODO
     (\<Union> {s. \<forall> b. s = GHOST params gparams ((best_children params gparams (b, \<sigma>)), \<sigma>) \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) \<noteq> \<emptyset>)})
     \<union>
-    \<close>
     (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) = \<emptyset>)})"
+  by auto
 
 (* Definition 4.31: Casper the Friendly Ghost *)
 fun estimator :: "params \<Rightarrow> ghost_params \<Rightarrow> state \<Rightarrow> block set"
