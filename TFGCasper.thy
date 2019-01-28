@@ -46,15 +46,9 @@ fun (in Ghost) score :: "block * state \<Rightarrow> real"
     "score (b, \<sigma>) = sum W {v. \<forall> v. \<exists> b'. v \<in> V \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
-fun single_est_set :: "message \<Rightarrow> block set"
-  where
-    "single_est_set m = {b . b = est m}"
-
 fun (in Ghost) children :: "block * state \<Rightarrow> block set"
   where
-    "children (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> (single_est_set ` \<sigma>) \<and> (b \<in> prev b')}"
-    (* same meaning? *)
-    (* "children (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev b')}" *)
+    "children (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> ((\<lambda>b. {b. b = est m}) ` \<sigma>) \<and> (b \<in> prev b')}"
 
 (* Definition 4.29: Best Children *)
 fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
@@ -67,9 +61,9 @@ fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
 function (in Ghost) GHOST :: "(block set) * state => block set"
   where
     "GHOST (b_set, \<sigma>) =
-    (\<Union> {s. \<forall> b. s = GHOST ((best_children (b, \<sigma>)), \<sigma>) \<and> b \<in> b_set \<and> (children (b, \<sigma>) \<noteq> \<emptyset>)})
+    (\<Union> ((\<lambda>b. GHOST (best_children (b, \<sigma>), \<sigma>)) ` {b. b \<in> b_set \<and> (children (b, \<sigma>) \<noteq> \<emptyset>)}))
     \<union>
-    (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children (b, \<sigma>) = \<emptyset>)})"
+    (\<Union> ((\<lambda>b. {b}) ` {b. b \<in> b_set \<and> (children (b, \<sigma>) = \<emptyset>)}))"
   by auto
 
 (* Definition 4.31: Casper the Friendly Ghost *)
