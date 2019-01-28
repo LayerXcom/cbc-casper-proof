@@ -53,9 +53,13 @@ fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Ri
     "score params gparams (b, \<sigma>) = sum (W params) ({v. \<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
 
 (* Definition 4.28: Children *)
+fun single_est_set :: "message \<Rightarrow> block set"
+  where
+    "single_est_set m = {b . b = est m}"
+
 fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block set"
   where
-    "children gparams (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> (\<Union> {b''. \<forall> b''. b'' = est m}) \<and> (b \<in> prev gparams b')}"
+    "children gparams (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> (single_est_set ` \<sigma>) \<and> (b \<in> prev gparams b')}"
     (* same meaning? *)
     (* "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}" *)
 
