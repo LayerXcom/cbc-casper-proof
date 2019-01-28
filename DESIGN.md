@@ -1,5 +1,5 @@
 # Design of CBC Casper in Isabelle
-## `params` as a global configuration
+## `Protocol` locale
 Each member of the CBC Casper family of protocols is going to be identified by five "parameters" (See section 2.1 of the paper) and the asynchronous safety is proved for arbitray parameters.
 
 To leverage this feature, we defined `Protocol` locale so that we can prove lemmas and theorems for all valid parameters.
