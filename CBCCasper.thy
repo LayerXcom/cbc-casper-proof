@@ -62,59 +62,6 @@ locale Protocol =
   and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
 begin
 
-lemma \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
-  sorry
-
-lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
-  unfolding M_def \<Sigma>_def
-  apply auto
-  done
-
-lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
-  using \<epsilon>_type by auto
-end
-
-lemma (in Protocol) \<Sigma>_is_non_empty : "\<Sigma> \<noteq> \<emptyset>"
-  oops
-
-(* NOTE: Issue #32 *)
-lemma (in Protocol) \<Sigma>_is_infinite : "infinite \<Sigma>"
-  oops
-
-(* Definition 2.8: Protocol state transitions \<rightarrow> *)
-fun is_future_state :: "(state * state) \<Rightarrow> bool"
-  where
-    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
-
-(* Definition 2.9 *)
-fun equivocation :: "(message * message) \<Rightarrow> bool"
-  where
-    "equivocation (m1, m2) =
-      (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
-
-(* Definition 2.10 *)
-definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
-  where
-    "equivocating_validators \<sigma> = 
-      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
-
-(* Definition 2.11 *)
-definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
-  where
-    "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
-
-(* Definition 2.12 *)
-definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
-  where 
-    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
-
-definition (in Protocol) \<Sigma>t :: "state set"
-  where
-    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
-
-lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
-  using \<Sigma>t_def by auto
-
 lemma (in Protocol) message_in_state_is_valid :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
   apply (rule, rule, rule)
@@ -172,5 +119,53 @@ lemma (in Protocol) message_is_in_M_i :
   "\<forall> m \<in> M. (\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1))"
   apply (simp add: M_def \<Sigma>_i.elims)
   by (metis Nats_1 Nats_add One_nat_def diff_Suc_1 plus_1_eq_Suc)
+
+(* FIXME: \<Sigma> should be a strict subset of Pow M. #49 *)
+lemma (in Protocol) \<Sigma>_type: "\<Sigma> \<subseteq> Pow M"
+  by (simp add: state_is_subset_of_M subsetI)
+
+(* FIXME: M should be a strict subset of C \<times> V \<times> \<Sigma>. #50 *)
+lemma (in Protocol) M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+  unfolding M_def \<Sigma>_def
+  apply auto
+  done
+
+lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using \<epsilon>_type by auto
+end
+
+(* Definition 2.8: Protocol state transitions \<rightarrow> *)
+fun is_future_state :: "(state * state) \<Rightarrow> bool"
+  where
+    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
+
+(* Definition 2.9 *)
+fun equivocation :: "(message * message) \<Rightarrow> bool"
+  where
+    "equivocation (m1, m2) =
+      (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
+
+(* Definition 2.10 *)
+definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
+  where
+    "equivocating_validators \<sigma> = 
+      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+
+(* Definition 2.11 *)
+definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
+  where
+    "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
+
+(* Definition 2.12 *)
+definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
+  where 
+    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
+
+definition (in Protocol) \<Sigma>t :: "state set"
+  where
+    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
+
+lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
+  using \<Sigma>t_def by auto
 
 end
