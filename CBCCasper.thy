@@ -10,13 +10,9 @@ begin
 notation Set.empty ("\<emptyset>")
 
 (* Definition 2.1 ~ 2.5 *)
-datatype validator = Validator int
+typedecl validator
 
-type_synonym weight = "validator \<Rightarrow> real"
-
-type_synonym threshold = real
-
-datatype consensus_value = Consensus_value int
+typedecl consensus_value
 
 (* NOTE: list is used here because set can not be used for recursive definition. *)
 datatype message =
@@ -24,38 +20,7 @@ datatype message =
 
 type_synonym state = "message set"
 
-type_synonym estimator = "state \<Rightarrow> consensus_value set"
-
-(* NOTE: Estimator is parameterized by weight. *)
-type_synonym estimator_param = "weight \<Rightarrow> estimator"
-
-(* CBC Casper parameters *)
-datatype params = 
-  Params "validator set * weight * threshold * consensus_value set * estimator_param"
-
-fun V :: "params \<Rightarrow> validator set"
-  where
-    "V (Params (v_set, _, _, _, _)) = v_set"
-
-fun W :: "params \<Rightarrow> weight"
-  where
-    "W (Params (_, w, _, _, _)) = w"
-
-fun t :: "params \<Rightarrow> threshold"
-  where
-    "t (Params (_, _, threshold, _, _)) = threshold"
-
-fun C :: "params \<Rightarrow> consensus_value set"
-  where
-    "C (Params (_, _, _, c_set, _)) = c_set"
-
-fun \<epsilon> :: "params \<Rightarrow> estimator"
-  where
-    "\<epsilon> (Params (_, w, _, _, e)) = e w"
-
-
 (* Section 2.2: Protocol Definition *)
-
 (* Definition 2.6 *)
 fun sender :: "message \<Rightarrow> validator"
   where
@@ -69,74 +34,51 @@ fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
 
-(* Definition 2.7 *)
-fun 
-  \<Sigma>_i :: "params \<Rightarrow> nat \<Rightarrow> state set" and
-  M_i :: "params \<Rightarrow> nat \<Rightarrow> message set"
+(* \<Sigma>, M Construction
+   NOTE: we cannot refer to the definitions from locale to its context *)
+fun
+  \<Sigma>_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> state set" and
+  M_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> message set"
   where 
-    "\<Sigma>_i params 0 = {\<emptyset>}"
-  | "\<Sigma>_i params n = {\<sigma> \<in> Pow (M_i params (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
-  | "M_i params n = {m. est m \<in> C params \<and> sender m \<in> V params \<and> justification m \<in> (\<Sigma>_i params n) \<and> est m \<in> \<epsilon> params (justification m)}" 
+    "\<Sigma>_i (V,C,\<epsilon>) 0 = {\<emptyset>}"
+  | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
-fun M :: "params \<Rightarrow> message set"
-  where
-    "M params =  \<Union> (M_i params `\<nat>)"
+locale Protocol =
+  fixes V :: "validator set"
+  and W :: "validator \<Rightarrow> real"
+  and t :: real
+  and C :: "consensus_value set"
+  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+  and \<Sigma> :: "state set"
+  and M :: "message set"
 
-fun \<Sigma> :: "params \<Rightarrow> state set"
-  where
-    "\<Sigma> params = \<Union> (\<Sigma>_i params `\<nat>)"
+  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
+  and t_type: "0 \<le> t" "t < Sum (W ` V)"
+  and C_type: "card C > 1"
+  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
 
-(* Definition 2.1 ~ 2.5 *)
-definition is_valid_validators :: "params \<Rightarrow> bool"
-  where
-     "is_valid_validators params = (V params \<noteq> \<emptyset>)"
+  assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
+  and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
+begin
 
-definition is_valid_weight :: "params \<Rightarrow> bool"
-  where
-    "is_valid_weight params = (\<forall> v \<in> V params. 0 \<le> W params v)"
+lemma \<Sigma>_type: "\<Sigma> \<subseteq> {s. s \<in> Pow M \<and> finite s}"
+  sorry
 
-definition is_valid_threshold :: "params \<Rightarrow> bool"
-  where
-    "is_valid_threshold params = (0 \<le> t params \<and> t params < sum (W params) (V params))"
+lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+  unfolding M_def \<Sigma>_def
+  apply auto
+  done
 
-definition is_valid_consensus_values :: "params \<Rightarrow> bool"
-  where
-     "is_valid_consensus_values params = (card (C params) > 1)"
+lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using \<epsilon>_type by auto
+end
 
-definition is_valid_estimator :: "params \<Rightarrow> bool"
-  where
-    "is_valid_estimator params = (\<forall> \<sigma> \<in> \<Sigma> params. \<epsilon> params \<sigma> \<in> Pow (C params) - {\<emptyset>})"
-
-definition is_valid_params :: "params \<Rightarrow> bool"
-  where
-    "is_valid_params params = (
-      is_valid_validators params
-      \<and> is_valid_weight params
-      \<and> is_valid_threshold params
-      \<and> is_valid_consensus_values params
-      \<and> is_valid_estimator params)"
-
-lemma estimate_is_valid:
-  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
-  \<longrightarrow> (\<forall> c \<in> \<epsilon> params \<sigma>. c \<in> C params)"
-  using is_valid_params_def is_valid_estimator_def
-  by blast
-
-lemma estimates_are_non_empty:
-  "\<forall> params \<sigma>. is_valid_params params \<and> \<sigma> \<in> \<Sigma> params
-  \<longrightarrow> \<epsilon> params \<sigma> \<noteq> \<emptyset>"
-  using is_valid_params_def is_valid_estimator_def
-  by blast
-
-lemma \<Sigma>_is_non_empty :
-  "\<forall> params. is_valid_params params
-  \<longrightarrow> \<Sigma> params \<noteq> \<emptyset>"
+lemma (in Protocol) \<Sigma>_is_non_empty : "\<Sigma> \<noteq> \<emptyset>"
   oops
 
 (* NOTE: Issue #32 *)
-lemma \<Sigma>_is_infinite :
-  "\<forall> params. is_valid_params params 
-  \<longrightarrow> infinite (\<Sigma> params)"
+lemma (in Protocol) \<Sigma>_is_infinite : "infinite \<Sigma>"
   oops
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
@@ -151,24 +93,84 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
-definition equivocating_validators :: "state \<Rightarrow> validator set"
+definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = 
-      {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
-definition equivocation_fault_weight :: "params \<Rightarrow> state \<Rightarrow> real"
+definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
-    "equivocation_fault_weight params \<sigma> = sum (W params) (equivocating_validators \<sigma>)"
+    "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
-definition is_faults_lt_threshold :: "params \<Rightarrow> state \<Rightarrow> bool"
+definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
-    "is_faults_lt_threshold params \<sigma> = (equivocation_fault_weight params \<sigma> < t params)"
+    "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
-fun \<Sigma>t :: "params \<Rightarrow> state set"
+definition (in Protocol) \<Sigma>t :: "state set"
   where
-    "\<Sigma>t params = {\<sigma> \<in> \<Sigma> params. is_faults_lt_threshold params \<sigma>}"
+    "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
 
+lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
+  using \<Sigma>t_def by auto
+
+lemma (in Protocol) message_in_state_is_valid :
+  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
+  apply (rule, rule, rule)
+proof -
+  fix \<sigma> m
+  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>"
+  have
+    "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+    using \<Sigma>_def \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> by auto
+  moreover have
+    "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n
+    \<longrightarrow> \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
+    by (metis One_nat_def \<Sigma>_i.simps(1) \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> diff_Suc_1 diff_add_inverse empty_iff insert_iff of_nat_1 of_nat_Suc of_nat_in_Nats)
+  moreover have
+    "\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))  
+    \<longrightarrow> (m \<in> \<sigma> \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) (n - 1))"
+    using calculation(2) by blast
+  moreover have
+    "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)
+    \<Longrightarrow> \<exists> n'\<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n'"
+  proof -
+    assume "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    then obtain n :: nat where "n \<in> \<nat>" "m \<in> M_i (V, C, \<epsilon>) (n - 1)" by auto
+    show ?thesis
+      apply auto
+      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> apply auto[1]
+      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> apply auto[1]
+      apply (metis (no_types, lifting) M_i.simps \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> id_apply mem_Collect_eq of_nat_eq_id of_nat_in_Nats)
+      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> by auto
+  qed  
+  moreover have
+    "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n
+    \<Longrightarrow> m \<in> M"
+    using M_def by blast 
+  ultimately show
+    "m \<in> M"
+    by (smt PowD \<Sigma>_i.elims \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> empty_iff insert_iff mem_Collect_eq subsetCE)
+qed
+
+lemma (in Protocol) state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
+  using message_in_state_is_valid by blast
+
+lemma (in Protocol) state_difference_is_valid_message :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
+  \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
+  \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
+  using state_is_subset_of_M by blast
+
+lemma (in Protocol) state_is_in_pow_M_i :
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1)) \<and> (\<forall> m \<in> \<sigma>. justification m \<subseteq> \<sigma>))" 
+  apply (simp add: \<Sigma>_def)
+  by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI)
+
+lemma (in Protocol) message_is_in_M_i :
+  "\<forall> m \<in> M. (\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1))"
+  apply (simp add: M_def \<Sigma>_i.elims)
+  by (metis Nats_1 Nats_add One_nat_def diff_Suc_1 plus_1_eq_Suc)
 
 end
