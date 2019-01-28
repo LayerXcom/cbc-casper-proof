@@ -39,7 +39,7 @@ fun justification :: "message \<Rightarrow> state"
     "justification (Message (_, _, s)) = set s"
 
 (* \<Sigma>, M Construction
-   NB: we cannot refer to the definitions from locale to its context *)
+   NOTE: we cannot refer to the definitions from locale to its context *)
 fun
   \<Sigma>_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> state set" and
   M_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> message set"
