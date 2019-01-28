@@ -44,46 +44,50 @@ lemma (in Protocol) latest_estimates_from_honest_validators_type :
   using M_type by auto
 
 (* Definition 7.7 *)
-fun latest_justifications_from_honest_validators :: "(state * validator) \<Rightarrow> state set"
+fun (in Protocol) latest_justifications_from_honest_validators :: "(state * validator) \<Rightarrow> state set"
   where
     "latest_justifications_from_honest_validators (\<sigma>, v) = 
       {justification m | m. m \<in> latest_messages_from_honest_validators (\<sigma>, v)}"
 
+lemma (in Protocol) latest_justifications_from_honest_validators_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_justifications_from_honest_validators (\<sigma>, v) \<subseteq> \<Sigma>"
+  using M_type by auto
+
 (* Definition 7.8 *)
-fun agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
+fun (in Protocol) agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "agreeing_validators (p, \<sigma>) = {v. \<forall> c. c \<in> latest_estimates_from_honest_validators (\<sigma>, v) \<and> p c}"
+    "agreeing_validators (p, \<sigma>) = {v \<in> V. \<forall> c \<in> C. c \<in> latest_estimates_from_honest_validators (\<sigma>, v) \<and> p c}"
 
 (* Definition 7.9 *)
-fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
+fun (in Protocol) disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "disagreeing_validators (p, \<sigma>) = {v. \<exists> c. c \<in> latest_estimates_from_honest_validators (\<sigma>, v) \<and> \<not> p c}"
+    "disagreeing_validators (p, \<sigma>) = {v \<in> V. \<exists> c \<in> C. c \<in> latest_estimates_from_honest_validators (\<sigma>, v) \<and> \<not> p c}"
 
 (* Definition 7.10 *)
-definition weight_measure :: "params \<Rightarrow> validator set \<Rightarrow> real"
+definition (in Protocol) weight_measure :: "validator set \<Rightarrow> real"
   where
-    "weight_measure params v_set = sum (W params) v_set"
+    "weight_measure v_set = sum W v_set"
 
 (* Definition 7.11 *)
-fun is_majority :: "params \<Rightarrow> (validator set * state) \<Rightarrow> bool"
+fun (in Protocol) is_majority :: "(validator set * state) \<Rightarrow> bool"
   where
-    "is_majority params (v_set, \<sigma>) = (weight_measure params v_set > (weight_measure params (V params) - weight_measure params (equivocating_validators \<sigma>)) div 2)"
+    "is_majority (v_set, \<sigma>) = (weight_measure v_set > (weight_measure V - weight_measure (equivocating_validators \<sigma>)) div 2)"
    
 (* Definition 7.12 *)
-definition is_majority_driven :: "params \<Rightarrow> consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
   where
-    "is_majority_driven params p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> params \<and> is_majority params (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> c \<in> \<epsilon> params \<sigma> \<and> p c)"
+    "is_majority_driven p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> is_majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
 
 (* Definition 7.13 *)
-definition is_max_driven :: "params \<Rightarrow> consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) is_max_driven :: "consensus_value_property \<Rightarrow> bool"
   where
-    "is_max_driven params p =
-      (\<forall> \<sigma> c. weight_measure params (agreeing_validators (p, \<sigma>)) > weight_measure params (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> params  \<sigma> \<and> p c)"
+    "is_max_driven p =
+      (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
 
 (* Definition 7.14 *)
-fun later_disagreeing_validators :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
+fun (in Protocol) later_disagreeing_messages :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
   where 
-    "later_disagreeing_validators (p, m, v, \<sigma>) = {m'. m' \<in> later_from (m, v, \<sigma>) \<and> \<not> p (est m')}"
+    "later_disagreeing_messages (p, m, v, \<sigma>) = {m' \<in> M. m' \<in> later_from (m, v, \<sigma>) \<and> \<not> p (est m')}"
 
 (* Definition 7.15 *)
 (* NOTE: Define singleton set here *)
