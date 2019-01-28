@@ -12,10 +12,6 @@ notation Set.empty ("\<emptyset>")
 (* Definition 2.1 ~ 2.5 *)
 typedecl validator
 
-type_synonym weight = "validator \<Rightarrow> real"
-
-type_synonym threshold = real
-
 typedecl consensus_value
 
 (* NOTE: list is used here because set can not be used for recursive definition. *)
@@ -50,8 +46,8 @@ fun
 
 locale Protocol =
   fixes V :: "validator set"
-  and W :: weight
-  and t :: threshold
+  and W :: "validator \<Rightarrow> real"
+  and t :: real
   and C :: "consensus_value set"
   and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
   and \<Sigma> :: "state set"

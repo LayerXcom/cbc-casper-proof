@@ -13,31 +13,35 @@ fun later :: "(message * message) \<Rightarrow> bool"
     "later (m1, m2) = (m2 \<in> justification m1)"
 
 (* Definition 7.2 *)
-fun from_sender :: "(validator * state) \<Rightarrow> message set"
+fun (in Protocol) from_sender :: "(validator * state) \<Rightarrow> message set"
   where
-    "from_sender (v, \<sigma>) = {m. m \<in> \<sigma> \<and> sender m = v}"
+    "from_sender (v, \<sigma>) = {m \<in> M. m \<in> \<sigma> \<and> sender m = v}"
      
 (* Definition 7.3 *)
-fun later_from :: "(message * validator * state) \<Rightarrow> message set"
+fun (in Protocol) later_from :: "(message * validator * state) \<Rightarrow> message set"
   where
-    "later_from (m, v, \<sigma>) = {m'. m \<in> \<sigma> \<and> sender m' = v \<and> later (m', m)}"
+    "later_from (m, v, \<sigma>) = {m' \<in> M. m \<in> \<sigma> \<and> sender m' = v \<and> later (m', m)}"
  
 (* Definition 7.4 *)
-fun latest_messages :: "(state * validator) \<Rightarrow> message set"
+fun (in Protocol) latest_messages :: "(state * validator) \<Rightarrow> message set"
   where
-    "latest_messages (\<sigma>, v) = {m. m \<in> \<sigma> \<and> sender m = v \<and> later_from (m, v, \<sigma>) = \<emptyset>}"
+    "latest_messages (\<sigma>, v) = {m \<in> M. m \<in> \<sigma> \<and> sender m = v \<and> later_from (m, v, \<sigma>) = \<emptyset>}"
 
 (* Definition 7.5 *)
-fun latest_messages_from_honest_validators :: "(state *validator) \<Rightarrow> message set"
+fun (in Protocol) latest_messages_from_honest_validators :: "(state * validator) \<Rightarrow> message set"
   where
     "latest_messages_from_honest_validators (\<sigma>, v) = 
       (if v \<in> equivocating_validators \<sigma> then \<emptyset> else latest_messages (\<sigma>, v))"
 
 (* Definition 7.6 *)
-fun latest_estimates_from_honest_validators :: "(state * validator) \<Rightarrow> consensus_value set"
+fun (in Protocol) latest_estimates_from_honest_validators:: "(state * validator) \<Rightarrow> consensus_value set"
   where
     "latest_estimates_from_honest_validators (\<sigma>, v) = 
       {est m | m. m \<in> latest_messages_from_honest_validators (\<sigma>, v)}"
+
+lemma (in Protocol) latest_estimates_from_honest_validators_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates_from_honest_validators (\<sigma>, v) \<subseteq> C"
+  using M_type by auto
 
 (* Definition 7.7 *)
 fun latest_justifications_from_honest_validators :: "(state * validator) \<Rightarrow> state set"
