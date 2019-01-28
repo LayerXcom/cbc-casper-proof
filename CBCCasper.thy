@@ -58,8 +58,9 @@ locale Protocol =
   and M :: "message set"
 
   assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
-  and threshould_type: "0 \<le> t" "t < Sum (W ` V)"
-  and estimator_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
+  and t_type: "0 \<le> t" "t < Sum (W ` V)"
+  and C_type: "card C > 1"
+  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
 
   assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
   and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
@@ -74,7 +75,7 @@ lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender 
   done
 
 lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
-  using estimator_type by auto
+  using \<epsilon>_type by auto
 end
 
 lemma (in Protocol) \<Sigma>_is_non_empty : "\<Sigma> \<noteq> \<emptyset>"
