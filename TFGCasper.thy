@@ -5,10 +5,7 @@ imports Main HOL.Real CBCCasper ConsensusSafety ExampleProtocols
 begin
 
 (* Section 4.4: Casper the Friendly GHOST *)
-
 (* Definition 4.23: Blocks *)
-(* typedecl block *)
-
 type_synonym block = consensus_value
 
 type_synonym genesis = block
@@ -43,10 +40,10 @@ fun prev :: "ghost_params \<Rightarrow> block \<Rightarrow> block set"
 fun n_cestor :: "ghost_params \<Rightarrow> block \<Rightarrow> nat \<Rightarrow> block set"
   where
     "n_cestor gparams b 0 = {b}"
-  | "n_cestor gparams b n = {b. \<forall> prevblk.  prevblk \<in> (prev gparams b) \<and>  (b \<in> n_cestor gparams prevblk (n-1))}"
+  | "n_cestor gparams b n = {b. \<forall> prevblk. prevblk \<in> (prev gparams b) \<and> (b \<in> n_cestor gparams prevblk (n-1))}"
 
 (* Definition 4.26: Blockchain membership *)
-fun blockchain_membership :: "ghost_params \<Rightarrow> (block * block) \<Rightarrow> bool"
+fun blockchain_membership :: "ghost_params \<Rightarrow> block * block \<Rightarrow> bool"
   where
     "blockchain_membership gparams (b1, b2) = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor gparams b2 n))"
 
@@ -58,7 +55,7 @@ fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Ri
 (* Definition 4.28: Children *)
 fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block set"
   where
-    "children gparams (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> (\<Union> {b''. \<forall> b''. b'' = {est m}}) \<and> (b \<in> prev gparams b')}"
+    "children gparams (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> (\<Union> {b''. \<forall> b''. b'' = est m}) \<and> (b \<in> prev gparams b')}"
     (* same meaning? *)
     (* "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}" *)
 
