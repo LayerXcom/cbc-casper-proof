@@ -48,9 +48,9 @@ fun blockchain_membership :: "ghost_params \<Rightarrow> block * block \<Rightar
     "blockchain_membership gparams (b1, b2) = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor gparams b2 n))"
 
 (* Definition 4.27: Score of a block *)
-fun score :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow> real"
+fun (in Protocol) score :: "ghost_params \<Rightarrow> block * state \<Rightarrow> real"
   where
-    "score params gparams (b, \<sigma>) = sum (W params) ({v. \<forall> v. \<exists> b'. v \<in> V params \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
+    "score gparams (b, \<sigma>) = sum W ({v. \<forall> v. \<exists> b'. v \<in> V \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (blockchain_membership gparams (b, b'))})"
 
 (* Definition 4.28: Children *)
 fun single_est_set :: "message \<Rightarrow> block set"
@@ -64,29 +64,29 @@ fun children :: "ghost_params \<Rightarrow> block * state \<Rightarrow> block se
     (* "children gparams (b, \<sigma>) = {b'. \<forall> b'. (b' \<in> est ` \<sigma>) \<and> (b \<in> prev gparams b')}" *)
 
 (* Definition 4.29: Best Children *)
-fun best_children :: "params \<Rightarrow> ghost_params \<Rightarrow> block * state \<Rightarrow>  block set"
+fun (in Protocol) best_children :: "ghost_params \<Rightarrow> block * state \<Rightarrow>  block set"
   where
-    "best_children params gparams (b, \<sigma>) = {b'. \<forall> b'.
+    "best_children gparams (b, \<sigma>) = {b'. \<forall> b'.
     (b' \<in> children gparams (b, \<sigma>)) \<and> 
-    \<not> (\<exists> b''. (b'' \<in> children gparams (b, \<sigma>)) \<and> (score params gparams (b'', \<sigma>)) > (score params gparams (b', \<sigma>)))}"
+    \<not> (\<exists> b''. (b'' \<in> children gparams (b, \<sigma>)) \<and> (score gparams (b'', \<sigma>)) > (score gparams (b', \<sigma>)))}"
 
 (* Definition 4.30: GHOST *)
-function GHOST :: "params \<Rightarrow> ghost_params \<Rightarrow> (block set) * state => block set"
+function (in Protocol) GHOST :: "ghost_params \<Rightarrow> (block set) * state => block set"
   where
-    "GHOST params gparams (b_set, \<sigma>) =  
-    (\<Union> {s. \<forall> b. s = GHOST params gparams ((best_children params gparams (b, \<sigma>)), \<sigma>) \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) \<noteq> \<emptyset>)})
+    "GHOST gparams (b_set, \<sigma>) =  
+    (\<Union> {s. \<forall> b. s = GHOST gparams ((best_children gparams (b, \<sigma>)), \<sigma>) \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) \<noteq> \<emptyset>)})
     \<union>
     (\<Union> {s. \<forall> b. s = {b} \<and> b \<in> b_set \<and> (children gparams (b, \<sigma>) = \<emptyset>)})"
   by auto
 
 (* Definition 4.31: Casper the Friendly Ghost *)
-fun estimator :: "params \<Rightarrow> ghost_params \<Rightarrow> state \<Rightarrow> block set"
+fun (in Protocol) estimator :: "ghost_params \<Rightarrow> state \<Rightarrow> block set"
   where
-    "estimator params gparams \<sigma> = GHOST params gparams ({g gparams}, \<sigma>)"
+    "estimator gparams \<sigma> = GHOST gparams ({g gparams}, \<sigma>)"
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
-fun P :: "params \<Rightarrow> ghost_params \<Rightarrow> consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
+fun P :: "ghost_params \<Rightarrow> consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
   where
-    "P params gparams p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = True) \<and> \<not> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = False) }"
+    "P gparams p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = True) \<and> \<not> (blockchain_membership gparams (b, b') \<longrightarrow> p b' = False) }"
 
 end
