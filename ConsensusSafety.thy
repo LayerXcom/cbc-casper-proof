@@ -202,7 +202,8 @@ proof -
   hence "state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     using \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> n_party_safety_for_state_properties by auto
   hence "state_properties_are_consistent {p \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. \<exists> q. p = naturally_corresponding_state_property q}"
-    sorry
+    apply simp
+    by meson 
   hence "state_properties_are_consistent {naturally_corresponding_state_property q | q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
     by (smt Collect_cong)
   hence "consensus_value_properties_are_consistent {q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
@@ -212,7 +213,8 @@ proof -
       by (metis (no_types) Setcompr_eq_image \<open>\<forall>q_set. state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set} \<longrightarrow> consensus_value_properties_are_consistent q_set\<close> \<open>state_properties_are_consistent {naturally_corresponding_state_property q |q. naturally_corresponding_state_property q \<in> \<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}}\<close> setcompr_eq_image)
   qed
   hence "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-    sorry
+    apply simp
+    by (smt mem_Collect_eq)
   thus
     "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     by simp
