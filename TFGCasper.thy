@@ -33,14 +33,17 @@ fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block set"
   | "n_cestor b n = {b. \<forall> prevblk. prevblk \<in> (prev b) \<and> (b \<in> n_cestor prevblk (n-1))}"
 
 (* Definition 4.26: Blockchain membership *)
-fun (in Ghost) blockchain_membership :: "block * block \<Rightarrow> bool"
+fun (in Ghost) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
   where
-    "blockchain_membership (b1, b2) = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor b2 n))"
+    "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor b2 n))"
+
+notation (ASCII)
+  comp  (infixl "blockchain_membership" 70)
 
 (* Definition 4.27: Score of a block *)
 fun (in Ghost) score :: "block * state \<Rightarrow> real"
   where
-    "score (b, \<sigma>) = sum W ({v. \<forall> v. \<exists> b'. v \<in> V \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (blockchain_membership (b, b'))})"
+    "score (b, \<sigma>) = sum W {v. \<forall> v. \<exists> b'. v \<in> V \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
 fun single_est_set :: "message \<Rightarrow> block set"
@@ -77,6 +80,6 @@ fun (in Ghost) estimator :: "state \<Rightarrow> block set"
 (* Definition 4.32: Example non-trivial properties of consensus values *)
 fun (in Ghost) P :: "consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
   where
-    "P p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (blockchain_membership (b, b') \<longrightarrow> p b' = True) \<and> \<not> (blockchain_membership (b, b') \<longrightarrow> p b' = False) }"
+    "P p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False) }"
 
 end
