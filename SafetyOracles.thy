@@ -90,10 +90,49 @@ fun (in Protocol) later_disagreeing_messages :: "(consensus_value_property * mes
     "later_disagreeing_messages (p, m, v, \<sigma>) = {m' \<in> M. m' \<in> later_from (m, v, \<sigma>) \<and> \<not> p (est m')}"
 
 (* Definition 7.15 *)
-(* NOTE: Define singleton set here *)
+(* `the_elem` is built-in  *)
 
 (* Section 7.2: Validator Cliques *)
 
 (* Definition 7.16: Clique with 1 layers *)
+fun (in Protocol) is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
+ where
+   "is_clique (v_set, p, \<sigma>) = 
+     (\<forall> v \<in> v_set. v_set \<subseteq> agreeing_validators (p, the_elem (latest_justifications_from_honest_validators (\<sigma>, v)))
+     \<and>  (\<forall>  v' \<in> v_set. later_disagreeing_messages (p, the_elem (latest_messages_from_honest_validators (the_elem (latest_justifications_from_honest_validators (\<sigma>, v)), v')), v', \<sigma>) = \<emptyset>))"
+
+
+(* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
+
+(* Definition 7.17 *)
+abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
+  where
+    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
+      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
+
+(* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
+protocol state *)
+lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
+  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
+  oops
+
+(* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
+lemma (in Protocol) later_from_not_affected_by_minimal_transitions :
+  "\<forall> \<sigma> \<sigma>' m m'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> m' = the_elem (\<sigma>' - \<sigma>)
+  \<longrightarrow> (\<forall> v \<in> V - {sender m'}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
+  oops
+
+(* Definition 7.18: One layer clique oracle threshold size *) 
+fun (in Protocol) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
+  where
+    "gt_threshold (v_set, \<sigma>)
+       = (weight_measure v_set > (weight_measure v_set) div 2 + t  - weight_measure (equivocating_validators \<sigma>))"
+
+(* Definition 7.19: Clique oracle with 1 layers *)
+fun (in Protocol) is_clique_oracle :: "(validator set * state * consensus_value_property) \<Rightarrow> bool"
+  where
+    "is_clique_oracle (v_set, \<sigma>, p)
+       = (is_clique (v_set - (equivocating_validators \<sigma>), p, \<sigma>) \<and> gt_threshold (v_set - (equivocating_validators \<sigma>), \<sigma>))"
 
 end
