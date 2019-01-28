@@ -97,10 +97,10 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
-definition equivocating_validators :: "state \<Rightarrow> validator set"
+definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = 
-      {v. \<exists> m1 m2. m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
 
 (* Definition 2.11 *)
 definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
