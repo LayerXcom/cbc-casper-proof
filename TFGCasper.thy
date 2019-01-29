@@ -71,8 +71,7 @@ fun (in Ghost) estimator :: "state \<Rightarrow> block set"
     "estimator \<sigma> = GHOST ({genesis}, \<sigma>)"
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
-fun (in Ghost) P :: "consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
+abbreviation (in Ghost) P :: "consensus_value_property set"
   where
-    "P p_set b_set = {p. \<exists>!b. \<forall>b'. b \<in> b_set \<and> b' \<in> b_set \<and> (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False) }"
-
+    "P \<equiv> {p. \<exists>!b \<in> B. \<forall>b' \<in> B. (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False)}"
 end
