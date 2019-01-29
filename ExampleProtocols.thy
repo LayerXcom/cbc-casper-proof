@@ -91,7 +91,7 @@ definition  (in Protocol) latest_messages_from_non_equivocating_validators :: "s
 (* Definition 4.13: Latest estimates from non-Equivocating validators *)
 definition (in Protocol) latest_estimates_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
   where
-    "latest_estimates_from_non_equivocating_validators \<sigma> v = {est m | m. m \<in> latest_messages_from_non_equivocating_validators \<sigma> v}"
+    "latest_estimates_from_non_equivocating_validators \<sigma> v = {est m | m. m \<in> M \<and> m \<in> latest_messages_from_non_equivocating_validators \<sigma> v}"
 
 (* Definition 4.14: Latest honest estimate driven estimator *)
 (* TODO *)
