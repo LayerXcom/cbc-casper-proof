@@ -25,7 +25,7 @@ fun (in Ghost) prev :: "block \<Rightarrow> block set"
   where
     "prev b = (if b = genesis then {b} else {b'. b' \<in> block_generator b})"
 
-(* Definition 4.25: n'th generation ansectr block *)
+(* Definition 4.25: n'th generation ancestor block *)
 fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block set"
   where
     "n_cestor b 0 = {b}"
