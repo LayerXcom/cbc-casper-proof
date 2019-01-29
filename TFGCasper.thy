@@ -8,7 +8,7 @@ begin
 (* Definition 4.23: Blocks *)
 type_synonym block = consensus_value
 
-fun  B_i :: "(block * (block \<Rightarrow> block set)) \<Rightarrow> nat \<Rightarrow> block set"
+fun B_i :: "(block * (block \<Rightarrow> block set)) \<Rightarrow> nat \<Rightarrow> block set"
   where
     "B_i (g, blk_gen) 0 = {g}"
   | "B_i (g, blk_gen) n = \<Union> {blk_gen b | b. b \<in> B_i (g, blk_gen) (n - 1)}"
@@ -19,22 +19,23 @@ locale Ghost = Protocol +
   and block_generator :: "block \<Rightarrow> block set"
 
   assumes B_def : "B = \<Union> (B_i (genesis, block_generator)` \<nat>)"
+  and block_generator_type : "\<forall> b \<in> B. is_singleton {b' \<in> B. b \<in> block_generator b'}"
 
 (* Definition 4.24: Previous block resolver *)
-fun (in Ghost) prev :: "block \<Rightarrow> block set"
+fun (in Ghost) prev :: "block \<Rightarrow> block"
   where
-    "prev b = (if b = genesis then {b} else {b'. b' \<in> block_generator b})"
+    "prev b = (if b = genesis then b else the_elem {b' \<in> B. b \<in> block_generator b'})"
 
 (* Definition 4.25: n'th generation ancestor block *)
-fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block set"
+fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block"
   where
-    "n_cestor b 0 = {b}"
-  | "n_cestor b n = {b. \<forall> prevblk. prevblk \<in> (prev b) \<and> (b \<in> n_cestor prevblk (n-1))}"
+    "n_cestor b 0 = b"
+  | "n_cestor b n = n_cestor (prev b) (n-1)"
 
 (* Definition 4.26: Blockchain membership *)
 fun (in Ghost) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
   where
-    "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> (b1 \<in> n_cestor b2 n))"
+    "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> b1 = n_cestor b2 n)"
 
 notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
@@ -47,7 +48,7 @@ fun (in Ghost) score :: "block * state \<Rightarrow> real"
 (* Definition 4.28: Children *)
 fun (in Ghost) children :: "block * state \<Rightarrow> block set"
   where
-    "children (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> ((\<lambda>b. {b. b = est m}) ` \<sigma>) \<and> (b \<in> prev b')}"
+    "children (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> ((\<lambda>b. {b. b = est m}) ` \<sigma>) \<and> (b = prev b')}"
 
 (* Definition 4.29: Best Children *)
 fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
