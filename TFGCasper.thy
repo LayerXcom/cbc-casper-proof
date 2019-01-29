@@ -48,7 +48,7 @@ fun (in Ghost) score :: "block * state \<Rightarrow> real"
 (* Definition 4.28: Children *)
 fun (in Ghost) children :: "block * state \<Rightarrow> block set"
   where
-    "children (b, \<sigma>) = {b'. \<forall> b'. \<forall> m. m \<in> \<sigma> \<and> b' \<in> \<Union> ((\<lambda>b. {b. b = est m}) ` \<sigma>) \<and> (b = prev b')}"
+    "children (b, \<sigma>) = {b' \<in> B. b' \<in> est `\<sigma> \<and> b = prev b'}"
 
 (* Definition 4.29: Best Children *)
 fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
