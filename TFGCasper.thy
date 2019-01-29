@@ -56,12 +56,11 @@ fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
     "best_children (b, \<sigma>) = {arg_max_on (score \<sigma>) (children (b, \<sigma>))}"
 
 (* Definition 4.30: GHOST *)
-function (in Ghost) GHOST :: "(block set) * state => block set"
+function (in Ghost) GHOST :: "(block set * state) => block set"
   where
     "GHOST (b_set, \<sigma>) =
-    (\<Union> ((\<lambda>b. GHOST (best_children (b, \<sigma>), \<sigma>)) ` {b. b \<in> b_set \<and> (children (b, \<sigma>) \<noteq> \<emptyset>)}))
-    \<union>
-    (\<Union> ((\<lambda>b. {b}) ` {b. b \<in> b_set \<and> (children (b, \<sigma>) = \<emptyset>)}))"
+      (\<Union> b \<in> {b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset>}. GHOST (best_children (b, \<sigma>), \<sigma>))
+       \<union> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>}"
   by auto
 
 (* Definition 4.31: Casper the Friendly Ghost *)
