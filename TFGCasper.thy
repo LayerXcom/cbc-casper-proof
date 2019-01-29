@@ -8,23 +8,22 @@ begin
 (* Definition 4.23: Blocks *)
 type_synonym block = consensus_value
 
+fun  B_i :: "(block * (block \<Rightarrow> block set)) \<Rightarrow> nat \<Rightarrow> block set"
+  where
+    "B_i (g, blk_gen) 0 = {g}"
+  | "B_i (g, blk_gen) n = \<Union> {blk_gen b | b. b \<in> B_i (g, blk_gen) (n - 1)}"
+
 locale Ghost = Protocol +
-  fixes Genesis :: block
-  and NextBlkgen :: "block \<Rightarrow> block set"
+  fixes genesis :: block
+  fixes B :: "block set"
+  and block_generator :: "block \<Rightarrow> block set"
 
-fun (in Ghost) B_i :: "nat \<Rightarrow> block set"
-  where
-    "B_i 0 = {Genesis}"
-  | "B_i n = \<Union> {NextBlkgen b | b. b \<in> B_i (n - 1)}"
-
-definition (in Ghost) B :: "block set"
-  where
-    "B = \<Union> (B_i ` \<nat>)"
+  assumes B_def : "B = \<Union> (B_i (genesis, block_generator)` \<nat>)"
 
 (* Definition 4.24: Previous block resolver *)
 fun (in Ghost) prev :: "block \<Rightarrow> block set"
   where
-    "prev b = (if b = Genesis then {b} else {b'. b' \<in> NextBlkgen b})"
+    "prev b = (if b = genesis then {b} else {b'. b' \<in> block_generator b})"
 
 (* Definition 4.25: n'th generation ansectr block *)
 fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block set"
@@ -69,7 +68,7 @@ function (in Ghost) GHOST :: "(block set) * state => block set"
 (* Definition 4.31: Casper the Friendly Ghost *)
 fun (in Ghost) estimator :: "state \<Rightarrow> block set"
   where
-    "estimator \<sigma> = GHOST ({Genesis}, \<sigma>)"
+    "estimator \<sigma> = GHOST ({genesis}, \<sigma>)"
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
 fun (in Ghost) P :: "consensus_value_property set \<Rightarrow> block set \<Rightarrow> consensus_value_property set"
