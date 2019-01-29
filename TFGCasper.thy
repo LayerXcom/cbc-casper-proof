@@ -41,9 +41,9 @@ notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
 
 (* Definition 4.27: Score of a block *)
-fun (in Ghost) score :: "block * state \<Rightarrow> real"
+fun (in Ghost) score :: "state \<Rightarrow> block \<Rightarrow> real"
   where
-    "score (b, \<sigma>) = sum W {v \<in> V. \<exists> b' \<in> B. b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
+    "score \<sigma> b = sum W {v \<in> V. \<exists> b' \<in> B. b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
 fun (in Ghost) children :: "block * state \<Rightarrow> block set"
@@ -53,9 +53,7 @@ fun (in Ghost) children :: "block * state \<Rightarrow> block set"
 (* Definition 4.29: Best Children *)
 fun (in Ghost) best_children :: "block * state \<Rightarrow>  block set"
   where
-    "best_children (b, \<sigma>) = {b'. \<forall> b'.
-    (b' \<in> children (b, \<sigma>)) \<and>
-    \<not> (\<exists> b''. (b'' \<in> children (b, \<sigma>)) \<and> (score (b'', \<sigma>)) > (score (b', \<sigma>)))}"
+    "best_children (b, \<sigma>) = {arg_max_on (score \<sigma>) (children (b, \<sigma>))}"
 
 (* Definition 4.30: GHOST *)
 function (in Ghost) GHOST :: "(block set) * state => block set"
