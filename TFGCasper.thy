@@ -27,15 +27,15 @@ fun (in Ghost) prev :: "block \<Rightarrow> block"
     "prev b = (if b = genesis then b else the_elem {b' \<in> B. b \<in> block_generator b'})"
 
 (* Definition 4.25: n'th generation ancestor block *)
-fun (in Ghost) n_cestor :: "block \<Rightarrow> nat \<Rightarrow> block"
+fun (in Ghost) n_cestor :: "block * nat \<Rightarrow> block"
   where
-    "n_cestor b 0 = b"
-  | "n_cestor b n = n_cestor (prev b) (n-1)"
+    "n_cestor (b, 0) = b"
+  | "n_cestor (b, n) = n_cestor (prev b, n-1)"
 
 (* Definition 4.26: Blockchain membership *)
 fun (in Ghost) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
   where
-    "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> b1 = n_cestor b2 n)"
+    "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> b1 = n_cestor (b2, n))"
 
 notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
