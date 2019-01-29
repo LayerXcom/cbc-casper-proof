@@ -4,3 +4,4 @@ session "all" = "HOL" +
     ConsensusSafety
     SafetyOracles
     ExampleProtocols
+    TFGCasper
