@@ -43,7 +43,7 @@ notation (ASCII)
 (* Definition 4.27: Score of a block *)
 fun (in Ghost) score :: "block * state \<Rightarrow> real"
   where
-    "score (b, \<sigma>) = sum W {v. \<forall> v. \<exists> b'. v \<in> V \<and> b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
+    "score (b, \<sigma>) = sum W {v \<in> V. \<exists> b' \<in> B. b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
 fun (in Ghost) children :: "block * state \<Rightarrow> block set"
