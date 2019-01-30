@@ -1,4 +1,4 @@
-theory SafetyOracles
+theory SafetyOracle
 
 imports Main CBCCasper ConsensusSafety
 
