@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper ConsensusSafety ExampleProtocols
+imports Main HOL.Real CBCCasper ConsensusSafety LatestMessage
 
 begin
 

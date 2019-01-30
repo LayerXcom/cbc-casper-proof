@@ -1,4 +1,4 @@
-theory ExampleProtocols
+theory LatestMessage
 
 imports Main CBCCasper
 
