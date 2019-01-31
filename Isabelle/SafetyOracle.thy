@@ -112,16 +112,70 @@ abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
+definition immediately_next_message where
+  "immediately_next_message = (\<lambda>(\<sigma>,m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
+
+lemma (in Protocol) message_cannot_justify_itself: "\<nexists>m. m \<in> M \<longrightarrow> m \<in> justification m"
+  sorry
+
+lemma (in Protocol) state_transition_by_immediately_next_message: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>m\<in>M. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>"
+  sorry
+
+lemma (in Protocol) state_differences_have_immediately_next_messages: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>\<sigma>'\<in>\<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists>m \<in> (\<sigma>'-\<sigma>). \<forall>m'\<in>justification m. m' \<in> \<sigma>')"
+  by (metis Diff_iff is_future_state.simps state_is_in_pow_M_i subsetCE subsetI subset_antisym)
+
+lemma (in Protocol) no_missing_message: "\<forall>\<sigma>\<in>\<Sigma>. \<nexists>m. m \<in> \<sigma> \<longrightarrow> (\<exists>m'\<in>\<sigma>. m \<in> justification m') \<and> m \<notin> \<sigma>"
+  sorry
+
 lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
   "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
   \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-  oops
+proof-
+  have "\<And>\<sigma> \<sigma>'. \<lbrakk> \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; is_future_state (\<sigma>',\<sigma>); \<sigma> \<noteq> \<sigma>'; card (\<sigma>'-\<sigma>) > 1 \<rbrakk> \<Longrightarrow> \<exists>\<sigma>''\<in>\<Sigma>. is_future_state (\<sigma>'',\<sigma>) \<and> is_future_state (\<sigma>',\<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>'"
+    using no_missing_message by auto
+  thus ?thesis
+    using M_type message_cannot_justify_itself no_missing_message by auto
+qed
 
 (* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
 lemma (in Protocol) later_from_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> \<sigma>' m m'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> (\<forall> v \<in> V - {sender m'}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
-  oops
+  apply (rule, rule, rule, rule, rule, rule)
+proof-
+  fix \<sigma> \<sigma>' m m' v
+  assume "(\<sigma>, \<sigma>') \<in> {(\<sigma>, \<sigma>') |\<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<and> (\<nexists>\<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}
+    \<and> m' = the_elem (\<sigma>' - \<sigma>)"
+  and "v \<in> V - {sender m'}"
+
+  have "later_from (m,v,\<sigma>) = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)}"
+    unfolding later_from.simps
+    using M_type message_cannot_justify_itself no_missing_message by auto
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> \<emptyset>"
+    by simp
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> {m'' \<in> {m'}. sender m'' = v}"
+  proof-
+    have "{m'' \<in> {m'}. sender m'' = v} = \<emptyset>"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> {m'' \<in> {m'}. sender m'' = v \<and> later(m',m)}"
+  proof-
+    have "sender m' = v \<Longrightarrow> later(m',m)"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> later(m'',m)}"
+    by auto
+  also have "\<dots> = {m'' \<in> \<sigma>'. sender m'' = v \<and> later(m'',m)}"
+    using M_type message_cannot_justify_itself no_missing_message by auto
+  also have "\<dots> = later_from (m,v,\<sigma>')"
+    using M_type message_cannot_justify_itself no_missing_message by blast
+  finally show "later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
+    by simp
+qed
 
 (* Definition 7.18: One layer clique oracle threshold size *) 
 fun (in Protocol) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
