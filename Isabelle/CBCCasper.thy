@@ -34,6 +34,21 @@ fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
 
+
+locale Params =
+  fixes V :: "validator set"
+  and W :: "validator \<Rightarrow> real"
+  and t :: real
+  and \<Sigma> :: "state set"
+  and M :: "message set"
+
+locale AbstractProtocol = Params +
+  fixes C :: "consensus_value set"
+  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+  assumes C_type: "card C > 1"
+  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
+
+
 (* \<Sigma>, M Construction
    NOTE: we cannot refer to the definitions from locale to its context *)
 fun
@@ -44,19 +59,11 @@ fun
   | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
   | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
-locale Protocol =
-  fixes V :: "validator set"
-  and W :: "validator \<Rightarrow> real"
-  and t :: real
-  and C :: "consensus_value set"
-  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
-  and \<Sigma> :: "state set"
-  and M :: "message set"
-
-  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
+(* Locale for proofs *)
+locale Protocol = AbstractProtocol +
+  assumes V_type "V \<noteq> \<emptyset>"
+  and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
-  and C_type: "card C > 1"
-  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
 
   assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
   and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
@@ -134,6 +141,15 @@ lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longr
   using \<epsilon>_type by auto
 end
 
+(* Definition 4.1: Observed validators *)
+definition observed :: "state \<Rightarrow> validator set"
+  where
+    "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
+
+lemma (in Protocol) oberved_type :
+  "\<forall> \<sigma> \<in> \<Sigma>. observed \<sigma> \<subseteq> V"
+  using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
+
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
@@ -146,26 +162,44 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
-definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
+definition is_equivocating :: "state \<Rightarrow> validator \<Rightarrow> bool"
   where
-    "equivocating_validators \<sigma> = 
-      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+    "is_equivocating \<sigma> v =  (\<exists> m1 \<in> \<sigma>. \<exists> m2 \<in> \<sigma>. equivocation (m1, m2) \<and> sender m1 = v)"
+
+definition equivocating_validators :: "state \<Rightarrow> validator set"
+  where
+    "equivocating_validators \<sigma> = {v \<in> observed \<sigma>. is_equivocating \<sigma> v}"
+
+definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
+  where
+    "equivocating_validators_paper \<sigma> = {v \<in> V. is_equivocating \<sigma> v}"
+
+lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
+  "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
+  by (meson Protocol.axioms(2) Protocol_axioms Protocol_axioms_def)
+
 
 (* Definition 2.11 *)
-definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
+definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
     "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
-definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
+definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
-definition (in Protocol) \<Sigma>t :: "state set"
+definition (in Params) \<Sigma>t :: "state set"
   where
     "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
 
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
+
+(* Definition 3.2 *)
+type_synonym state_property = "state \<Rightarrow> bool"
+
+(* Definition 3.7 *)
+type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 
 end
