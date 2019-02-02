@@ -118,8 +118,51 @@ definition immediately_next_message where
 lemma (in Protocol) message_cannot_justify_itself: "\<nexists>m. m \<in> M \<longrightarrow> m \<in> justification m"
   sorry
 
-lemma (in Protocol) state_transition_by_immediately_next_message: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>m\<in>M. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>"
-  sorry
+lemma (in Protocol) state_transition_by_immediately_next_message_induction: "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+  apply (rule, rule, rule, rule, rule)
+proof-
+  fix n \<sigma> m
+  assume "1 \<le> n" "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n" "m \<in> M_i (V, C, \<epsilon>) n" "immediately_next_message (\<sigma>, m)"
+
+  have "\<exists>n'. n = Suc n'"
+    using \<open>1 \<le> n\<close> old.nat.exhaust by auto
+  hence si: "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+    by force
+
+  hence "\<Sigma>_i (V,C,\<epsilon>) (n+1) = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+    by force
+
+  have "justification m \<subseteq> \<sigma>"
+    using immediately_next_message_def
+    by (metis (no_types, lifting) \<open>immediately_next_message (\<sigma>, m)\<close> case_prod_conv)
+  hence "justification m \<subseteq> \<sigma> \<union> {m}"
+    by blast
+  moreover have "\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma>"
+    using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by blast
+  hence"\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}"
+    by auto
+  ultimately have "\<And>m'. m' \<in> \<sigma> \<union> {m} \<Longrightarrow> justification m \<subseteq> \<sigma>"
+    using \<open>justification m \<subseteq> \<sigma>\<close> by blast
+
+  have "{m} \<in> Pow (M_i (V,C,\<epsilon>) n)"
+    using \<open>m \<in> M_i (V, C, \<epsilon>) n\<close> by auto
+  moreover have "\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n-1))"
+    using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by auto
+  hence "\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n)"
+    using Mi_monotonic
+    by (metis (full_types) PowD PowI Suc_eq_plus1 \<open>\<exists>n'. n = Suc n'\<close> diff_Suc_1 subset_iff)
+  ultimately have "\<sigma> \<union> {m} \<in> Pow (M_i (V,C,\<epsilon>) n)"
+    by blast
+
+  show "\<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)"
+    using \<open>\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (M_i (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> by auto
+qed
+
+lemma (in Protocol) state_transition_by_immediately_next_message_at_n: "\<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+  apply (cases n)
+  apply auto[1]
+  using state_transition_by_immediately_next_message_induction
+  by (metis le_add1 plus_1_eq_Suc)
 
 lemma (in Protocol) state_differences_have_immediately_next_messages: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>\<sigma>'\<in>\<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists>m \<in> (\<sigma>'-\<sigma>). \<forall>m'\<in>justification m. m' \<in> \<sigma>')"
   by (metis Diff_iff is_future_state.simps state_is_in_pow_M_i subsetCE subsetI subset_antisym)
