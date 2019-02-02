@@ -124,18 +124,13 @@ lemma (in Protocol) state_transition_by_immediately_next_message: "\<forall>\<si
 lemma (in Protocol) state_differences_have_immediately_next_messages: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>\<sigma>'\<in>\<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists>m \<in> (\<sigma>'-\<sigma>). \<forall>m'\<in>justification m. m' \<in> \<sigma>')"
   by (metis Diff_iff is_future_state.simps state_is_in_pow_M_i subsetCE subsetI subset_antisym)
 
-lemma (in Protocol) no_missing_message: "\<forall>\<sigma>\<in>\<Sigma>. \<nexists>m. m \<in> \<sigma> \<longrightarrow> (\<exists>m'\<in>\<sigma>. m \<in> justification m') \<and> m \<notin> \<sigma>"
-  sorry
+lemma (in Protocol) no_missing_message: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>m\<in>\<sigma>. \<forall>m'\<in>justification m. m' \<in> \<sigma>"
+  using state_is_in_pow_M_i by fastforce
 
 lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
   "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
   \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-proof-
-  have "\<And>\<sigma> \<sigma>'. \<lbrakk> \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; is_future_state (\<sigma>',\<sigma>); \<sigma> \<noteq> \<sigma>'; card (\<sigma>'-\<sigma>) > 1 \<rbrakk> \<Longrightarrow> \<exists>\<sigma>''\<in>\<Sigma>. is_future_state (\<sigma>'',\<sigma>) \<and> is_future_state (\<sigma>',\<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>'"
-    using no_missing_message by auto
-  thus ?thesis
-    using M_type message_cannot_justify_itself no_missing_message by auto
-qed
+  sorry
 
 (* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
 lemma (in Protocol) later_from_not_affected_by_minimal_transitions :
@@ -149,8 +144,7 @@ proof-
   and "v \<in> V - {sender m'}"
 
   have "later_from (m,v,\<sigma>) = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)}"
-    unfolding later_from.simps
-    using M_type message_cannot_justify_itself no_missing_message by auto
+    sorry
   also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> \<emptyset>"
     by simp
   also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> {m'' \<in> {m'}. sender m'' = v}"
@@ -170,9 +164,9 @@ proof-
   also have "\<dots> = {m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> later(m'',m)}"
     by auto
   also have "\<dots> = {m'' \<in> \<sigma>'. sender m'' = v \<and> later(m'',m)}"
-    using M_type message_cannot_justify_itself no_missing_message by auto
+    sorry
   also have "\<dots> = later_from (m,v,\<sigma>')"
-    using M_type message_cannot_justify_itself no_missing_message by blast
+    sorry
   finally show "later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
     by simp
 qed
