@@ -1,6 +1,7 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
-module CBCCasper(Validator, Message, Set, equivocation, is_future_state) where {
+module SafetyOracle(Validator, Message, Set, equivocation, is_future_state)
+  where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
   (>>=), (>>), (=<<), (&&), (||), (^), (^^), (.), ($), ($!), (++), (!!), Eq,
