@@ -69,7 +69,9 @@ lemma (in Protocol) non_equivocating_validators_have_at_most_one_latest_message:
 (* TODO *)
 
 (* Lemma 7 *)
-(* TODO *)
+lemma (in Protocol) monotonicity_of_justifications :
+  "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> m' \<in> later (m, \<sigma>) \<longrightarrow> justification m \<subseteq> justification m'"
+  using M_type state_is_in_pow_M_i by auto
 
 (* Lemma 8 *)
 (* TODO *)

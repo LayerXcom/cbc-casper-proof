@@ -1,6 +1,6 @@
 theory SafetyOracle
 
-imports Main CBCCasper ConsensusSafety
+imports Main CBCCasper StateTransition
 
 begin
 
@@ -104,24 +104,44 @@ fun (in Protocol) is_clique :: "(validator set * consensus_value_property * stat
 
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 
-(* Definition 7.17 *)
-abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
-  where
-    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
-      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
-
-(* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
-protocol state *)
-lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-  oops
-
 (* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
 lemma (in Protocol) later_from_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> \<sigma>' m m'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> (\<forall> v \<in> V - {sender m'}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
-  oops
+  apply (rule, rule, rule, rule, rule, rule)
+proof-
+  fix \<sigma> \<sigma>' m m' v
+  assume "(\<sigma>, \<sigma>') \<in> {(\<sigma>, \<sigma>') |\<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<and> (\<nexists>\<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}
+    \<and> m' = the_elem (\<sigma>' - \<sigma>)"
+  and "v \<in> V - {sender m'}"
+
+  have "later_from (m,v,\<sigma>) = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)}"
+    sorry
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> \<emptyset>"
+    by simp
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> {m'' \<in> {m'}. sender m'' = v}"
+  proof-
+    have "{m'' \<in> {m'}. sender m'' = v} = \<emptyset>"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m' \<in> \<sigma>. sender m' = v \<and> later(m',m)} \<union> {m'' \<in> {m'}. sender m'' = v \<and> later(m',m)}"
+  proof-
+    have "sender m' = v \<Longrightarrow> later(m',m)"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> later(m'',m)}"
+    by auto
+  also have "\<dots> = {m'' \<in> \<sigma>'. sender m'' = v \<and> later(m'',m)}"
+    sorry
+  also have "\<dots> = later_from (m,v,\<sigma>')"
+    sorry
+  finally show "later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
+    by simp
+qed
 
 (* Definition 7.18: One layer clique oracle threshold size *) 
 fun (in Protocol) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
