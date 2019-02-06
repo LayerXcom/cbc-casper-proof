@@ -1,13 +1,13 @@
 theory SafetyOracle
 
-imports Main CBCCasper ConsensusSafety LatestMessage
+imports Main CBCCasper LatestMessage StateTransition
 
 begin
 
 (* Section 7: Safety Oracles *)
 (* Section 7.1 Preliminary Definitions *)
 
-(* NOTE: Definition 7.1 is replaced by definition 4.2*)
+(* NOTE: Definition 7.1 is defined as `justified` *)
 (* NOTE: Definition 7.2 is duplicate of definition 4.3 *)
 (* NOTE: Definition 7.3 is duplicate of definition 4.5 *)
 (* NOTE: Definition 7.4 is duplicate of definition 4.6 *)
@@ -92,24 +92,51 @@ fun is_clique :: "(validator set * consensus_value_property * state) \<Rightarro
 
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 
-(* Definition 7.17 *)
-abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
-  where
-    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
-      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
-
-(* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
-protocol state *)
-lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-  oops
-
 (* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
 lemma (in Protocol) later_from_not_affected_by_minimal_transitions :
-  "\<forall> \<sigma> \<sigma>' m m'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> m' = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> (\<forall> v \<in> V - {sender m'}. later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>'))"
-  oops
+  "\<forall> \<sigma> \<sigma>' m m' v. (\<sigma>, \<sigma>') \<in> minimal_transitions
+  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
+  \<longrightarrow> v \<in> V - {sender m'}
+  \<longrightarrow> later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
+  apply (rule, rule, rule, rule, rule, rule, rule, rule)
+proof-
+  fix \<sigma> \<sigma>' m m' v
+  assume "(\<sigma>, \<sigma>') \<in> minimal_transitions"
+  assume "m' = the_elem (\<sigma>' - \<sigma>)"
+  assume "v \<in> V - {sender m'}"
+
+  have "later_from (m,v,\<sigma>) = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''}"
+    by auto
+  also have "\<dots> = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''} \<union> \<emptyset>"
+    by auto    
+  also have "\<dots> = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''} \<union> {m'' \<in> {m'}. sender m'' = v}"
+  proof-
+    have "{m'' \<in> {m'}. sender m'' = v} = \<emptyset>"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''} \<union> {m'' \<in> {m'}. sender m'' = v \<and> justified m m''}"
+  proof-
+    have "sender m' = v \<Longrightarrow> justified m m'"
+      using \<open>v \<in> V - {sender m'}\<close> by auto
+    thus ?thesis
+      by blast
+  qed
+  also have "\<dots> = {m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> justified m m''}"
+    by auto
+  also have "\<dots> = {m'' \<in> \<sigma>'. sender m'' = v \<and> justified m m''}"
+  proof -
+    have "\<sigma>' =  \<sigma> \<union> {m'}"
+      using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions\<close> \<open>m' = the_elem (\<sigma>' - \<sigma>)\<close> minimal_transitions_reconstruction by auto 
+    then show ?thesis
+      by auto
+  qed
+  then have "\<dots> = later_from (m,v,\<sigma>')"
+    by auto
+  then show "later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
+    using \<open>{m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> justified m m''} = {m'' \<in> \<sigma>'. sender m'' = v \<and> justified m m''}\<close> calculation by auto
+qed
 
 (* Definition 7.18: One layer clique oracle threshold size *) 
 fun (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"

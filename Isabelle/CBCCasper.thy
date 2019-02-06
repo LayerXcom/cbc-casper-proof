@@ -58,6 +58,28 @@ begin
     where
       "is_valid_estimator e = (\<forall>\<sigma> \<in> \<Sigma>. e \<sigma> \<in> Pow C - {\<emptyset>})"
 
+  lemma \<Sigma>i_subset_Mi: "\<Sigma>_i (V,C,\<epsilon>) (n + 1) \<subseteq> Pow (M_i (V,C,\<epsilon>) n)"
+    by force
+
+  lemma \<Sigma>i_subset_to_Mi: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
+    by auto
+
+  lemma Mi_subset_to_\<Sigma>i: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+2)"
+    by auto
+
+  lemma \<Sigma>i_monotonic: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+    apply (induction n)
+    apply simp
+    apply (metis Mi_subset_to_\<Sigma>i Suc_eq_plus1 \<Sigma>i_subset_to_Mi add.commute add_2_eq_Suc)
+    done
+
+  lemma Mi_monotonic: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
+    apply (induction n)
+    defer
+    using \<Sigma>i_monotonic \<Sigma>i_subset_to_Mi apply blast
+    apply auto
+    done
+
 end
 
 (* Locale for proofs *)
@@ -67,7 +89,6 @@ locale Protocol = Params +
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
-
 
 lemma (in Protocol) message_in_state_is_valid :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
@@ -200,5 +221,26 @@ type_synonym state_property = "state \<Rightarrow> bool"
 
 (* Definition 3.7 *)
 type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
+
+(* Message justification *)
+definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
+  where
+    "justified m1 m2 = (m1 \<in> justification m2)"
+
+lemma (in Protocol) transitivity_of_justifications :
+  "\<forall> m1 m2 m3 \<sigma>. {m1, m2, m3} \<subseteq> \<sigma> \<and> \<sigma> \<in> \<Sigma> 
+  \<longrightarrow> m1 \<in> justification m2 \<and> m2 \<in> justification m3
+  \<longrightarrow> m1 \<in> justification m3"
+  by (meson M_type contra_subsetD insert_subset message_in_state_is_valid state_is_in_pow_M_i)
+
+lemma (in Protocol) irreflexivity_of_justifications: 
+  "\<forall> m \<in> M.  m \<notin> justification m"
+  sorry
+
+lemma (in Protocol) asymmetry_of_justifications :
+  "\<forall> m1 m2. m1 \<in> M \<and> m2 \<in> M 
+  \<longrightarrow> m1 \<in> justification m2 \<longrightarrow> m2 \<notin> justification m1"
+  using M_type irreflexivity_of_justifications state_is_in_pow_M_i by blast
+
 
 end

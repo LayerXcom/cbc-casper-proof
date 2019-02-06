@@ -2,6 +2,7 @@ session "all" = "HOL" +
   theories [document = false]
     CBCCasper
     ConsensusSafety
-    SafetyOracle
     LatestMessage
+    StateTransition
+    SafetyOracle
     TFGCasper

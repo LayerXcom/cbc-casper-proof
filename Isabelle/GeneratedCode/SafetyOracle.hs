@@ -394,8 +394,11 @@ observed sigma = image sender sigma;
 justification :: Message -> Set Message;
 justification (Message (uu, (uv, s))) = Set s;
 
+justified :: Message -> Message -> bool;
+justified m1 m2 = member m1 (justification m2);
+
 later :: (Message, Set Message) -> Set Message;
-later (m, sigma) = filtera (\ ma -> member m (justification ma)) sigma;
+later (m, sigma) = filtera (justified m) sigma;
 
 equal_validator :: Validator -> Validator -> bool;
 equal_validator x y = equal_validator x y;
