@@ -165,7 +165,7 @@ proof -
   moreover have
     "(\<exists> \<sigma> \<in> \<Sigma>. \<exists> c \<in> \<epsilon> \<sigma>. \<forall> q \<in> q_set. q c)
     \<longrightarrow> (\<exists> c \<in> C. \<forall> q' \<in> q_set. q' c)"
-    using \<epsilon>_type by fastforce
+    using is_valid_estimator_def \<epsilon>_type by fastforce
   ultimately show
     "state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set}
     \<Longrightarrow> consensus_value_properties_are_consistent q_set"

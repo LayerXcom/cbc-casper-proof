@@ -48,26 +48,26 @@ locale Params =
   fixes V :: "validator set"
   and W :: "validator \<Rightarrow> real"
   and t :: real
-
-
-locale NonVolatileParams =
   fixes C :: "consensus_value set"
   and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
 
-  assumes C_type: "card C > 1"
-  and \<epsilon>_type: "\<And>\<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<in> Pow C - {\<emptyset>}"
+begin
+  definition "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
+  definition "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
+  definition is_valid_estimator :: "(state \<Rightarrow> consensus_value set) \<Rightarrow> bool"
+    where
+      "is_valid_estimator e = (\<forall>\<sigma> \<in> \<Sigma>. e \<sigma> \<in> Pow C - {\<emptyset>})"
 
+end
 
 (* Locale for proofs *)
-locale Protocol = Params + NonVolatileParams +
-  assumes V_type "V \<noteq> \<emptyset>"
+locale Protocol = Params +
+  assumes V_type: "V \<noteq> \<emptyset>"
   and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
+  and C_type: "card C > 1"
+  and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
-begin
-
-definition "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
-definition "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
 
 lemma (in Protocol) message_in_state_is_valid :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
@@ -137,9 +137,8 @@ lemma (in Protocol) M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C 
   apply auto
   done
 
-lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
-  using \<epsilon>_type by auto
-end
+lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using is_valid_estimator_def \<epsilon>_type by auto
 
 (* Definition 4.1: Observed validators *)
 definition observed :: "state \<Rightarrow> validator set"
@@ -176,7 +175,7 @@ definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> val
 
 lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
-  by (meson Protocol.axioms(2) Protocol_axioms Protocol_axioms_def)
+  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq oberved_type observed_def subsetCE)
 
 
 (* Definition 2.11 *)

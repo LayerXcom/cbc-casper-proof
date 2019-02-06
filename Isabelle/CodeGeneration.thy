@@ -39,7 +39,7 @@ code_printing
   class_instance validator :: "HOL.equal" => (Haskell) -
   (* | type_constructor validator => (Haskell) "Map String String" *)
 
-interpretation p: Params V W t for V W t
+interpretation p: Params V W t C \<epsilon> for V W t C \<epsilon>
   done
 
 (* Define a constant *)
@@ -49,17 +49,21 @@ export_code is_clique is_clique_oracle in Haskell
   module_name SafetyOracle file GeneratedCode
 
 
-interpretation gp: GhostParams V W t genesis B prev for V W t genesis B prev
+interpretation gp: GhostParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev 
   done
-
-term gp.best_children
-
-definition "best_children = gp.best_children"
 
 (* FIXME: Wellsortedness error *)
 (* 
+definition "best_children = gp.best_children"
 export_code best_children in Haskell
   module_name TFGCasper file GeneratedCode
- *)
+*)
+
+(* FIXME: No code equations for GhostParams.GHOST *)
+(*
+definition "estimator = gp.estimator"
+export_code estimator in Haskell
+  module_name TFGCasper file GeneratedCode
+*)
 
 end
