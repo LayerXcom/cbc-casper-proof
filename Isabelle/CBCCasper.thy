@@ -190,4 +190,21 @@ definition (in Protocol) \<Sigma>t :: "state set"
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
 
+(* Message justification *)
+lemma (in Protocol) transitivity_of_justifications :
+  "\<forall> m1 m2 m3 \<sigma>. {m1, m2, m3} \<subseteq> \<sigma> \<and> \<sigma> \<in> \<Sigma> 
+  \<longrightarrow> m1 \<in> justification m2 \<and> m2 \<in> justification m3
+  \<longrightarrow> m1 \<in> justification m3"
+  by (meson M_type contra_subsetD insert_subset message_in_state_is_valid state_is_in_pow_M_i)
+
+lemma (in Protocol) irreflexivity_of_justifications: 
+  "\<forall> m \<in> M.  m \<notin> justification m"
+  sorry
+
+lemma (in Protocol) asymmetry_of_justifications :
+  "\<forall> m1 m2. m1 \<in> M \<and> m2 \<in> M 
+  \<longrightarrow> m1 \<in> justification m2 \<longrightarrow> m2 \<notin> justification m1"
+  using M_type irreflexivity_of_justifications state_is_in_pow_M_i by blast
+
+
 end
