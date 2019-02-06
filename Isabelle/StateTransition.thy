@@ -1,12 +1,12 @@
 theory StateTransition
 
-imports Main CBCCasper ConsensusSafety
+imports Main CBCCasper
 
 begin
 
 
 (* Definition 7.17 *)
-abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
+definition (in Protocol) minimal_transitions :: "(state * state) set"
   where
     "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
       \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
@@ -16,7 +16,8 @@ protocol state *)
 definition immediately_next_message where
   "immediately_next_message = (\<lambda>(\<sigma>,m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
 
-lemma (in Protocol) state_transition_by_immediately_next_message_induction: "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+lemma (in Protocol) state_transition_by_immediately_next_message_induction: 
+  "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
   apply (rule, rule, rule, rule, rule)
 proof-
   fix n \<sigma> m
@@ -56,7 +57,8 @@ proof-
     using \<open>\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (M_i (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> by auto
 qed
 
-lemma (in Protocol) state_transition_by_immediately_next_message_at_n: "\<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+lemma (in Protocol) state_transition_by_immediately_next_message_at_n: 
+  "\<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
   apply (cases n)
   apply auto[1]
   using state_transition_by_immediately_next_message_induction
@@ -83,9 +85,23 @@ proof -
   qed
 qed
 
-lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
+lemma (in Protocol) minimal_transition_implies_recieving_single_message :
+  "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
   sorry
+
+
+lemma (in Protocol) minimal_transitions_reconstruction :
+  "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> \<sigma> \<union> {the_elem (\<sigma>'- \<sigma>)} = \<sigma>'"
+  apply (rule, rule, rule)
+proof -
+  fix \<sigma> \<sigma>'
+  assume "(\<sigma>, \<sigma>') \<in> minimal_transitions"
+  then have "is_singleton (\<sigma>'- \<sigma>)"
+    using  minimal_transitions_def minimal_transition_implies_recieving_single_message by auto 
+  then have "\<sigma> \<subseteq> \<sigma>'"
+    using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions\<close> minimal_transitions_def by auto
+  then show "\<sigma> \<union> {the_elem (\<sigma>'- \<sigma>)} = \<sigma>'"
+    by (metis Diff_partition \<open>is_singleton (\<sigma>' - \<sigma>)\<close> is_singleton_the_elem)
+qed
 
 end

@@ -35,13 +35,6 @@ theorem (in Protocol) n_party_common_futures :
 (* Section 3.2: Guaranteeing Consistent Decisions *)
 (* Section 3.2.1: Guaranteeing Consistent Decisions on Properties of Protocol States *)
 
-(* Definition 3.2  *)
-type_synonym state_property = "state \<Rightarrow> bool"
-
-fun state_property_not :: "state_property \<Rightarrow> state_property"
-  where
-    "state_property_not p = (\<lambda>\<sigma>. (\<not> p \<sigma>))"
-
 (* Definition 3.3  *)
 fun (in Protocol) state_property_is_decided :: "(state_property * state) \<Rightarrow> bool"
   where
@@ -57,6 +50,10 @@ lemma (in Protocol) forward_consistency :
   by auto
 
 (* Lemma 3 *)
+fun state_property_not :: "state_property \<Rightarrow> state_property"
+  where
+    "state_property_not p = (\<lambda>\<sigma>. (\<not> p \<sigma>))"
+
 lemma (in Protocol) backword_consistency :
   "\<forall> \<sigma>' \<sigma>. \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t
   \<longrightarrow> \<sigma>' \<in> futures \<sigma> 
@@ -126,8 +123,6 @@ proof-
 qed
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
-(* Definition 3.7 *)
-type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 
 (* Definition 3.8 *)
 fun (in Protocol) naturally_corresponding_state_property :: "consensus_value_property \<Rightarrow> state_property"
@@ -170,7 +165,7 @@ proof -
   moreover have
     "(\<exists> \<sigma> \<in> \<Sigma>. \<exists> c \<in> \<epsilon> \<sigma>. \<forall> q \<in> q_set. q c)
     \<longrightarrow> (\<exists> c \<in> C. \<forall> q' \<in> q_set. q' c)"
-    using \<epsilon>_type by fastforce
+    using is_valid_estimator_def \<epsilon>_type by fastforce
   ultimately show
     "state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set}
     \<Longrightarrow> consensus_value_properties_are_consistent q_set"

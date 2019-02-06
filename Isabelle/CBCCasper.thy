@@ -44,45 +44,51 @@ fun
   | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
   | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
-lemma \<Sigma>i_subset_Mi: "\<Sigma>_i (V,C,\<epsilon>) (n + 1) \<subseteq> Pow (M_i (V,C,\<epsilon>) n)"
-  by force
-
-lemma \<Sigma>i_subset_to_Mi: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
-  by auto
-
-lemma Mi_subset_to_\<Sigma>i: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+2)"
-  by auto
-
-lemma \<Sigma>i_monotonic: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
-  apply (induction n)
-  apply simp
-  apply (metis Mi_subset_to_\<Sigma>i Suc_eq_plus1 \<Sigma>i_subset_to_Mi add.commute add_2_eq_Suc)
-  done
-
-lemma Mi_monotonic: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
-  apply (induction n)
-  defer
-  using \<Sigma>i_monotonic \<Sigma>i_subset_to_Mi apply blast
-  apply auto
-  done
-
-locale Protocol =
+locale Params =
   fixes V :: "validator set"
   and W :: "validator \<Rightarrow> real"
   and t :: real
-  and C :: "consensus_value set"
+  fixes C :: "consensus_value set"
   and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
-  and \<Sigma> :: "state set"
-  and M :: "message set"
 
-  assumes W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
+begin
+  definition "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
+  definition "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
+  definition is_valid_estimator :: "(state \<Rightarrow> consensus_value set) \<Rightarrow> bool"
+    where
+      "is_valid_estimator e = (\<forall>\<sigma> \<in> \<Sigma>. e \<sigma> \<in> Pow C - {\<emptyset>})"
+
+  lemma \<Sigma>i_subset_Mi: "\<Sigma>_i (V,C,\<epsilon>) (n + 1) \<subseteq> Pow (M_i (V,C,\<epsilon>) n)"
+    by force
+
+  lemma \<Sigma>i_subset_to_Mi: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
+    by auto
+
+  lemma Mi_subset_to_\<Sigma>i: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1) \<Longrightarrow> \<Sigma>_i (V,C,\<epsilon>) (n+1) \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+2)"
+    by auto
+
+  lemma \<Sigma>i_monotonic: "\<Sigma>_i (V,C,\<epsilon>) n \<subseteq> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+    apply (induction n)
+    apply simp
+    apply (metis Mi_subset_to_\<Sigma>i Suc_eq_plus1 \<Sigma>i_subset_to_Mi add.commute add_2_eq_Suc)
+    done
+
+  lemma Mi_monotonic: "M_i (V,C,\<epsilon>) n \<subseteq> M_i (V,C,\<epsilon>) (n+1)"
+    apply (induction n)
+    defer
+    using \<Sigma>i_monotonic \<Sigma>i_subset_to_Mi apply blast
+    apply auto
+    done
+
+end
+
+(* Locale for proofs *)
+locale Protocol = Params +
+  assumes V_type: "V \<noteq> \<emptyset>"
+  and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
   and C_type: "card C > 1"
-  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
-
-  assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
-  and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
-begin
+  and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
 lemma (in Protocol) message_in_state_is_valid :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
@@ -152,9 +158,17 @@ lemma (in Protocol) M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C 
   apply auto
   done
 
-lemma estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
-  using \<epsilon>_type by auto
-end
+lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using is_valid_estimator_def \<epsilon>_type by auto
+
+(* Definition 4.1: Observed validators *)
+definition observed :: "state \<Rightarrow> validator set"
+  where
+    "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
+
+lemma (in Protocol) oberved_type :
+  "\<forall> \<sigma> \<in> \<Sigma>. observed \<sigma> \<subseteq> V"
+  using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
@@ -168,18 +182,30 @@ fun equivocation :: "(message * message) \<Rightarrow> bool"
       (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
 
 (* Definition 2.10 *)
-definition (in Protocol) equivocating_validators :: "state \<Rightarrow> validator set"
+definition is_equivocating :: "state \<Rightarrow> validator \<Rightarrow> bool"
   where
-    "equivocating_validators \<sigma> = 
-      {v \<in> V. \<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma> \<and> m2 \<in> \<sigma> \<and> equivocation (m1, m2) \<and> sender m1 = v}"
+    "is_equivocating \<sigma> v =  (\<exists> m1 \<in> \<sigma>. \<exists> m2 \<in> \<sigma>. equivocation (m1, m2) \<and> sender m1 = v)"
+
+definition equivocating_validators :: "state \<Rightarrow> validator set"
+  where
+    "equivocating_validators \<sigma> = {v \<in> observed \<sigma>. is_equivocating \<sigma> v}"
+
+definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
+  where
+    "equivocating_validators_paper \<sigma> = {v \<in> V. is_equivocating \<sigma> v}"
+
+lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
+  "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
+  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq oberved_type observed_def subsetCE)
+
 
 (* Definition 2.11 *)
-definition (in Protocol) equivocation_fault_weight :: "state \<Rightarrow> real"
+definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
     "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
-definition (in Protocol) is_faults_lt_threshold :: "state \<Rightarrow> bool"
+definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
@@ -190,7 +216,17 @@ definition (in Protocol) \<Sigma>t :: "state set"
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
 
+(* Definition 3.2 *)
+type_synonym state_property = "state \<Rightarrow> bool"
+
+(* Definition 3.7 *)
+type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
+
 (* Message justification *)
+definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
+  where
+    "justified m1 m2 = (m1 \<in> justification m2)"
+
 lemma (in Protocol) transitivity_of_justifications :
   "\<forall> m1 m2 m3 \<sigma>. {m1, m2, m3} \<subseteq> \<sigma> \<and> \<sigma> \<in> \<Sigma> 
   \<longrightarrow> m1 \<in> justification m2 \<and> m2 \<in> justification m3
