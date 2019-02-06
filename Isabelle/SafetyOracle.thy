@@ -164,8 +164,9 @@ lemma (in Protocol) state_transition_by_immediately_next_message_at_n: "\<forall
   using state_transition_by_immediately_next_message_induction
   by (metis le_add1 plus_1_eq_Suc)
 
-lemma (in Protocol) state_differences_have_immediately_next_messages: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>\<sigma>'\<in>\<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists>m \<in> (\<sigma>'-\<sigma>). \<forall>m'\<in>justification m. m' \<in> \<sigma>')"
-  by (metis Diff_iff is_future_state.simps state_is_in_pow_M_i subsetCE subsetI subset_antisym)
+lemma (in Protocol) state_differences_have_immediately_next_messages: 
+  "\<forall>\<sigma>\<in>\<Sigma>. \<forall>\<sigma>'\<in>\<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists>m \<in> (\<sigma>'-\<sigma>). justification m \<subseteq> \<sigma>)"
+  oops  
 
 lemma (in Protocol) no_missing_message: "\<forall>\<sigma>\<in>\<Sigma>. \<forall>m\<in>\<sigma>. \<forall>m'\<in>justification m. m' \<in> \<sigma>"
   using state_is_in_pow_M_i by fastforce
