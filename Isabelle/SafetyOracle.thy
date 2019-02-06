@@ -58,12 +58,12 @@ fun (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
     "is_majority (v_set, \<sigma>) = (weight_measure v_set > (weight_measure V - weight_measure (equivocating_validators \<sigma>)) div 2)"
    
 (* Definition 7.12 *)
-definition (in AbstractProtocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
   where
     "is_majority_driven p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> is_majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
 (* Definition 7.13 *)
-definition (in AbstractProtocol) is_max_driven :: "consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) is_max_driven :: "consensus_value_property \<Rightarrow> bool"
   where
     "is_max_driven p =
       (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
@@ -93,7 +93,7 @@ fun is_clique :: "(validator set * consensus_value_property * state) \<Rightarro
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 
 (* Definition 7.17 *)
-abbreviation (in Params) minimal_transitions :: "(state * state) set"
+abbreviation (in Protocol) minimal_transitions :: "(state * state) set"
   where
     "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
       \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"

@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper LatestMessage
+imports Main HOL.Real CBCCasper LatestMessage SafetyOracle
 
 begin
 
@@ -8,26 +8,18 @@ begin
 (* Definition 4.23: Blocks *)
 type_synonym block = consensus_value
 
-fun B_i :: "(block * (block \<Rightarrow> block set)) \<Rightarrow> nat \<Rightarrow> block set"
-  where
-    "B_i (g, blk_gen) 0 = {g}"
-  | "B_i (g, blk_gen) n = \<Union> {blk_gen b | b. b \<in> B_i (g, blk_gen) (n - 1)}"
-
 locale GhostParams = Params +
+  (* Definition 4.23: Previous block resolver *)
+  fixes B :: "block set"
   fixes genesis :: block
-  and B :: "block set"
-  and block_generator :: "block \<Rightarrow> block set"
-
-  assumes B_def : "B = \<Union> (B_i (genesis, block_generator) `\<nat>)"
+  (* Definition 4.24: Previous block resolver *)
+  and prev :: "block \<Rightarrow> block"
 
 (* Locale for proofs *)
-locale Ghost = GhostParams +
-  assumes block_generator_type : "\<forall> b \<in> B. is_singleton {b' \<in> B. b \<in> block_generator b'}"
-
-(* Definition 4.24: Previous block resolver *)
-fun (in GhostParams) prev :: "block \<Rightarrow> block"
-  where
-    "prev b = (if b = genesis then b else the_elem {b' \<in> B. b \<in> block_generator b'})"
+locale Ghost = GhostParams + Protocol +
+  assumes prev_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
+  and block_is_consensus_value : "B = C"
+  and ghost_is_estimator : "\<epsilon> = estimator"
 
 (* Definition 4.25: n'th generation ancestor block *)
 fun (in GhostParams) n_cestor :: "block * nat \<Rightarrow> block"
@@ -51,7 +43,11 @@ fun (in GhostParams) score :: "state \<Rightarrow> block \<Rightarrow> real"
 (* Definition 4.28: Children *)
 fun (in GhostParams) children :: "block * state \<Rightarrow> block set"
   where
-    "children (b, \<sigma>) = {b' \<in> B. b' \<in> est `\<sigma> \<and> b = prev b'}"
+    "children (b, \<sigma>) = {b' \<in> est `\<sigma>. b = prev b'}"
+
+lemma (in Ghost) children_type :
+  "\<forall> b \<sigma>. b \<in> B \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> B"
+  using Ghost_axioms Ghost_axioms_def Ghost_def by auto
 
 (* Definition 4.29: Best Children *)
 fun (in GhostParams) best_children :: "block * state \<Rightarrow>  block set"
@@ -59,7 +55,7 @@ fun (in GhostParams) best_children :: "block * state \<Rightarrow>  block set"
     "best_children (b, \<sigma>) = {arg_max_on (score \<sigma>) (children (b, \<sigma>))}"
 
 (* Definition 4.30: GHOST *)
-(* Question3: wellsortedness error *)
+(* Question3: well-ortedness error *)
 function (in GhostParams) GHOST :: "(block set * state) => block set"
   where
     "GHOST (b_set, \<sigma>) =
@@ -77,5 +73,16 @@ abbreviation (in GhostParams) P :: "consensus_value_property set"
   where
     "P \<equiv> {p. \<exists>!b \<in> B. \<forall>b' \<in> B. (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False)}"
 
+lemma (in Ghost) block_membership_property_is_majority_driven :
+  "\<forall> p \<in> P. is_majority_driven p"
+  apply simp
+  by (metis DiffE Pow_iff \<epsilon>_type block_is_consensus_value is_majority_driven_def subsetCE)
+
+lemma (in Ghost) block_membership_property_is_max_driven :
+  "\<forall> p \<in> P. is_max_driven p"
+  apply simp
+  (* FIXME: Timeout *)
+  (* by (metis DiffE Nats_0 ghost_is_estimator) *)
+  oops
 
 end

@@ -34,21 +34,6 @@ fun justification :: "message \<Rightarrow> state"
   where
     "justification (Message (_, _, s)) = set s"
 
-
-locale Params =
-  fixes V :: "validator set"
-  and W :: "validator \<Rightarrow> real"
-  and t :: real
-  and \<Sigma> :: "state set"
-  and M :: "message set"
-
-locale AbstractProtocol = Params +
-  fixes C :: "consensus_value set"
-  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
-  assumes C_type: "card C > 1"
-  and \<epsilon>_type: "\<And>s. s \<in> \<Sigma> \<Longrightarrow> \<epsilon> s \<in> Pow C - {\<emptyset>}"
-
-
 (* \<Sigma>, M Construction
    NOTE: we cannot refer to the definitions from locale to its context *)
 fun
@@ -59,15 +44,30 @@ fun
   | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
   | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
+locale Params =
+  fixes V :: "validator set"
+  and W :: "validator \<Rightarrow> real"
+  and t :: real
+
+
+locale NonVolatileParams =
+  fixes C :: "consensus_value set"
+  and \<epsilon> :: "message set \<Rightarrow> consensus_value set"
+
+  assumes C_type: "card C > 1"
+  and \<epsilon>_type: "\<And>\<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<in> Pow C - {\<emptyset>}"
+
+
 (* Locale for proofs *)
-locale Protocol = AbstractProtocol +
+locale Protocol = Params + NonVolatileParams +
   assumes V_type "V \<noteq> \<emptyset>"
   and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
 
-  assumes \<Sigma>_def: "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
-  and M_def: "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
 begin
+
+definition "\<Sigma> = (\<Union>i\<in>\<nat>. \<Sigma>_i (V,C,\<epsilon>) i)"
+definition "M = (\<Union>i\<in>\<nat>. M_i (V,C,\<epsilon>) i)"
 
 lemma (in Protocol) message_in_state_is_valid :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
@@ -189,7 +189,7 @@ definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
-definition (in Params) \<Sigma>t :: "state set"
+definition (in Protocol) \<Sigma>t :: "state set"
   where
     "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
 

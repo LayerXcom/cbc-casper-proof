@@ -39,28 +39,25 @@ code_printing
   class_instance validator :: "HOL.equal" => (Haskell) -
   (* | type_constructor validator => (Haskell) "Map String String" *)
 
-interpretation p: Params V W t \<Sigma> M for V W t \<Sigma> M
+interpretation p: Params V W t for V W t
   done
 
+(* Define a constant *)
 definition "is_clique_oracle = p.is_clique_oracle"
 
 export_code is_clique is_clique_oracle in Haskell
   module_name SafetyOracle file GeneratedCode
 
-(* 
-FIXME: TFG is just a interpretation of Params
-definition "bc = GhostParams.best_children"
 
-interpretation gp: GhostParams V W t \<Sigma> M genesis "\<Union> (B_i (genesis, block_generator) `\<nat>)" block_generator for V W t \<Sigma> M genesis B block_generator 
-  using GhostParams_def by blast
+interpretation gp: GhostParams V W t genesis B prev for V W t genesis B prev
+  done
 
 term gp.best_children
 
-lemma [code]: "bc = gp.best_children"
-
 definition "best_children = gp.best_children"
 
-(* Question2: No code equations for GhostParams.best_children *)
+(* FIXME: Wellsortedness error *)
+(* 
 export_code best_children in Haskell
   module_name TFGCasper file GeneratedCode
  *)
