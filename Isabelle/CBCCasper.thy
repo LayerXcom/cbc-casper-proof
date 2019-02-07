@@ -1,6 +1,6 @@
 theory CBCCasper
 
-imports Main HOL.Real
+imports Main HOL.Real "AFP/Restricted_Predicates"
 
 begin
 
@@ -228,19 +228,44 @@ definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
     "justified m1 m2 = (m1 \<in> justification m2)"
 
 lemma (in Protocol) transitivity_of_justifications :
-  "\<forall> m1 m2 m3 \<sigma>. {m1, m2, m3} \<subseteq> \<sigma> \<and> \<sigma> \<in> \<Sigma> 
-  \<longrightarrow> m1 \<in> justification m2 \<and> m2 \<in> justification m3
-  \<longrightarrow> m1 \<in> justification m3"
-  by (meson M_type contra_subsetD insert_subset message_in_state_is_valid state_is_in_pow_M_i)
+  "transp_on justified M"
+  apply (simp add: transp_on_def)
+  by (meson M_type Protocol.state_is_in_pow_M_i Protocol_axioms contra_subsetD justified_def)
 
-lemma (in Protocol) irreflexivity_of_justifications: 
-  "\<forall> m \<in> M.  m \<notin> justification m"
-  sorry
+lemma (in Protocol) irreflexivity_of_justifications :
+  "irreflp_on justified M"
+  apply (simp add: irreflp_on_def)
+  apply (simp add: justified_def)
+  apply (simp add: M_def)
+  apply auto
+proof -
+  fix n m
+  assume "est m \<in> C" 
+  assume "sender m \<in> V"
+  assume "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n" 
+  assume "est m \<in> \<epsilon> (justification m)" 
+  assume "m \<in> justification m"
+  have  "m \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>est m \<in> C\<close> \<open>est m \<in> \<epsilon> (justification m)\<close> \<open>justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> \<open>m \<in> justification m\<close> \<open>sender m \<in> V\<close> add.right_neutral add_Suc_right diff_is_0_eq' diff_le_self diff_zero mem_Collect_eq not_gr0 subsetCE)
+  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) (n - 1)"
+    using M_i.simps by blast
+  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) 0"
+    apply (induction n)
+    apply simp
+    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>m \<in> justification m\<close> add.right_neutral add_Suc_right diff_Suc_1 mem_Collect_eq not_gr0 subsetCE subsetCE)
+  then have "justification m \<in> {\<emptyset>}"
+    by simp
+  then show False
+    using \<open>m \<in> justification m\<close> by blast
+qed
 
-lemma (in Protocol) asymmetry_of_justifications :
-  "\<forall> m1 m2. m1 \<in> M \<and> m2 \<in> M 
-  \<longrightarrow> m1 \<in> justification m2 \<longrightarrow> m2 \<notin> justification m1"
-  using M_type irreflexivity_of_justifications state_is_in_pow_M_i by blast
+lemma (in Protocol) justification_is_strict_partial_order_on_M :
+  "po_on justified M"
+  apply (simp add: po_on_def)
+  by (simp add: irreflexivity_of_justifications transitivity_of_justifications)
 
+lemma (in Protocol) justification_implies_different_messages :
+  "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
+  by (meson irreflexivity_of_justifications irreflp_on_def)
 
 end
