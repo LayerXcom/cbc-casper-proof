@@ -268,4 +268,61 @@ lemma (in Protocol) justification_implies_different_messages :
   "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
   by (meson irreflexivity_of_justifications irreflp_on_def)
 
+
+lemma (in Protocol) only_valid_message_is_justified :
+  "\<forall> m \<in> M. \<forall> m'. justified m' m \<longrightarrow> m' \<in> M"
+  apply (simp add: justified_def)
+  using M_type message_in_state_is_valid by blast
+
+
+lemma (in Protocol) justified_message_exists_in_M_i_n_minus_1 :
+  "\<forall> n m m'. n \<in> \<nat> 
+  \<longrightarrow> justified m' m
+  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
+  \<longrightarrow>  m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+proof -
+  have "\<forall> n m m'. justified m' m
+  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
+  \<longrightarrow> m \<in> M \<and> m' \<in> M
+  \<longrightarrow> m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    apply (rule, rule, rule, rule, rule, rule)
+  proof -
+    fix n m m'
+    assume "justified m' m" 
+    assume "m \<in> M_i (V, C, \<epsilon>) n"
+    assume "m \<in> M \<and> m' \<in> M"
+    then have "justification m \<in> \<Sigma>_i (V,C,\<epsilon>) n"
+      using M_i.simps \<open>m \<in> M_i (V, C, \<epsilon>) n\<close> by blast
+    then have "justification m \<in>  Pow (M_i (V,C,\<epsilon>) (n - 1))"
+      by (metis (no_types, lifting) Suc_diff_Suc \<Sigma>_i.simps(1) \<Sigma>i_subset_Mi \<open>justified m' m\<close> add_leE diff_add diff_le_self empty_iff justified_def neq0_conv plus_1_eq_Suc singletonD subsetCE)
+    show "m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+      using \<open>justification m \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))\<close> \<open>justified m' m\<close> justified_def by auto
+  qed
+  then show ?thesis
+    by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
+qed
+
+
+lemma "(\<exists> f. \<forall> i. \<exists>n. A) \<and> (\<exists> f. \<forall> i. \<exists>n. A \<longrightarrow> B) \<Longrightarrow> (\<exists> f. \<forall> i. \<exists>n. B)"
+  by simp
+
+lemma (in Protocol) justification_is_well_founded_on_M :
+  "wfp_on justified M"
+proof (rule ccontr)
+  assume "\<not> wfp_on justified M"
+  then have "\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)"
+    by (simp add: wfp_on_def)
+  then have  "\<exists>f. \<forall>i.\<exists> n \<in> \<nat>. f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
+    using M_def by auto
+  moreover have "\<exists>f. \<forall>i. \<exists> n \<in> \<nat>. (f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)
+                    \<longrightarrow> f (Suc i) \<in> M_i (V, C, \<epsilon>) (n - 1) \<and> justified (f (Suc (Suc i))) (f (Suc i)))"
+    using Nats_1 \<open>\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> justified_message_exists_in_M_i_n_minus_1 by blast
+  ultimately have "\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)"
+    apply simp
+    sorry
+  show False
+    using \<open>\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)\<close> justified_def by auto
+qed
+
+
 end
