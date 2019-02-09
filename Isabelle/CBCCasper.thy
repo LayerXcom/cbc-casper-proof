@@ -302,9 +302,13 @@ proof -
     by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
 qed
 
-
-lemma "(\<exists> f. \<forall> i. \<exists>n. A) \<and> (\<exists> f. \<forall> i. \<exists>n. A \<longrightarrow> B) \<Longrightarrow> (\<exists> f. \<forall> i. \<exists>n. B)"
-  by simp
+(*  
+lemma 
+  "(\<exists> f. \<forall> i. \<exists>n \<in> \<nat>. f i \<in> MM_i n \<and> jus (f (Suc i)) (f i))
+  \<and> (\<exists> f. \<forall> i. (\<exists>n \<in> \<nat>. f i \<in> MM_i n \<and> jus (f (Suc i)) (f i)) \<longrightarrow> (\<exists> n \<in> \<nat>. f i \<in> MM_i (n - 1) \<and> jus (f (Suc (Suc i))) (f (Suc i))))
+  \<Longrightarrow> (\<exists> f. \<exists> i. f i \<in> MM_i 0 \<and>  jus (f (Suc i)) (f i))"
+  oops
+ *)
 
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
@@ -314,15 +318,13 @@ proof (rule ccontr)
     by (simp add: wfp_on_def)
   then have  "\<exists>f. \<forall>i.\<exists> n \<in> \<nat>. f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
     using M_def by auto
-  moreover have "\<exists>f. \<forall>i. \<exists> n \<in> \<nat>. (f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)
-                    \<longrightarrow> f (Suc i) \<in> M_i (V, C, \<epsilon>) (n - 1) \<and> justified (f (Suc (Suc i))) (f (Suc i)))"
+  moreover have "\<exists>f. \<forall>i. (\<exists> n \<in> \<nat>. f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i))
+                 \<longrightarrow> (\<exists> n \<in> \<nat>. f (Suc i) \<in> M_i (V, C, \<epsilon>) (n - 1) \<and> justified (f (Suc (Suc i))) (f (Suc i)))"
     using Nats_1 \<open>\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> justified_message_exists_in_M_i_n_minus_1 by blast
   ultimately have "\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)"
-    apply simp
     sorry
   show False
     using \<open>\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)\<close> justified_def by auto
 qed
-
 
 end
