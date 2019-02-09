@@ -82,7 +82,7 @@ proof -
       using justified_def by auto 
     then have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m'. justified m' m \<and> m' \<in> \<sigma>' - \<sigma> \<and> m \<noteq> m'" 
       using justification_implies_different_messages  state_difference_is_valid_message
-      by (meson DiffD1 Protocol.message_in_state_is_valid Protocol_axioms \<open>\<sigma>' \<in> \<Sigma>\<close>)   
+      by (meson DiffD1 Params.message_in_state_is_valid Protocol_axioms \<open>\<sigma>' \<in> \<Sigma>\<close>)   
     show False
       sorry
   qed

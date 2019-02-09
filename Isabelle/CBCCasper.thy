@@ -4,7 +4,10 @@ imports Main HOL.Real "AFP/Restricted_Predicates"
 
 begin
 
+(* ###################################################### *)
 (* Section 2: Description of CBC Casper *)
+(* ###################################################### *)
+
 (* Section 2.1: CBC Casper "Parameters" *)
 
 notation Set.empty ("\<emptyset>")
@@ -80,6 +83,71 @@ begin
     apply auto
     done
 
+  lemma message_is_in_M_i :
+    "\<forall> m \<in> M. \<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    apply (simp add: M_def \<Sigma>_i.elims)
+    by (metis Nats_1 Nats_add One_nat_def diff_Suc_1 plus_1_eq_Suc)
+
+  lemma state_is_in_pow_M_i :
+    "\<forall> \<sigma> \<in> \<Sigma>. (\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1)) \<and> (\<forall> m \<in> \<sigma>. justification m \<subseteq> \<sigma>))" 
+    apply (simp add: \<Sigma>_def)
+    by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI)
+
+  lemma message_is_in_M_i_n :
+    "\<forall> m \<in> M. \<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n"
+    by (smt Mi_monotonic Suc_diff_Suc add_leE diff_add diff_le_self message_is_in_M_i neq0_conv plus_1_eq_Suc subsetCE zero_less_diff)
+
+  lemma message_in_state_is_valid :
+    "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
+    apply (rule, rule, rule)
+  proof -
+    fix \<sigma> m
+    assume "\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>"
+    have
+      "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+      using \<Sigma>_def \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> by auto
+    moreover have
+      "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n
+      \<longrightarrow> \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
+      by (metis One_nat_def \<Sigma>_i.simps(1) \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> diff_Suc_1 diff_add_inverse empty_iff insert_iff of_nat_1 of_nat_Suc of_nat_in_Nats)
+    moreover have
+      "\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))  
+      \<longrightarrow> (m \<in> \<sigma> \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) (n - 1))"
+      using calculation(2) by blast
+    moreover have
+      "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)
+      \<Longrightarrow> \<exists> n'\<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n'"
+     by (smt Mi_monotonic Suc_diff_Suc add_leE diff_add diff_le_self message_is_in_M_i neq0_conv plus_1_eq_Suc subsetCE zero_less_diff)
+    moreover have
+      "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n
+      \<Longrightarrow> m \<in> M"
+      using M_def by blast 
+    ultimately show
+      "m \<in> M"
+      by (smt PowD \<Sigma>_i.elims \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> empty_iff insert_iff mem_Collect_eq subsetCE)
+  qed
+
+  lemma state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
+    using message_in_state_is_valid by blast
+  
+  lemma state_difference_is_valid_message :
+    "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
+    \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
+    \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
+    using state_is_subset_of_M by blast
+  
+  (* FIXME: Remove this after \<Sigma>_type is proved. *)
+  lemma \<Sigma>_is_subseteq_of_pow_M: "\<Sigma> \<subseteq> Pow M"
+    by (simp add: state_is_subset_of_M subsetI)
+  
+  lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+    unfolding M_def \<Sigma>_def
+    by auto
+
+definition set_to_list :: "'a set \<Rightarrow> 'a list"
+  where "set_to_list s = (SOME l. set l = s)"
+
+
 end
 
 (* Locale for proofs *)
@@ -90,73 +158,67 @@ locale Protocol = Params +
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
-lemma (in Protocol) message_in_state_is_valid :
-  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma> \<longrightarrow>  m \<in> M"
-  apply (rule, rule, rule)
+(*  FIXME: #50 M isn't always a strict subset of C \<times> V \<times> \<Sigma>. *)
+lemma (in Protocol) M_type_counterexample: 
+  "(\<forall> \<sigma>. \<epsilon> \<sigma> = C) \<Longrightarrow> M = Message `(C \<times> V \<times>  set_to_list `\<Sigma>)"
+  apply auto
 proof -
-  fix \<sigma> m
-  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>"
-  have
-    "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
-    using \<Sigma>_def \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> by auto
-  moreover have
-    "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n
-    \<longrightarrow> \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
-    by (metis One_nat_def \<Sigma>_i.simps(1) \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> diff_Suc_1 diff_add_inverse empty_iff insert_iff of_nat_1 of_nat_Suc of_nat_in_Nats)
-  moreover have
-    "\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))  
-    \<longrightarrow> (m \<in> \<sigma> \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) (n - 1))"
-    using calculation(2) by blast
-  moreover have
-    "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)
-    \<Longrightarrow> \<exists> n'\<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n'"
-  proof -
-    assume "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)"
-    then obtain n :: nat where "n \<in> \<nat>" "m \<in> M_i (V, C, \<epsilon>) (n - 1)" by auto
-    show ?thesis
-      apply auto
-      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> apply auto[1]
-      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> apply auto[1]
-      apply (metis (no_types, lifting) M_i.simps \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> id_apply mem_Collect_eq of_nat_eq_id of_nat_in_Nats)
-      using \<open>\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)\<close> by auto
-  qed  
-  moreover have
-    "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n
-    \<Longrightarrow> m \<in> M"
-    using M_def by blast 
-  ultimately show
-    "m \<in> M"
-    by (smt PowD \<Sigma>_i.elims \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> empty_iff insert_iff mem_Collect_eq subsetCE)
+  fix m
+  assume "\<forall> \<sigma>. \<epsilon> \<sigma> = C"
+  assume "m \<in> M"
+  have "\<exists> n \<in> \<nat>. m \<in>  M_i (V, C, \<epsilon>) n"
+     using message_is_in_M_i_n
+     using \<open>m \<in> M\<close> by blast
+  have "est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
+    by (simp add: M_type \<open>m \<in> M\<close>)
+  then show "m \<in> Message `(C \<times> V \<times>  set_to_list `\<Sigma>)"
+    apply auto
+    using set_to_list_def 
+    sorry
+  next
+    fix c v \<sigma>
+  assume "\<forall> \<sigma>. \<epsilon> \<sigma> = C"
+  assume "c \<in> C"
+  assume "v \<in> V"
+  assume "\<sigma> \<in> \<Sigma>"
+  have "\<epsilon> \<sigma> = C"
+    using \<open>\<forall> \<sigma>. \<epsilon> \<sigma> = C\<close> by auto 
+  have "\<exists> n. n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+    using \<open>\<sigma> \<in> \<Sigma>\<close> \<Sigma>_def by auto  
+  then have "\<exists> n \<in> \<nat>. Message (c, v, set_to_list \<sigma>) \<in> M_i (V, C, \<epsilon>) n"
+  proof -     
+    obtain n where "n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n" using `\<exists> n. n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n` by auto
+    have "justification (Message (c, v, set_to_list \<sigma>)) \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+      using set_to_list_def \<open>n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> 
+      sorry
+    then show ?thesis
+      using  \<open>c \<in> C\<close>  \<open>v \<in> V\<close>  \<open>\<forall>\<sigma>. \<epsilon> \<sigma> = C\<close> \<open>n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> by auto
+  qed
+  then show "Message (c, v, set_to_list \<sigma>) \<in> M"
+    using M_def by auto  
 qed
 
-lemma (in Protocol) state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
-  using message_in_state_is_valid by blast
 
-lemma (in Protocol) state_difference_is_valid_message :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
-  \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
-  \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
-  using state_is_subset_of_M by blast
-
-lemma (in Protocol) state_is_in_pow_M_i :
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1)) \<and> (\<forall> m \<in> \<sigma>. justification m \<subseteq> \<sigma>))" 
-  apply (simp add: \<Sigma>_def)
-  by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI)
-
-lemma (in Protocol) message_is_in_M_i :
-  "\<forall> m \<in> M. (\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1))"
-  apply (simp add: M_def \<Sigma>_i.elims)
-  by (metis Nats_1 Nats_add One_nat_def diff_Suc_1 plus_1_eq_Suc)
-
-(* FIXME: \<Sigma> should be a strict subset of Pow M. #49 *)
-lemma (in Protocol) \<Sigma>_type: "\<Sigma> \<subseteq> Pow M"
-  by (simp add: state_is_subset_of_M subsetI)
-
-(* FIXME: M should be a strict subset of C \<times> V \<times> \<Sigma>. #50 *)
-lemma (in Protocol) M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
-  unfolding M_def \<Sigma>_def
-  apply auto
-  done
+(* FIXME: #49 \<Sigma> is strict subset of Pow M *)
+lemma (in Protocol) \<Sigma>_type: "\<Sigma> \<subset> Pow M"
+proof -
+  have m_in_M_0: "\<exists> m. m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>"
+    sorry
+  obtain m where "m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>" using m_in_M_0 by auto
+  have "{m} \<in> \<Sigma>_i (V, C, \<epsilon>) (Suc 0)"
+    using Params.\<Sigma>i_subset_Mi \<open>m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>\<close> by auto
+  then have "\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}"
+    sorry
+  obtain m' where "m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}"
+      using `\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}` by auto
+  then have "{m'} \<in> Pow M" 
+    using M_def
+    by (metis Nats_1 One_nat_def PowD PowI Pow_bottom UN_I insert_subset)
+  moreover have "{m'} \<notin> \<Sigma>"
+    using Params.state_is_in_pow_M_i Protocol_axioms \<open>m' \<in> M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}\<close> by fastforce
+  ultimately show ?thesis
+    using \<Sigma>_is_subseteq_of_pow_M by auto
+qed
 
 lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
   using is_valid_estimator_def \<epsilon>_type by auto
@@ -168,7 +230,7 @@ definition observed :: "state \<Rightarrow> validator set"
 
 lemma (in Protocol) oberved_type :
   "\<forall> \<sigma> \<in> \<Sigma>. observed \<sigma> \<subseteq> V"
-  using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
+  using Params.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
@@ -222,7 +284,11 @@ type_synonym state_property = "state \<Rightarrow> bool"
 (* Definition 3.7 *)
 type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 
-(* Message justification *)
+
+(* ###################################################### *)
+(* Message justification and lemmas *)
+(* ###################################################### *)
+
 definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
   where
     "justified m1 m2 = (m1 \<in> justification m2)"
@@ -230,7 +296,7 @@ definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
 lemma (in Protocol) transitivity_of_justifications :
   "transp_on justified M"
   apply (simp add: transp_on_def)
-  by (meson M_type Protocol.state_is_in_pow_M_i Protocol_axioms contra_subsetD justified_def)
+  by (meson Params.M_type Params.state_is_in_pow_M_i Protocol_axioms contra_subsetD justified_def)
 
 lemma (in Protocol) irreflexivity_of_justifications :
   "irreflp_on justified M"
@@ -268,12 +334,10 @@ lemma (in Protocol) justification_implies_different_messages :
   "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
   by (meson irreflexivity_of_justifications irreflp_on_def)
 
-
 lemma (in Protocol) only_valid_message_is_justified :
   "\<forall> m \<in> M. \<forall> m'. justified m' m \<longrightarrow> m' \<in> M"
   apply (simp add: justified_def)
-  using M_type message_in_state_is_valid by blast
-
+  using Params.M_type message_in_state_is_valid by blast
 
 lemma (in Protocol) justified_message_exists_in_M_i_n_minus_1 :
   "\<forall> n m m'. n \<in> \<nat> 
