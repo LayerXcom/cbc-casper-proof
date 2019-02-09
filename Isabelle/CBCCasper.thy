@@ -144,10 +144,6 @@ begin
     unfolding M_def \<Sigma>_def
     by auto
 
-definition set_to_list :: "'a set \<Rightarrow> 'a list"
-  where "set_to_list s = (SOME l. set l = s)"
-
-
 end
 
 (* Locale for proofs *)
@@ -157,46 +153,6 @@ locale Protocol = Params +
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
-
-(*  FIXME: #50 M isn't always a strict subset of C \<times> V \<times> \<Sigma>. *)
-lemma (in Protocol) M_type_counterexample: 
-  "(\<forall> \<sigma>. \<epsilon> \<sigma> = C) \<Longrightarrow> M = Message `(C \<times> V \<times>  set_to_list `\<Sigma>)"
-  apply auto
-proof -
-  fix m
-  assume "\<forall> \<sigma>. \<epsilon> \<sigma> = C"
-  assume "m \<in> M"
-  have "\<exists> n \<in> \<nat>. m \<in>  M_i (V, C, \<epsilon>) n"
-     using message_is_in_M_i_n
-     using \<open>m \<in> M\<close> by blast
-  have "est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
-    by (simp add: M_type \<open>m \<in> M\<close>)
-  then show "m \<in> Message `(C \<times> V \<times>  set_to_list `\<Sigma>)"
-    apply auto
-    using set_to_list_def 
-    sorry
-  next
-    fix c v \<sigma>
-  assume "\<forall> \<sigma>. \<epsilon> \<sigma> = C"
-  assume "c \<in> C"
-  assume "v \<in> V"
-  assume "\<sigma> \<in> \<Sigma>"
-  have "\<epsilon> \<sigma> = C"
-    using \<open>\<forall> \<sigma>. \<epsilon> \<sigma> = C\<close> by auto 
-  have "\<exists> n. n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
-    using \<open>\<sigma> \<in> \<Sigma>\<close> \<Sigma>_def by auto  
-  then have "\<exists> n \<in> \<nat>. Message (c, v, set_to_list \<sigma>) \<in> M_i (V, C, \<epsilon>) n"
-  proof -     
-    obtain n where "n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n" using `\<exists> n. n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n` by auto
-    have "justification (Message (c, v, set_to_list \<sigma>)) \<in> \<Sigma>_i (V, C, \<epsilon>) n"
-      using set_to_list_def \<open>n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> 
-      sorry
-    then show ?thesis
-      using  \<open>c \<in> C\<close>  \<open>v \<in> V\<close>  \<open>\<forall>\<sigma>. \<epsilon> \<sigma> = C\<close> \<open>n \<in> \<nat> \<and> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> by auto
-  qed
-  then show "Message (c, v, set_to_list \<sigma>) \<in> M"
-    using M_def by auto  
-qed
 
 
 (* FIXME: #49 \<Sigma> is strict subset of Pow M *)
