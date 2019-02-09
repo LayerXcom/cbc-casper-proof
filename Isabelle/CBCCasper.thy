@@ -1,6 +1,6 @@
 theory CBCCasper
 
-imports Main HOL.Real
+imports Main HOL.Real "AFP/Restricted_Predicates"
 
 begin
 
@@ -228,19 +228,103 @@ definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
     "justified m1 m2 = (m1 \<in> justification m2)"
 
 lemma (in Protocol) transitivity_of_justifications :
-  "\<forall> m1 m2 m3 \<sigma>. {m1, m2, m3} \<subseteq> \<sigma> \<and> \<sigma> \<in> \<Sigma> 
-  \<longrightarrow> m1 \<in> justification m2 \<and> m2 \<in> justification m3
-  \<longrightarrow> m1 \<in> justification m3"
-  by (meson M_type contra_subsetD insert_subset message_in_state_is_valid state_is_in_pow_M_i)
+  "transp_on justified M"
+  apply (simp add: transp_on_def)
+  by (meson M_type Protocol.state_is_in_pow_M_i Protocol_axioms contra_subsetD justified_def)
 
-lemma (in Protocol) irreflexivity_of_justifications: 
-  "\<forall> m \<in> M.  m \<notin> justification m"
-  sorry
+lemma (in Protocol) irreflexivity_of_justifications :
+  "irreflp_on justified M"
+  apply (simp add: irreflp_on_def)
+  apply (simp add: justified_def)
+  apply (simp add: M_def)
+  apply auto
+proof -
+  fix n m
+  assume "est m \<in> C" 
+  assume "sender m \<in> V"
+  assume "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n" 
+  assume "est m \<in> \<epsilon> (justification m)" 
+  assume "m \<in> justification m"
+  have  "m \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>est m \<in> C\<close> \<open>est m \<in> \<epsilon> (justification m)\<close> \<open>justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> \<open>m \<in> justification m\<close> \<open>sender m \<in> V\<close> add.right_neutral add_Suc_right diff_is_0_eq' diff_le_self diff_zero mem_Collect_eq not_gr0 subsetCE)
+  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) (n - 1)"
+    using M_i.simps by blast
+  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) 0"
+    apply (induction n)
+    apply simp
+    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>m \<in> justification m\<close> add.right_neutral add_Suc_right diff_Suc_1 mem_Collect_eq not_gr0 subsetCE subsetCE)
+  then have "justification m \<in> {\<emptyset>}"
+    by simp
+  then show False
+    using \<open>m \<in> justification m\<close> by blast
+qed
 
-lemma (in Protocol) asymmetry_of_justifications :
-  "\<forall> m1 m2. m1 \<in> M \<and> m2 \<in> M 
-  \<longrightarrow> m1 \<in> justification m2 \<longrightarrow> m2 \<notin> justification m1"
-  using M_type irreflexivity_of_justifications state_is_in_pow_M_i by blast
+lemma (in Protocol) justification_is_strict_partial_order_on_M :
+  "po_on justified M"
+  apply (simp add: po_on_def)
+  by (simp add: irreflexivity_of_justifications transitivity_of_justifications)
 
+lemma (in Protocol) justification_implies_different_messages :
+  "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
+  by (meson irreflexivity_of_justifications irreflp_on_def)
+
+
+lemma (in Protocol) only_valid_message_is_justified :
+  "\<forall> m \<in> M. \<forall> m'. justified m' m \<longrightarrow> m' \<in> M"
+  apply (simp add: justified_def)
+  using M_type message_in_state_is_valid by blast
+
+
+lemma (in Protocol) justified_message_exists_in_M_i_n_minus_1 :
+  "\<forall> n m m'. n \<in> \<nat> 
+  \<longrightarrow> justified m' m
+  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
+  \<longrightarrow>  m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+proof -
+  have "\<forall> n m m'. justified m' m
+  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
+  \<longrightarrow> m \<in> M \<and> m' \<in> M
+  \<longrightarrow> m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+    apply (rule, rule, rule, rule, rule, rule)
+  proof -
+    fix n m m'
+    assume "justified m' m" 
+    assume "m \<in> M_i (V, C, \<epsilon>) n"
+    assume "m \<in> M \<and> m' \<in> M"
+    then have "justification m \<in> \<Sigma>_i (V,C,\<epsilon>) n"
+      using M_i.simps \<open>m \<in> M_i (V, C, \<epsilon>) n\<close> by blast
+    then have "justification m \<in>  Pow (M_i (V,C,\<epsilon>) (n - 1))"
+      by (metis (no_types, lifting) Suc_diff_Suc \<Sigma>_i.simps(1) \<Sigma>i_subset_Mi \<open>justified m' m\<close> add_leE diff_add diff_le_self empty_iff justified_def neq0_conv plus_1_eq_Suc singletonD subsetCE)
+    show "m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+      using \<open>justification m \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))\<close> \<open>justified m' m\<close> justified_def by auto
+  qed
+  then show ?thesis
+    by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
+qed
+
+(*  
+lemma 
+  "(\<exists> f. \<forall> i. \<exists>n \<in> \<nat>. f i \<in> MM_i n \<and> jus (f (Suc i)) (f i))
+  \<and> (\<exists> f. \<forall> i. (\<exists>n \<in> \<nat>. f i \<in> MM_i n \<and> jus (f (Suc i)) (f i)) \<longrightarrow> (\<exists> n \<in> \<nat>. f i \<in> MM_i (n - 1) \<and> jus (f (Suc (Suc i))) (f (Suc i))))
+  \<Longrightarrow> (\<exists> f. \<exists> i. f i \<in> MM_i 0 \<and>  jus (f (Suc i)) (f i))"
+  oops
+ *)
+
+lemma (in Protocol) justification_is_well_founded_on_M :
+  "wfp_on justified M"
+proof (rule ccontr)
+  assume "\<not> wfp_on justified M"
+  then have "\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)"
+    by (simp add: wfp_on_def)
+  then have  "\<exists>f. \<forall>i.\<exists> n \<in> \<nat>. f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
+    using M_def by auto
+  moreover have "\<exists>f. \<forall>i. (\<exists> n \<in> \<nat>. f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i))
+                 \<longrightarrow> (\<exists> n \<in> \<nat>. f (Suc i) \<in> M_i (V, C, \<epsilon>) (n - 1) \<and> justified (f (Suc (Suc i))) (f (Suc i)))"
+    using Nats_1 \<open>\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> justified_message_exists_in_M_i_n_minus_1 by blast
+  ultimately have "\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)"
+    sorry
+  show False
+    using \<open>\<exists>f. \<exists>i. f i \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified (f (Suc i)) (f i)\<close> justified_def by auto
+qed
 
 end

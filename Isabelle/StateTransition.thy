@@ -78,8 +78,11 @@ proof -
     assume "\<not> (\<exists> m \<in> \<sigma>' - \<sigma>. justification m \<subseteq> \<sigma>)"
     have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m' \<in> justification m. m' \<in> \<sigma>' - \<sigma>"
       using \<open>\<not> (\<exists>m\<in>\<sigma>' - \<sigma>. justification m \<subseteq> \<sigma>)\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> state_is_in_pow_M_i by fastforce
-    then have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m' \<in> justification m. m' \<in> \<sigma>' - \<sigma> \<and> m \<noteq> m'"
-      using \<open>\<sigma>' \<in> \<Sigma>\<close> irreflexivity_of_justifications state_is_subset_of_M by fastforce 
+    then have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m'. justified m' m \<and> m' \<in> \<sigma>' - \<sigma>"
+      using justified_def by auto 
+    then have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m'. justified m' m \<and> m' \<in> \<sigma>' - \<sigma> \<and> m \<noteq> m'" 
+      using justification_implies_different_messages  state_difference_is_valid_message
+      by (meson DiffD1 Protocol.message_in_state_is_valid Protocol_axioms \<open>\<sigma>' \<in> \<Sigma>\<close>)   
     show False
       sorry
   qed
