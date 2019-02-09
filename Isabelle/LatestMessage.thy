@@ -39,7 +39,7 @@ fun later_from :: "(message * validator * state) \<Rightarrow> message set"
   where
     "later_from (m, v, \<sigma>) = later (m, \<sigma>) \<inter> from_sender (v, \<sigma>)"
 
-lemma (in Protocol) later_froM_is_subseteq_of_product_of_C_V_\<Sigma> :
+lemma (in Protocol) later_from_type :
   "\<forall> \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
   using later_type from_sender_type by auto
 

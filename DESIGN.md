@@ -56,5 +56,5 @@ definition (in Protocol) observed :: "state ⇒ validator set"
 
 lemma (in Protocol) oberved_type :
   "∀ σ ∈ Σ. observed σ ⊆ V"
-  using Protocol.M_is_subseteq_of_product_of_C_V_\<Sigma> Protocol_axioms observed_def state_is_subset_of_M by fastforce
+  using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 ```

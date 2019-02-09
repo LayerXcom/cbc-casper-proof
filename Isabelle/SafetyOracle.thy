@@ -75,7 +75,7 @@ fun later_disagreeing_messages :: "(consensus_value_property * message * validat
 
 lemma (in Protocol) later_disagreeing_messages_type :
   "\<forall> p \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_disagreeing_messages (p, m, v, \<sigma>) \<subseteq> M"
-  using later_froM_is_subseteq_of_product_of_C_V_\<Sigma> by auto
+  using later_from_type by auto
 
 (* Definition 7.15 *)
 (* `the_elem` is built-in  *)
