@@ -286,6 +286,11 @@ lemma (in Protocol) justification_is_strict_partial_order_on_M :
   apply (simp add: po_on_def)
   by (simp add: irreflexivity_of_justifications transitivity_of_justifications)
 
+lemma (in Protocol) monotonicity_of_justifications :
+  "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subseteq> justification m"
+  apply simp
+  by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_M_i)
+
 lemma (in Protocol) justification_implies_different_messages :
   "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
   by (meson irreflexivity_of_justifications irreflp_on_def)
@@ -320,8 +325,7 @@ proof -
   qed
   then show ?thesis
     by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
-qed
-
+qed  
 
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
