@@ -322,30 +322,57 @@ proof -
     by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
 qed
 
+
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
 proof (rule ccontr)
   assume "\<not> wfp_on justified M"
   then have "\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)"
     by (simp add: wfp_on_def)
-  then have "\<exists>f. \<forall>i. f (Suc i) \<in> M \<and> justified (f (Suc (Suc i))) (f (Suc i))"
-    by auto
   then obtain f where "\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)" by auto
   then have "\<forall>i.\<exists> n. n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
     using M_def by auto
   fix i
   obtain n where "n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
     using \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> message_is_in_M_i_n by blast 
-  have case_n :  "f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
-    using \<open>n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)\<close> by simp 
-  moreover have case_n_1 : "f (Suc i) \<in> M_i (V, C, \<epsilon>) (n - 1) \<and> justified (f (Suc (Suc i))) (f (Suc i))"
-    using Nats_1 \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> justified_message_exists_in_M_i_n_minus_1 \<open>n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)\<close> by blast 
-  ultimately have "\<exists> m m'. m \<in>  M_i (V, C, \<epsilon>) 0 \<and> justified m' m"
+  then show False
     apply (induction n)
-    apply blast
-    sorry
-  show False
-    using \<open>\<exists> m m'. m \<in>  M_i (V, C, \<epsilon>) 0 \<and>  justified m' m\<close> justified_def by auto
+  proof - 
+    show "0 \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) 0 \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
+      using justified_def by auto[1]
+    next show "\<And>n. (n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False) \<Longrightarrow>
+         Suc n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) (Suc n) \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
+    proof -      
+      fix n
+      assume "n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
+      then have "n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False"
+        (* This is not true when i = 0. *)
+        (* e.g. lemma "(\<forall> i. P (Suc i)) \<Longrightarrow> (\<forall> i. i > 0 \<longrightarrow> P i)"
+           by (metis Suc_pred)*)
+        sorry
+      assume "Suc n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) (Suc n) \<and> justified (f (Suc i)) (f i)"
+      then have "Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))"
+        using Protocol.justified_message_exists_in_M_i_n_minus_1 Protocol_axioms \<open>\<forall>i. \<exists>n. n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)\<close> by force
+      then show False
+      proof (cases "n > 0") 
+        case False
+        thus ?thesis
+          using Nats_0 \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close> 
+                \<open>n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False\<close>
+          by blast
+      next
+        case True
+        then have "n \<in> \<nat>"
+          using \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close>
+          (* lemma "\<exists> n. Suc n \<in> \<nat> \<and> n > 0 \<longrightarrow> n \<notin> \<nat>"
+            by blast *)
+          sorry
+        thus ?thesis
+          using \<open>n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False\<close> 
+                \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close> by blast        
+      qed
+    qed
+  qed
 qed
 
 end
