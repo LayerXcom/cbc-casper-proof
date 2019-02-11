@@ -299,6 +299,10 @@ lemma (in Protocol) monotonicity_of_justifications :
   apply simp
   by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_M_i)
 
+lemma (in Protocol) strict_monotonicity_of_justifications :
+  "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subset> justification m"
+  by (metis M_type irreflexivity_of_justifications irreflp_on_def justified_def message_in_state_is_valid monotonicity_of_justifications psubsetI)
+
 lemma (in Protocol) justification_implies_different_messages :
   "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
   by (meson irreflexivity_of_justifications irreflp_on_def)
@@ -335,56 +339,23 @@ proof -
     by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
 qed  
 
+lemma (in Protocol) monotonicity_of_card_of_justification : 
+  "\<forall> m m'. m \<in> M 
+  \<longrightarrow> justified m' m 
+  \<longrightarrow> card (justification m') < card (justification m)"
+  by (meson M_type Protocol.strict_monotonicity_of_justifications Protocol_axioms justification_is_finite psubset_card_mono)
+
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
-proof (rule ccontr)
+proof (rule ccontr) 
   assume "\<not> wfp_on justified M"
   then have "\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)"
     by (simp add: wfp_on_def)
   then obtain f where "\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)" by auto
-  then have "\<forall>i.\<exists> n. n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
-    using M_def by auto
-  fix i
-  obtain n where "n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)"
-    using \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> message_is_in_M_i_n by blast 
+  then have "\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i) \<and> card (justification (f (Suc i))) < card (justification (f i))"
+    by (simp add: monotonicity_of_card_of_justification)
   then show False
-    apply (induction n)
-  proof - 
-    show "0 \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) 0 \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
-      using justified_def by auto[1]
-    next show "\<And>n. (n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False) \<Longrightarrow>
-         Suc n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) (Suc n) \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
-    proof -      
-      fix n
-      assume "n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i) \<Longrightarrow> False"
-      then have "n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False"
-        (* This is not true when i = 0. *)
-        (* e.g. lemma "(\<forall> i. P (Suc i)) \<Longrightarrow> (\<forall> i. i > 0 \<longrightarrow> P i)"
-           by (metis Suc_pred)*)
-        sorry
-      assume "Suc n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) (Suc n) \<and> justified (f (Suc i)) (f i)"
-      then have "Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))"
-        using Protocol.justified_message_exists_in_M_i_n_minus_1 Protocol_axioms \<open>\<forall>i. \<exists>n. n \<in> \<nat> \<and> f i \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc i)) (f i)\<close> by force
-      then show False
-      proof (cases "n > 0") 
-        case False
-        thus ?thesis
-          using Nats_0 \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close> 
-                \<open>n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False\<close>
-          by blast
-      next
-        case True
-        then have "n \<in> \<nat>"
-          using \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close>
-          (* lemma "\<exists> n. Suc n \<in> \<nat> \<and> n > 0 \<longrightarrow> n \<notin> \<nat>"
-            by blast *)
-          sorry
-        thus ?thesis
-          using \<open>n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i)) \<Longrightarrow> False\<close> 
-                \<open>Suc n \<in> \<nat> \<and> f (Suc i) \<in> M_i (V, C, \<epsilon>) n \<and> justified (f (Suc (Suc i))) (f (Suc i))\<close> by blast        
-      qed
-    qed
-  qed
+    sorry
 qed
 
 end
