@@ -371,4 +371,8 @@ proof (rule ccontr)
     by (metis \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> add.right_neutral add_Suc_right)
 qed
 
+lemma (in Protocol) subset_of_M_have_minimal_of_justification :
+  "\<forall> S \<subseteq> M. S \<noteq> \<emptyset> \<longrightarrow> (\<exists> m_min \<in> S. \<forall> m. justified m m_min \<longrightarrow> m \<notin> S)"
+  by (metis justification_is_well_founded_on_M wfp_on_imp_has_min_elt wfp_on_mono)
+
 end

@@ -84,8 +84,11 @@ proof -
     then have "\<forall> m \<in> \<sigma>' - \<sigma>. \<exists> m'. justified m' m \<and> m' \<in> \<sigma>' - \<sigma> \<and> m \<noteq> m'" 
       using justification_implies_different_messages  state_difference_is_valid_message
       by (meson DiffD1 Params.message_in_state_is_valid Protocol_axioms \<open>\<sigma>' \<in> \<Sigma>\<close>)   
-    show False
-      sorry
+    have "\<exists> m_min \<in> \<sigma>' - \<sigma>. \<forall> m. justified m m_min \<longrightarrow> m \<notin> \<sigma>' - \<sigma>"
+      using subset_of_M_have_minimal_of_justification
+      by (meson Diff_eq_empty_iff Diff_subset \<open>\<sigma> \<subseteq> \<sigma>' \<and> \<sigma> \<noteq> \<sigma>'\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> state_is_subset_of_M subset_antisym subset_trans)
+    then show False
+      using \<open>\<forall>m\<in>\<sigma>' - \<sigma>. \<exists>m'. justified m' m \<and> m' \<in> \<sigma>' - \<sigma>\<close> by blast
   qed
 qed
 
