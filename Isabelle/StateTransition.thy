@@ -25,10 +25,10 @@ proof-
 
   have "\<exists>n'. n = Suc n'"
     using \<open>1 \<le> n\<close> old.nat.exhaust by auto
-  hence si: "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  hence si: "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
     by force
 
-  hence "\<Sigma>_i (V,C,\<epsilon>) (n+1) = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  hence "\<Sigma>_i (V,C,\<epsilon>) (n+1) = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
     by force
 
   have "justification m \<subseteq> \<sigma>"
@@ -36,9 +36,9 @@ proof-
     by (metis (no_types, lifting) \<open>immediately_next_message (\<sigma>, m)\<close> case_prod_conv)
   hence "justification m \<subseteq> \<sigma> \<union> {m}"
     by blast
-  moreover have "\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma>"
+  moreover have "\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma>"
     using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by blast
-  hence"\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}"
+  hence"\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}"
     by auto
   ultimately have "\<And>m'. m' \<in> \<sigma> \<union> {m} \<Longrightarrow> justification m \<subseteq> \<sigma>"
     using \<open>justification m \<subseteq> \<sigma>\<close> by blast
@@ -54,7 +54,8 @@ proof-
     by blast
 
   show "\<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)"
-    using \<open>\<And>m'. m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (M_i (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> by auto
+    using \<open>\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (M_i (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> 
+    \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by auto
 qed
 
 lemma (in Protocol) state_transition_by_immediately_next_message_at_n: 

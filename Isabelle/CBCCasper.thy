@@ -44,7 +44,7 @@ fun
   M_i :: "(validator set \<times> consensus_value set \<times> (message set \<Rightarrow> consensus_value set)) \<Rightarrow> nat \<Rightarrow> message set"
   where 
     "\<Sigma>_i (V,C,\<epsilon>) 0 = {\<emptyset>}"
-  | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). \<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>}"
+  | "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
   | "M_i (V,C,\<epsilon>) n = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> (\<Sigma>_i (V,C,\<epsilon>) n) \<and> est m \<in> \<epsilon> (justification m)}" 
 
 locale Params =
@@ -135,11 +135,19 @@ begin
     \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
     \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
     using state_is_subset_of_M by blast
-  
+
+  lemma state_is_finite : "\<forall> \<sigma> \<in> \<Sigma>. finite \<sigma>"
+    apply (simp add:  \<Sigma>_def)
+    using Params.\<Sigma>i_monotonic by fastforce
+
+  lemma justification_is_finite : "\<forall> m \<in> M. finite (justification m)"
+    apply (simp add:  M_def)
+    using Params.\<Sigma>i_monotonic by fastforce
+
   (* FIXME: Remove this after \<Sigma>_type is proved. *)
   lemma \<Sigma>_is_subseteq_of_pow_M: "\<Sigma> \<subseteq> Pow M"
     by (simp add: state_is_subset_of_M subsetI)
-  
+
   lemma M_type: "\<And>m. m \<in> M \<Longrightarrow> est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>"
     unfolding M_def \<Sigma>_def
     by auto
