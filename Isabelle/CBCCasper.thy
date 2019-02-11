@@ -352,10 +352,23 @@ proof (rule ccontr)
   then have "\<exists>f. \<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)"
     by (simp add: wfp_on_def)
   then obtain f where "\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)" by auto
-  then have "\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i) \<and> card (justification (f (Suc i))) < card (justification (f i))"
-    by (simp add: monotonicity_of_card_of_justification)
+  have "\<forall> i. card (justification (f i)) \<le> card (justification (f 0)) - i"
+    apply (rule)
+  proof -
+    fix i
+    have "card (justification (f (Suc i))) < card (justification (f i))"
+    using \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> by (simp add: monotonicity_of_card_of_justification)
+    show "card (justification (f i)) \<le> card (justification (f 0)) - i"
+      apply (induction i)
+      apply simp
+      using \<open>card (justification (f (Suc i))) < card (justification (f i))\<close>
+      by (smt Suc_diff_le \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> diff_Suc_Suc diff_is_0_eq le_iff_add less_Suc_eq_le less_imp_le monotonicity_of_card_of_justification not_less_eq_eq trans_less_add1)  
+  qed
+  then have "\<exists> i. i = card (justification (f 0)) + Suc 0 \<and> card (justification (f i)) \<le> card (justification (f 0)) - i"
+    by blast
   then show False
-    sorry
+    using le_0_eq le_simps(2) linorder_not_le monotonicity_of_card_of_justification nat_diff_split order_less_imp_le
+    by (metis \<open>\<forall>i. f i \<in> M \<and> justified (f (Suc i)) (f i)\<close> add.right_neutral add_Suc_right)
 qed
 
 end
