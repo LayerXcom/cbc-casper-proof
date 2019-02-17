@@ -277,10 +277,14 @@ fun is_future_state :: "(state * state) \<Rightarrow> bool"
     "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
 
 (* Definition 2.9 *)
-fun equivocation :: "(message * message) \<Rightarrow> bool"
+definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
   where
-    "equivocation (m1, m2) =
-      (sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> m1 \<notin> justification m2 \<and> m2 \<notin> justification m1)"
+    "justified m1 m2 = (m1 \<in> justification m2)"
+
+definition equivocation :: "(message * message) \<Rightarrow> bool"
+  where
+    "equivocation =
+      (\<lambda>(m1, m2). sender m1 = sender m2 \<and> m1 \<noteq> m2 \<and> \<not> (justified m1 m2) \<and> \<not> (justified m2 m1))"
 
 (* Definition 2.10 *)
 definition is_equivocating :: "state \<Rightarrow> validator \<Rightarrow> bool"
@@ -331,10 +335,6 @@ type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 (* ###################################################### *)
 (* Message justification and lemmas *)
 (* ###################################################### *)
-
-definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
-  where
-    "justified m1 m2 = (m1 \<in> justification m2)"
 
 lemma (in Protocol) transitivity_of_justifications :
   "transp_on justified M"

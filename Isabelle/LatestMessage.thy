@@ -92,26 +92,54 @@ lemma (in Protocol) observed_non_equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<subseteq> V"
   using observed_type equivocating_validators_type by auto
 
+lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
+  using justification_is_well_founded_on_M from_sender_type wfp_on_subset by blast 
 
-(* TODO #78: Justification is well-ordered over messages from a non-equivocating validator *)
-lemma (in Protocol) justification_is_well_founded_on_messages_from_non_equivocating_validator:
-  "\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> wfp_on justified (from_sender (v, \<sigma>))"
-  oops
+lemma (in Protocol) justification_is_strict_partial_order_on_messages_from_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  po_on justified (from_sender (v, \<sigma>)))"
+  using justification_is_strict_partial_order_on_M from_sender_type po_on_subset by blast 
 
-lemma (in Protocol) justification_is_total_order_on_messages_from_non_equivocating_validator:
-  "\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> total_on justified (from_sender (v, \<sigma>))"
-  oops
+(* Modified from: https://isabelle.in.tum.de/library/HOL/HOL/Order_Relation.html *)
+definition strict_linear_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
+  where 
+      "strict_linear_order_on P A \<equiv> po_on P A  \<and> total_on P A"
 
+definition strict_well_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
+  where 
+      "strict_well_order_on P A \<equiv> strict_linear_order_on P A  \<and> wfp_on P A"
 
+lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> total_on justified (from_sender (v, \<sigma>)))"
+proof -
+  have "\<forall> m1 m2 \<sigma> v. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<and> {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> sender m1 = sender m2 "
+    by (simp add: from_sender_def)
+  then have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
+      \<longrightarrow> (\<forall> m1 m2. {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> m1 = m2 \<or> justified m1 m2 \<or> justified m2 m1))" 
+    apply (simp add: equivocating_validators_def is_equivocating_def equivocation_def from_sender_def observed_def)
+    by blast
+  then show ?thesis
+    by (simp add: total_on_def)
+qed
+
+lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_well_order_on justified (from_sender (v, \<sigma>)))"
+  apply (simp add: strict_well_order_on_def strict_linear_order_on_def)
+  using justification_is_total_on_messages_from_non_equivocating_validator 
+        justification_is_well_founded_on_messages_from_validator
+        justification_is_strict_partial_order_on_messages_from_validator
+  by auto
+
+(* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
-  "\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_message \<sigma> v) = 1"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_message \<sigma> v) = 1)"
   oops
 
 (* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
 (* Lemma 5: Non-equivocating validators have at most one latest message *)
 lemma (in Protocol) non_equivocating_validators_have_at_most_one_latest_message:
-  "\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> card (latest_message \<sigma> v) \<le> 1"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> card (latest_message \<sigma> v) \<le> 1)"
   oops
 
 (* Definition 4.10: The relation \<succeq> (Comparison of cardinalities of justification)*)
