@@ -252,6 +252,14 @@ proof -
     using \<Sigma>_is_subseteq_of_pow_M by auto
 qed
 
+(* M isn't always a strict subset of C \<times> V \<times> \<Sigma>. *)
+lemma (in Protocol) M_type_counterexample: 
+  "(\<forall> \<sigma>. \<epsilon> \<sigma> = C) \<Longrightarrow> M = {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>}"
+  apply (simp add: M_def)
+  apply auto
+  using \<Sigma>i_is_subset_of_\<Sigma> apply blast
+  by (simp add: \<Sigma>_def) 
+
 (* Definition 4.1: Observed validators *)
 definition observed :: "state \<Rightarrow> validator set"
   where
