@@ -61,6 +61,7 @@ begin
     where
       "is_valid_estimator e = (\<forall>\<sigma> \<in> \<Sigma>. e \<sigma> \<in> Pow C - {\<emptyset>})"
 
+  (* FIXME: Rename these lemmas. *)
   lemma \<Sigma>i_subset_Mi: "\<Sigma>_i (V,C,\<epsilon>) (n + 1) \<subseteq> Pow (M_i (V,C,\<epsilon>) n)"
     by force
 
@@ -144,7 +145,6 @@ begin
     apply (simp add:  M_def)
     using Params.\<Sigma>i_monotonic by fastforce
 
-  (* FIXME: Remove this after \<Sigma>_type is proved. *)
   lemma \<Sigma>_is_subseteq_of_pow_M: "\<Sigma> \<subseteq> Pow M"
     by (simp add: state_is_subset_of_M subsetI)
 
@@ -165,12 +165,19 @@ locale Protocol = Params +
 lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
   using is_valid_estimator_def \<epsilon>_type by auto
 
+lemma (in Protocol) estimates_are_subset_of_C: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<subseteq> C"
+  using is_valid_estimator_def \<epsilon>_type by auto
+
 lemma (in Params) empty_set_exists_in_\<Sigma>_0: "\<emptyset> \<in> \<Sigma>_i (V, C, \<epsilon>) 0"
   by simp
 
 lemma (in Params) empty_set_exists_in_\<Sigma>: "\<emptyset> \<in> \<Sigma>"
   apply (simp add:  \<Sigma>_def)
   using Nats_0 \<Sigma>_i.simps(1) by blast
+
+lemma (in Params) \<Sigma>_i_is_non_empty: "\<Sigma>_i (V, C, \<epsilon>) n \<noteq> \<emptyset>"
+  apply (induction n)
+  using empty_set_exists_in_\<Sigma>_0 by auto
 
 lemma (in Params) \<Sigma>_is_non_empty: "\<Sigma> \<noteq> \<emptyset>"
   using empty_set_exists_in_\<Sigma> by blast
@@ -189,18 +196,52 @@ proof -
     by (metis V_type all_not_in_conv est.simps estimates_exists_for_empty_set justification.simps sender.simps set_empty subsetCE)
 qed  
 
+lemma (in Protocol) M_i_is_non_empty: "M_i (V, C, \<epsilon>) n \<noteq> \<emptyset>"
+  apply (induction n)
+  using non_justifying_message_exists_in_M_0 apply auto
+  using Mi_monotonic empty_iff empty_subsetI by fastforce
+
 lemma (in Protocol) M_is_non_empty: "M \<noteq> \<emptyset>"
   using non_justifying_message_exists_in_M_0 M_def Nats_0 by blast
 
-(* FIXME: #49 \<Sigma> is strict subset of Pow M *)
+lemma (in Protocol) C_is_not_empty : "C \<noteq> \<emptyset>"
+  using C_type by auto
+
+lemma (in Params) \<Sigma>i_is_subset_of_\<Sigma> :
+  "\<forall> n \<in> \<nat>. \<Sigma>_i (V, C, \<epsilon>) n \<subseteq> \<Sigma>"
+  by (simp add: \<Sigma>_def SUP_upper)
+
+lemma (in Protocol) message_justifying_state_in_\<Sigma>_n_exists_in_M_n :
+  "\<forall> n \<in> \<nat>. (\<forall> \<sigma>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n \<longrightarrow> (\<exists> m. m \<in> M_i (V, C, \<epsilon>) n \<and> justification m = \<sigma>))"
+  apply auto
+proof -
+  fix n \<sigma>
+  assume "n \<in> \<nat>"
+  and "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  then have "\<sigma> \<in> \<Sigma>"
+    using \<Sigma>i_is_subset_of_\<Sigma> by auto
+  have "\<epsilon> \<sigma> \<noteq> \<emptyset>"
+    using estimates_are_non_empty \<open>\<sigma> \<in> \<Sigma>\<close> by auto  
+  have "finite \<sigma>" 
+    using state_is_finite \<open>\<sigma> \<in> \<Sigma>\<close> by auto
+  moreover have "\<exists> m. sender m \<in> V \<and> est m \<in> \<epsilon> \<sigma> \<and> justification m = \<sigma>"
+    using est.simps sender.simps justification.simps V_type \<open>\<epsilon> \<sigma> \<noteq> \<emptyset>\<close> \<open>finite \<sigma>\<close>
+    by (metis all_not_in_conv finite_list)
+  moreover have "\<epsilon> \<sigma> \<subseteq> C"
+    using estimates_are_subset_of_C \<Sigma>i_is_subset_of_\<Sigma> \<open>n \<in> \<nat>\<close> \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> by blast
+  ultimately show "\<exists> m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n \<and> est m \<in> \<epsilon> (justification m) \<and> justification m = \<sigma>"
+    using Nats_1 One_nat_def
+    using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> by blast
+qed
+
 lemma (in Protocol) \<Sigma>_type: "\<Sigma> \<subset> Pow M"
 proof -
   obtain m where "m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>"
     using non_justifying_message_exists_in_M_0 by auto
   then have "{m} \<in> \<Sigma>_i (V, C, \<epsilon>) (Suc 0)"
     using Params.\<Sigma>i_subset_Mi by auto
-  then have "\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}" 
-    sorry
+  then have "\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}"
+    using message_justifying_state_in_\<Sigma>_n_exists_in_M_n Nats_1 One_nat_def by metis
   then obtain m' where "m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}" by auto
   then have "{m'} \<in> Pow M" 
     using M_def
