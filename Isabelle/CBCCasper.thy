@@ -92,7 +92,23 @@ begin
   lemma state_is_in_pow_M_i :
     "\<forall> \<sigma> \<in> \<Sigma>. (\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1)) \<and> (\<forall> m \<in> \<sigma>. justification m \<subseteq> \<sigma>))" 
     apply (simp add: \<Sigma>_def)
-    by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI)
+    (* Slow proof found by sledgehammer *)
+    (* by (smt M_i.simps One_nat_def PowD \<Sigma>_i.elims empty_iff insert_iff mem_Collect_eq subsetCE subsetI) *)
+    apply auto
+    proof -
+      fix y :: nat and \<sigma> :: "message set"
+      assume a1: "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) y"
+      assume a2: "y \<in> \<nat>"
+      have "\<sigma> \<subseteq> M_i (V, C, \<epsilon>) y"
+        using a1 by (meson Params.\<Sigma>i_monotonic Params.\<Sigma>i_subset_Mi Pow_iff contra_subsetD)
+      then have "\<exists>n. n \<in> \<nat> \<and> \<sigma> \<subseteq> M_i (V, C, \<epsilon>) (n - 1)"
+        using a2 by (metis (no_types) Nats_1 Nats_add diff_Suc_1 plus_1_eq_Suc)
+      then show "\<exists>n\<in>\<nat>. \<sigma> \<subseteq> {m. est m \<in> C \<and> sender m \<in> V \<and> justification m \<in> \<Sigma>_i (V, C, \<epsilon>) (n - Suc 0) \<and> est m \<in> \<epsilon> (justification m)}"
+        by auto
+    next 
+      show "\<And>y \<sigma> m x. y \<in> \<nat> \<Longrightarrow> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) y \<Longrightarrow> m \<in> \<sigma> \<Longrightarrow> x \<in> justification m \<Longrightarrow> x \<in> \<sigma>"
+        using Params.\<Sigma>i_monotonic by fastforce
+    qed
 
   lemma message_is_in_M_i_n :
     "\<forall> m \<in> M. \<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n"
@@ -105,27 +121,13 @@ begin
     fix \<sigma> m
     assume "\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>"
     have
-      "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
-      using \<Sigma>_def \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> by auto
-    moreover have
-      "\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n
-      \<longrightarrow> \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
-      by (metis One_nat_def \<Sigma>_i.simps(1) \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> diff_Suc_1 diff_add_inverse empty_iff insert_iff of_nat_1 of_nat_Suc of_nat_in_Nats)
-    moreover have
-      "\<exists> n \<in> \<nat>. \<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))  
-      \<longrightarrow> (m \<in> \<sigma> \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) (n - 1))"
-      using calculation(2) by blast
-    moreover have
-      "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)
-      \<Longrightarrow> \<exists> n'\<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n'"
-     by (smt Mi_monotonic Suc_diff_Suc add_leE diff_add diff_le_self message_is_in_M_i neq0_conv plus_1_eq_Suc subsetCE zero_less_diff)
-    moreover have
       "\<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) n
       \<Longrightarrow> m \<in> M"
       using M_def by blast 
-    ultimately show
+    then show
       "m \<in> M"
-      by (smt PowD \<Sigma>_i.elims \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> empty_iff insert_iff mem_Collect_eq subsetCE)
+      apply (simp add: M_def)
+      by (smt M_i.simps Params.\<Sigma>i_monotonic PowD Suc_diff_Suc \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> \<sigma>\<close> add_leE diff_add diff_le_self gr0I mem_Collect_eq plus_1_eq_Suc state_is_in_pow_M_i subsetCE zero_less_diff)
   qed
 
   lemma state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
