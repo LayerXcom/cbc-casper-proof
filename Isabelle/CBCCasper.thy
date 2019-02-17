@@ -162,19 +162,46 @@ locale Protocol = Params +
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
+lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
+  using is_valid_estimator_def \<epsilon>_type by auto
+
+lemma (in Params) empty_set_exists_in_\<Sigma>_0: "\<emptyset> \<in> \<Sigma>_i (V, C, \<epsilon>) 0"
+  by simp
+
+lemma (in Params) empty_set_exists_in_\<Sigma>: "\<emptyset> \<in> \<Sigma>"
+  apply (simp add:  \<Sigma>_def)
+  using Nats_0 \<Sigma>_i.simps(1) by blast
+
+lemma (in Params) \<Sigma>_is_non_empty: "\<Sigma> \<noteq> \<emptyset>"
+  using empty_set_exists_in_\<Sigma> by blast
+
+lemma (in Protocol) estimates_exists_for_empty_set :
+  "\<epsilon> \<emptyset> \<noteq> \<emptyset>"
+  by (simp add: empty_set_exists_in_\<Sigma> estimates_are_non_empty)
+
+lemma (in Protocol) non_justifying_message_exists_in_M_0: 
+  "\<exists> m. m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>" 
+  apply auto
+proof -
+  have "\<epsilon> \<emptyset> \<subseteq> C"
+    using Params.empty_set_exists_in_\<Sigma> \<epsilon>_type is_valid_estimator_def by auto
+  then show "\<exists>m. est m \<in> C \<and> sender m \<in> V \<and> justification m = \<emptyset> \<and> est m \<in> \<epsilon> (justification m) \<and> justification m = \<emptyset>"
+    by (metis V_type all_not_in_conv est.simps estimates_exists_for_empty_set justification.simps sender.simps set_empty subsetCE)
+qed  
+
+lemma (in Protocol) M_is_non_empty: "M \<noteq> \<emptyset>"
+  using non_justifying_message_exists_in_M_0 M_def Nats_0 by blast
 
 (* FIXME: #49 \<Sigma> is strict subset of Pow M *)
 lemma (in Protocol) \<Sigma>_type: "\<Sigma> \<subset> Pow M"
 proof -
-  have m_in_M_0: "\<exists> m. m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>"
+  obtain m where "m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>"
+    using non_justifying_message_exists_in_M_0 by auto
+  then have "{m} \<in> \<Sigma>_i (V, C, \<epsilon>) (Suc 0)"
+    using Params.\<Sigma>i_subset_Mi by auto
+  then have "\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}" 
     sorry
-  obtain m where "m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>" using m_in_M_0 by auto
-  have "{m} \<in> \<Sigma>_i (V, C, \<epsilon>) (Suc 0)"
-    using Params.\<Sigma>i_subset_Mi \<open>m \<in> M_i (V, C, \<epsilon>) 0 \<and> justification m = \<emptyset>\<close> by auto
-  then have "\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}"
-    sorry
-  obtain m' where "m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}"
-      using `\<exists> m'. m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}` by auto
+  then obtain m' where "m' \<in>  M_i (V, C, \<epsilon>) (Suc 0) \<and> justification m' = {m}" by auto
   then have "{m'} \<in> Pow M" 
     using M_def
     by (metis Nats_1 One_nat_def PowD PowI Pow_bottom UN_I insert_subset)
@@ -183,9 +210,6 @@ proof -
   ultimately show ?thesis
     using \<Sigma>_is_subseteq_of_pow_M by auto
 qed
-
-lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"
-  using is_valid_estimator_def \<epsilon>_type by auto
 
 (* Definition 4.1: Observed validators *)
 definition observed :: "state \<Rightarrow> validator set"
