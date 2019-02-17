@@ -398,7 +398,7 @@ justified :: Message -> Message -> bool;
 justified m1 m2 = member m1 (justification m2);
 
 later :: (Message, Set Message) -> Set Message;
-later (m, sigma) = filtera (justified m) sigma;
+later = (\ (m, a) -> filtera (justified m) a);
 
 equal_validator :: Validator -> Validator -> bool;
 equal_validator x y = equal_validator x y;
@@ -418,7 +418,7 @@ equal_set :: forall a. (Eq a) => Set a -> Set a -> bool;
 equal_set a b = less_eq_set a b && less_eq_set b a;
 
 from_sender :: (Validator, Set Message) -> Set Message;
-from_sender (v, sigma) = filtera (\ m -> equal_validator (sender m) v) sigma;
+from_sender = (\ (v, a) -> filtera (\ m -> equal_validator (sender m) v) a);
 
 bot_set :: forall a. Set a;
 bot_set = Set [];
@@ -428,8 +428,8 @@ inf_set a (Coset xs) = fold remove xs a;
 inf_set a (Set xs) = Set (filter (\ x -> member x a) xs);
 
 later_from :: (Message, (Validator, Set Message)) -> Set Message;
-later_from (m, (v, sigma)) =
-  inf_set (later (m, sigma)) (from_sender (v, sigma));
+later_from =
+  (\ (m, (v, sigma)) -> inf_set (later (m, sigma)) (from_sender (v, sigma)));
 
 latest_messages :: Set Message -> Validator -> Set Message;
 latest_messages sigma v =

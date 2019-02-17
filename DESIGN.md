@@ -54,7 +54,7 @@ definition (in Protocol) observed :: "state ⇒ validator set"
   where
     "observed σ = {sender m | m. m ∈ σ}"
 
-lemma (in Protocol) oberved_type :
+lemma (in Protocol) observed_type :
   "∀ σ ∈ Σ. observed σ ⊆ V"
   using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 ```

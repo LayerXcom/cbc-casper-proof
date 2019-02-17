@@ -25,18 +25,14 @@ lemma (in Protocol) latest_justifications_from_non_equivocating_validators_type 
   using M_type latest_messages_from_non_equivocating_validators_type by auto
 
 (* Definition 7.8 *)
-(* NOTE: Modified from the original draft. *)
-fun observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
-  where
-    "observed_non_equivocating_validators \<sigma> = observed \<sigma> - equivocating_validators \<sigma>"
-
+(* NOTE: Modified from the original draft with observed_non_equivocating_validators *)
 fun  agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
     "agreeing_validators (p, \<sigma>) = {v \<in> observed_non_equivocating_validators \<sigma>. \<forall> c \<in> latest_estimates_from_non_equivocating_validators \<sigma> v. p c}"
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
-  using oberved_type by auto
+  using observed_type by auto
 
 (* Definition 7.9 *)
 fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
@@ -45,7 +41,7 @@ fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> 
 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
-  using oberved_type by auto
+  using observed_type by auto
 
 (* Definition 7.10 *)
 definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
@@ -106,6 +102,7 @@ proof-
   assume "v \<in> V - {sender m'}"
 
   have "later_from (m,v,\<sigma>) = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''}"
+    apply (simp add: later_from_def from_sender_def later_def)
     by auto
   also have "\<dots> = {m'' \<in> \<sigma>. sender m'' = v \<and> justified m m''} \<union> \<emptyset>"
     by auto    
@@ -133,6 +130,7 @@ proof-
       by auto
   qed
   then have "\<dots> = later_from (m,v,\<sigma>')"
+    apply (simp add: later_from_def from_sender_def later_def)
     by auto
   then show "later_from (m, v, \<sigma>) = later_from (m, v, \<sigma>')"
     using \<open>{m'' \<in> \<sigma> \<union> {m'}. sender m'' = v \<and> justified m m''} = {m'' \<in> \<sigma>'. sender m'' = v \<and> justified m m''}\<close> calculation by auto
