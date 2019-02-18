@@ -45,7 +45,7 @@ For example, in `futures` functions, it's assumed that the received `σ` is in `
 ```
 fun (in Protocol) futures :: "state ⇒ state set"
   where
-    "futures σ = {σ' ∈ Σt. is_future_state (σ', σ)}"
+    "futures σ = {σ' ∈ Σt. is_future_state (σ, σ')}"
 ```
 
 On the other hand, it's **proved** that the function `observed` returns correct set.

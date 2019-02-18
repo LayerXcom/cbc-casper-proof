@@ -10,7 +10,7 @@ begin
 (* Definition 3.1 *)
 fun (in Protocol) futures :: "state \<Rightarrow> state set"
   where
-    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>', \<sigma>)}"
+    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>, \<sigma>')}"
 
 (* Lemma 1 *)
 lemma (in Protocol) monotonic_futures :
