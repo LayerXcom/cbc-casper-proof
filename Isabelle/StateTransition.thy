@@ -4,6 +4,32 @@ imports Main CBCCasper
 
 begin
 
+definition (in Params) state_transition :: "state rel"
+  where 
+    "state_transition = {(\<sigma>1, \<sigma>2). {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma> \<and> is_future_state(\<sigma>1, \<sigma>2)}" 
+
+lemma (in Params) reflexivity_of_state_transition :
+  "refl_on \<Sigma> state_transition"  
+  apply (simp add: state_transition_def refl_on_def)
+  by auto
+
+lemma (in Params) transitivity_of_state_transition :
+  "trans state_transition"  
+  apply (simp add: state_transition_def trans_def)
+  by auto
+
+lemma (in Params) state_transition_is_preorder :
+  "preorder_on \<Sigma> state_transition"
+  by (simp add: preorder_on_def reflexivity_of_state_transition transitivity_of_state_transition)
+
+lemma (in Params) antisymmetry_of_state_transition :
+  "antisym state_transition"  
+  apply (simp add: state_transition_def antisym_def)
+  by auto
+
+lemma (in Params) state_transition_is_partial_order :
+  "partial_order_on \<Sigma> state_transition"
+  by (simp add: partial_order_on_def state_transition_is_preorder antisymmetry_of_state_transition)
 
 (* Definition 7.17 *)
 definition (in Protocol) minimal_transitions :: "(state * state) set"

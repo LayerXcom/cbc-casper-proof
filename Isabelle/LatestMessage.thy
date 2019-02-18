@@ -96,12 +96,8 @@ lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
   using justification_is_well_founded_on_M from_sender_type wfp_on_subset by blast 
 
-lemma (in Protocol) justification_is_strict_partial_order_on_messages_from_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  po_on justified (from_sender (v, \<sigma>)))"
-  using justification_is_strict_partial_order_on_M from_sender_type po_on_subset by blast 
-
 lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> total_on justified (from_sender (v, \<sigma>)))"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> Relation.total_on (from_sender (v, \<sigma>)) message_justification)"
 proof -
   have "\<forall> m1 m2 \<sigma> v. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<and> {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> sender m1 = sender m2 "
     by (simp add: from_sender_def)
@@ -110,16 +106,23 @@ proof -
     apply (simp add: equivocating_validators_def is_equivocating_def equivocation_def from_sender_def observed_def)
     by blast
   then show ?thesis
-    by (simp add: total_on_def)
+    apply (simp add: Relation.total_on_def message_justification_def)
+    using from_sender_type by blast
 qed
 
+(* The definition of strict_linear_order_on based on that the subset of partial ordered set is partial order. *)
+lemma (in Protocol) justification_is_strict_linear_order_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification)"
+  by (simp add: strict_linear_order_on_def justification_is_total_on_messages_from_non_equivocating_validator 
+      irreflexivity_of_justifications transitivity_of_justifications)
+
+(* FIXME: This can be proved after justification_is_well_founded_on_messages_from_validator is modified to use `wf`. *)
 lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_well_order_on justified (from_sender (v, \<sigma>)))"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_well_order_on (from_sender (v, \<sigma>)) message_justification)"
   apply (simp add: strict_well_order_on_def strict_linear_order_on_def)
   using justification_is_total_on_messages_from_non_equivocating_validator 
         justification_is_well_founded_on_messages_from_validator
-        justification_is_strict_partial_order_on_messages_from_validator
-  by auto
+  oops
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
