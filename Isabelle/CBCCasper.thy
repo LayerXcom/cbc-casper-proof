@@ -1,6 +1,6 @@
 theory CBCCasper
 
-imports Main HOL.Real "AFP/Restricted_Predicates"
+imports Main HOL.Real "Libraries/Strict_Order"
 
 begin
 

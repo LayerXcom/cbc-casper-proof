@@ -100,15 +100,6 @@ lemma (in Protocol) justification_is_strict_partial_order_on_messages_from_valid
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  po_on justified (from_sender (v, \<sigma>)))"
   using justification_is_strict_partial_order_on_M from_sender_type po_on_subset by blast 
 
-(* Modified from: https://isabelle.in.tum.de/library/HOL/HOL/Order_Relation.html *)
-definition strict_linear_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
-  where 
-      "strict_linear_order_on P A \<equiv> po_on P A  \<and> total_on P A"
-
-definition strict_well_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
-  where 
-      "strict_well_order_on P A \<equiv> strict_linear_order_on P A  \<and> wfp_on P A"
-
 lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> total_on justified (from_sender (v, \<sigma>)))"
 proof -
@@ -133,13 +124,14 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_message \<sigma> v) = 1)"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_messages \<sigma> v) = 1)"
   oops
 
 (* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
 (* Lemma 5: Non-equivocating validators have at most one latest message *)
 lemma (in Protocol) non_equivocating_validators_have_at_most_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> card (latest_message \<sigma> v) \<le> 1)"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> card (latest_messages \<sigma> v) \<le> 1)"
+  (* Proved with strict_partial_order_has_at_most_one_maximum *)
   oops
 
 (* Definition 4.10: The relation \<succeq> (Comparison of cardinalities of justification)*)
