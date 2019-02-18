@@ -135,7 +135,7 @@ begin
   
   lemma state_difference_is_valid_message :
     "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
-    \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
+    \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
     \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
     using state_is_subset_of_M by blast
 
@@ -274,7 +274,7 @@ lemma (in Protocol) observed_type :
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
-    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
+    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<subseteq> \<sigma>2)"
 
 (* Definition 2.9 *)
 definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
@@ -453,5 +453,32 @@ qed
 lemma (in Protocol) subset_of_M_have_minimal_of_justification :
   "\<forall> S \<subseteq> M. S \<noteq> \<emptyset> \<longrightarrow> (\<exists> m_min \<in> S. \<forall> m. justified m m_min \<longrightarrow> m \<notin> S)"
   by (metis justification_is_well_founded_on_M wfp_on_imp_has_min_elt wfp_on_mono)
+
+definition (in Params) state_transition :: "state rel"
+  where 
+    "state_transition = {(\<sigma>1, \<sigma>2). {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma> \<and> is_future_state(\<sigma>1, \<sigma>2)}" 
+
+lemma (in Params) reflexivity_of_state_transition :
+  "refl_on \<Sigma> state_transition"  
+  apply (simp add: state_transition_def refl_on_def)
+  by auto
+
+lemma (in Params) transitivity_of_state_transition :
+  "trans state_transition"  
+  apply (simp add: state_transition_def trans_def)
+  by auto
+
+lemma (in Params) state_transition_is_preorder :
+  "preorder_on \<Sigma> state_transition"
+  by (simp add: preorder_on_def reflexivity_of_state_transition transitivity_of_state_transition)
+
+lemma (in Params) antisymmetry_of_state_transition :
+  "antisym state_transition"  
+  apply (simp add: state_transition_def antisym_def)
+  by auto
+
+lemma (in Params) state_transition_is_partial_order :
+  "partial_order_on \<Sigma> state_transition"
+  by (simp add: partial_order_on_def state_transition_is_preorder antisymmetry_of_state_transition)
 
 end
