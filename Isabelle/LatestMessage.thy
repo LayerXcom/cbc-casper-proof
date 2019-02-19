@@ -1,3 +1,5 @@
+section \<open>Latest Message\<close>
+
 theory LatestMessage
 
 imports Main CBCCasper

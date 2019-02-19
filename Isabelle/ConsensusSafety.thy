@@ -1,3 +1,5 @@
+section \<open>Safety Proof\<close>
+
 theory ConsensusSafety
 
 imports Main CBCCasper

@@ -1,3 +1,5 @@
+section \<open>Description of CBC Casper\<close>
+
 theory CBCCasper
 
 imports Main HOL.Real "AFP/Restricted_Predicates"
