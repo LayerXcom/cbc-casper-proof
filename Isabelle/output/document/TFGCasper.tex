@@ -1,0 +1,350 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{TFGCasper}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ TFGCasper\isanewline
+\isanewline
+\isakeyword{imports}\ Main\ HOL{\isachardot}Real\ CBCCasper\ LatestMessage\ SafetyOracle\isanewline
+\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isanewline
+\isanewline
+\isacommand{type{\isacharunderscore}synonym}\isamarkupfalse%
+\ block\ {\isacharequal}\ consensus{\isacharunderscore}value\isanewline
+\isanewline
+\isacommand{locale}\isamarkupfalse%
+\ GhostParams\ {\isacharequal}\ Params\ {\isacharplus}\isanewline
+\ \ \isanewline
+\ \ \isakeyword{fixes}\ B\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{fixes}\ genesis\ {\isacharcolon}{\isacharcolon}\ block\isanewline
+\ \ \isanewline
+\ \ \isakeyword{and}\ prev\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isasymRightarrow}\ block{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ n{\isacharunderscore}cestor\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isacharasterisk}\ nat\ {\isasymRightarrow}\ block{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isacharcomma}\ {\isadigit{0}}{\isacharparenright}\ {\isacharequal}\ b{\isachardoublequoteclose}\isanewline
+\ \ {\isacharbar}\ {\isachardoublequoteopen}n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isacharcomma}\ n{\isacharparenright}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}prev\ b{\isacharcomma}\ n{\isacharminus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ blockchain{\isacharunderscore}membership\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isasymRightarrow}\ block\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ {\isacharparenleft}\isakeyword{infixl}\ {\isachardoublequoteopen}{\isasymdownharpoonright}{\isachardoublequoteclose}\ {\isadigit{7}}{\isadigit{0}}{\isacharparenright}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}b{\isadigit{1}}\ {\isasymdownharpoonright}\ b{\isadigit{2}}\ {\isacharequal}\ {\isacharparenleft}{\isasymexists}\ n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{2}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{notation}\isamarkupfalse%
+\ {\isacharparenleft}ASCII{\isacharparenright}\isanewline
+\ \ comp\ \ {\isacharparenleft}\isakeyword{infixl}\ {\isachardoublequoteopen}blockchain{\isacharunderscore}membership{\isachardoublequoteclose}\ {\isadigit{7}}{\isadigit{0}}{\isacharparenright}\isanewline
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ score\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ block\ {\isasymRightarrow}\ real{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}score\ {\isasymsigma}\ b\ {\isacharequal}\ sum\ W\ {\isacharbraceleft}v\ {\isasymin}\ observed\ {\isasymsigma}{\isachardot}\ {\isasymexists}\ b{\isacharprime}\ {\isasymin}\ B{\isachardot}\ b{\isacharprime}\ {\isasymin}\ {\isacharparenleft}latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}b\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ children\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isacharasterisk}\ state\ {\isasymRightarrow}\ block\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\ {\isacharbraceleft}b{\isacharprime}\ {\isasymin}\ est\ {\isacharbackquote}{\isasymsigma}{\isachardot}\ b\ {\isacharequal}\ prev\ b{\isacharprime}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ best{\isacharunderscore}children\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isacharasterisk}\ state\ {\isasymRightarrow}\ \ block\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}best{\isacharunderscore}children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\ {\isacharbraceleft}arg{\isacharunderscore}max{\isacharunderscore}on\ {\isacharparenleft}score\ {\isasymsigma}{\isacharparenright}\ {\isacharparenleft}children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isacommand{function}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ GHOST\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}block\ set\ {\isacharasterisk}\ state{\isacharparenright}\ {\isacharequal}{\isachargreater}\ block\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}GHOST\ {\isacharparenleft}b{\isacharunderscore}set{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\isanewline
+\ \ \ \ \ \ {\isacharparenleft}{\isasymUnion}\ b\ {\isasymin}\ {\isacharbraceleft}b\ {\isasymin}\ b{\isacharunderscore}set{\isachardot}\ children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isasymnoteq}\ {\isasymemptyset}{\isacharbraceright}{\isachardot}\ GHOST\ {\isacharparenleft}best{\isacharunderscore}children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}\isanewline
+\ \ \ \ \ \ \ {\isasymunion}\ {\isacharbraceleft}b\ {\isasymin}\ b{\isacharunderscore}set{\isachardot}\ children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\ {\isasymemptyset}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{fun}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ estimator\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ block\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}estimator\ {\isasymsigma}\ {\isacharequal}\ GHOST\ {\isacharparenleft}{\isacharbraceleft}genesis{\isacharbraceright}{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{abbreviation}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ P\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}consensus{\isacharunderscore}value{\isacharunderscore}property\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}P\ {\isasymequiv}\ {\isacharbraceleft}p{\isachardot}\ {\isasymexists}{\isacharbang}b\ {\isasymin}\ B{\isachardot}\ {\isasymforall}b{\isacharprime}\ {\isasymin}\ B{\isachardot}\ {\isacharparenleft}b\ {\isasymdownharpoonright}\ b{\isacharprime}\ {\isasymlongrightarrow}\ p\ b{\isacharprime}\ {\isacharequal}\ True{\isacharparenright}\ {\isasymand}\ {\isasymnot}\ {\isacharparenleft}b\ {\isasymdownharpoonright}\ b{\isacharprime}\ {\isasymlongrightarrow}\ p\ b{\isacharprime}\ {\isacharequal}\ False{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ GHOST{\isacharunderscore}is{\isacharunderscore}valid{\isacharunderscore}estimator\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isacharparenleft}{\isasymforall}\ b{\isachardot}\ b\ {\isasymin}\ B\ {\isasymlongleftrightarrow}\ prev\ b\ {\isasymin}\ B{\isacharparenright}\ {\isasymand}\ B\ {\isacharequal}\ C\ {\isasymand}\ genesis\ {\isasymin}\ C\ \isanewline
+\ \ {\isasymLongrightarrow}\ is{\isacharunderscore}valid{\isacharunderscore}estimator\ estimator{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{oops}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{locale}\isamarkupfalse%
+\ Ghost\ {\isacharequal}\ GhostParams\ {\isacharplus}\ Protocol\ {\isacharplus}\isanewline
+\ \ \isakeyword{assumes}\ prev{\isacharunderscore}type\ {\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ b{\isachardot}\ b\ {\isasymin}\ B\ {\isasymlongleftrightarrow}\ prev\ b\ {\isasymin}\ B{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ block{\isacharunderscore}is{\isacharunderscore}consensus{\isacharunderscore}value\ {\isacharcolon}\ {\isachardoublequoteopen}B\ {\isacharequal}\ C{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ ghost{\isacharunderscore}is{\isacharunderscore}estimator\ {\isacharcolon}\ {\isachardoublequoteopen}{\isasymepsilon}\ {\isacharequal}\ estimator{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ genesis{\isacharunderscore}type\ {\isacharcolon}\ {\isachardoublequoteopen}genesis\ {\isasymin}\ C{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Ghost{\isacharparenright}\ children{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ b\ {\isasymsigma}{\isachardot}\ b\ {\isasymin}\ B\ {\isasymand}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymlongrightarrow}\ \ children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isasymsubseteq}\ B{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ Ghost{\isacharunderscore}axioms\ Ghost{\isacharunderscore}axioms{\isacharunderscore}def\ Ghost{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Ghost{\isacharparenright}\ block{\isacharunderscore}membership{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}majority{\isacharunderscore}driven\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ p\ {\isasymin}\ P{\isachardot}\ is{\isacharunderscore}majority{\isacharunderscore}driven\ p{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ DiffE\ Pow{\isacharunderscore}iff\ is{\isacharunderscore}valid{\isacharunderscore}estimator{\isacharunderscore}def\ {\isasymepsilon}{\isacharunderscore}type\ block{\isacharunderscore}is{\isacharunderscore}consensus{\isacharunderscore}value\ is{\isacharunderscore}majority{\isacharunderscore}driven{\isacharunderscore}def\ subsetCE{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Ghost{\isacharparenright}\ block{\isacharunderscore}membership{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}max{\isacharunderscore}driven\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ p\ {\isasymin}\ P{\isachardot}\ is{\isacharunderscore}max{\isacharunderscore}driven\ p{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isanewline
+\ \ \isanewline
+\ \ \isacommand{oops}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/code/layerx/cbc-casper-proof/Isabelle/TFGCasper.thy%:%
+%:%10=1%:%
+%:%11=1%:%
+%:%12=2%:%
+%:%13=3%:%
+%:%14=4%:%
+%:%15=5%:%
+%:%20=5%:%
+%:%23=6%:%
+%:%24=7%:%
+%:%25=8%:%
+%:%26=9%:%
+%:%27=9%:%
+%:%28=10%:%
+%:%29=11%:%
+%:%30=11%:%
+%:%31=12%:%
+%:%32=13%:%
+%:%33=14%:%
+%:%34=15%:%
+%:%35=16%:%
+%:%36=17%:%
+%:%37=18%:%
+%:%38=19%:%
+%:%39=19%:%
+%:%40=20%:%
+%:%41=21%:%
+%:%42=22%:%
+%:%43=23%:%
+%:%44=24%:%
+%:%45=25%:%
+%:%46=25%:%
+%:%47=26%:%
+%:%48=27%:%
+%:%49=28%:%
+%:%50=29%:%
+%:%51=29%:%
+%:%52=30%:%
+%:%53=31%:%
+%:%54=32%:%
+%:%55=33%:%
+%:%56=33%:%
+%:%57=34%:%
+%:%58=35%:%
+%:%59=36%:%
+%:%60=37%:%
+%:%61=38%:%
+%:%62=38%:%
+%:%63=39%:%
+%:%64=40%:%
+%:%65=41%:%
+%:%66=42%:%
+%:%67=43%:%
+%:%68=43%:%
+%:%69=44%:%
+%:%70=45%:%
+%:%71=46%:%
+%:%72=47%:%
+%:%73=48%:%
+%:%74=49%:%
+%:%75=49%:%
+%:%76=50%:%
+%:%77=51%:%
+%:%79=53%:%
+%:%82=54%:%
+%:%86=54%:%
+%:%87=54%:%
+%:%92=54%:%
+%:%95=55%:%
+%:%96=56%:%
+%:%97=57%:%
+%:%98=57%:%
+%:%99=58%:%
+%:%100=59%:%
+%:%101=60%:%
+%:%102=61%:%
+%:%103=62%:%
+%:%104=62%:%
+%:%105=63%:%
+%:%106=64%:%
+%:%107=65%:%
+%:%108=66%:%
+%:%109=67%:%
+%:%110=67%:%
+%:%111=68%:%
+%:%112=69%:%
+%:%115=70%:%
+%:%119=70%:%
+%:%120=70%:%
+%:%121=71%:%
+%:%127=71%:%
+%:%130=72%:%
+%:%131=73%:%
+%:%132=74%:%
+%:%133=74%:%
+%:%134=75%:%
+%:%135=76%:%
+%:%136=77%:%
+%:%137=78%:%
+%:%138=79%:%
+%:%139=80%:%
+%:%140=80%:%
+%:%141=81%:%
+%:%144=82%:%
+%:%148=82%:%
+%:%149=82%:%
+%:%150=82%:%
+%:%155=82%:%
+%:%158=83%:%
+%:%159=84%:%
+%:%160=84%:%
+%:%161=85%:%
+%:%164=86%:%
+%:%168=86%:%
+%:%169=86%:%
+%:%170=87%:%
+%:%171=87%:%
+%:%176=87%:%
+%:%179=88%:%
+%:%180=89%:%
+%:%181=89%:%
+%:%182=90%:%
+%:%185=91%:%
+%:%189=91%:%
+%:%190=91%:%
+%:%191=92%:%
+%:%192=93%:%
+%:%193=94%:%
+%:%199=94%:%
+%:%204=95%:%
+%:%209=96%:%
