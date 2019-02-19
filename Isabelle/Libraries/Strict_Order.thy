@@ -56,30 +56,18 @@ lemma strict_partial_order_has_at_most_one_maximum :
   \<longrightarrow> is_singleton {x. maximum_on A r x}"
 proof (rule ccontr)
   assume "\<not> (strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> is_singleton {x. maximum_on A r x})"
-  then have "strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> (\<exists> x1 x2. {x1, x2} \<subseteq> A \<and> x1 \<noteq> x2 \<and> (\<forall> y \<in> A. (y, x1) \<in> r) \<and> (\<forall> y \<in> A. (y, x2) \<in> r))"
-    apply (simp add: maximum_on_def upper_bound_on_def is_singleton_def strict_partial_order_def irrefl_def)
-    apply auto
-    (* sledgehammer *)
-  proof -
-    fix x :: 'a
-    assume a1: "\<forall>a. (a, a) \<notin> r"
-    assume a2: "trans r"
-    obtain aa :: "'a set \<Rightarrow> 'a" and aaa :: "'a set \<Rightarrow> 'a" where
-        f3: "aa (Collect (maximum_on A r)) \<in> Collect (maximum_on A r) \<and> aaa (Collect (maximum_on A r)) \<in> Collect (maximum_on A r) \<and> aa (Collect (maximum_on A r)) \<noteq> aaa (Collect (maximum_on A r))"
-      by (meson \<open>\<not> (strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> is_singleton {x. maximum_on A r x})\<close> is_singletonI')
-  have f4: "\<forall>A r a. maximum_on A r (a::'a) = (a \<in> A \<and> upper_bound_on A r a)"
-    using maximum_on_def by blast
-    then have f5: "(aaa (Collect (maximum_on A r)), aa (Collect (maximum_on A r))) \<in> r"
-      using f3 by (metis (no_types) CollectD upper_bound_on_def)
-    have "\<forall>a. a \<notin> A \<or> (a, aaa (Collect (maximum_on A r))) \<in> r \<or> aaa (Collect (maximum_on A r)) = a"
-      using f4 f3 by (metis CollectD upper_bound_on_def)
-  then show "\<exists>x1. x1 \<in> A \<and> (\<exists>x2. x2 \<in> A \<and> x1 \<noteq> x2 \<and> (\<forall>y\<in>A. (y, x1) \<in> r) \<and> (\<forall>y\<in>A. (y, x2) \<in> r))"
-    using f5 f4 f3 a2 a1 by (metis (no_types) CollectD transE)
-  qed
+  then have "strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> \<not> is_singleton {x. maximum_on A r x}"
+    by simp
+  then have "strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> (\<exists> x1 x2. x1 \<noteq> x2 \<and> {x1, x2} \<subseteq> {x. maximum_on A r x})"
+    by (meson empty_subsetI insert_subset is_singletonI')
+  then have "strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> (\<exists> x1 x2. x1 \<noteq> x2 \<and> {x1, x2} \<subseteq> {x \<in> A. \<forall> y. y \<in> A \<longrightarrow> (y, x) \<in> r \<or> x = y})"
+    by (simp add: maximum_on_def upper_bound_on_def)
+  then have "strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> (\<exists> x1 x2. x1 \<noteq> x2 \<and> {x1, x2} \<subseteq> A \<and> (\<forall> y. y \<in> A \<longrightarrow> (y, x1) \<in> r \<or> x1 = y) \<and> (\<forall> y. y \<in> A \<longrightarrow> (y, x2) \<in> r \<or> x2 = y))"
+    by auto
   then show False
-    using strict_partial_order_def antisym_def
+    using strict_partial_order_def
     (* NOTE: Why \<open>...\<close> is required? *)
-    using \<open>\<not> (strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> is_singleton {x. maximum_on A r x})\<close> irrefl_def by fastforce
+    by (metis \<open>\<not> (strict_partial_order r \<longrightarrow> {x. maximum_on A r x} \<noteq> \<emptyset> \<longrightarrow> is_singleton {x. maximum_on A r x})\<close> insert_subset irrefl_def transE)
 qed
 
 lemma strict_linear_order_on_finite_non_empty_set_has_one_maximum :
