@@ -35,8 +35,8 @@ definition maximal_on :: "'a set \<Rightarrow> 'a rel \<Rightarrow> 'a \<Rightar
 
 lemma maximal_and_maximum_coincide_for_strict_linear_order :
   "strict_linear_order_on A r \<Longrightarrow> maximal_on A r x = maximum_on A r x"
-  apply (simp add: strict_linear_order_on_def irrefl_def maximal_on_def maximum_on_def upper_bound_on_def total_on_def)
-  by (metis transE)
+  apply (simp add: strict_linear_order_on_def irrefl_def total_on_def trans_def maximal_on_def maximum_on_def upper_bound_on_def)
+  by blast
 
 lemma strict_partial_order_on_finite_non_empty_set_has_maximal :
   "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
