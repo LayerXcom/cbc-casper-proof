@@ -1,8 +1,10 @@
-session "all" = "HOL" +
+session Isabelle = HOL +
+  options [document = pdf, document_output = "output", quick_and_dirty]
   theories [document = false]
+    "AFP/Restricted_Predicates"
+  theories
     CBCCasper
     ConsensusSafety
     LatestMessage
-    StateTransition
-    SafetyOracle
-    TFGCasper
+  document_files
+    "root.tex"
