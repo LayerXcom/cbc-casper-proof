@@ -38,14 +38,33 @@ lemma maximal_and_maximum_coincide_for_strict_linear_order :
   apply (simp add: strict_linear_order_on_def irrefl_def total_on_def trans_def maximal_on_def maximum_on_def upper_bound_on_def)
   by blast
 
+lemma "(\<not> (A \<longrightarrow> B)) = A \<and> \<not> B"
+  oops
+
+lemma "((x, y) \<in> r \<longrightarrow> y \<notin> A) = ((x, y) \<in> r \<and> y \<in> A)"
+  oops
+
+lemma "(\<not> (\<forall> y. (x, y) \<in> r \<longrightarrow> y \<notin> A)) = (\<exists> y. (x, y) \<in> r \<and> y \<in> A)"
+  by simp
+
+lemma "\<forall> x. (\<not> (\<forall> y. (x, y) \<in> r \<longrightarrow> y \<notin> A)) = (\<exists> y. (x, y) \<in> r \<and> y \<in> A)"
+  by simp
+
+
 lemma strict_partial_order_on_finite_non_empty_set_has_maximal :
   "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
 proof (rule ccontr)
   (* NOTE: How to use \<not> for pure logic? #81 *)
   assume "\<not> (strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x))"
-  moreover have "finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x) \<longrightarrow> (\<forall> x \<in> A. \<exists> y. (x, y) \<in> r \<longrightarrow> y \<in> A)"
-    using maximal_on_def by auto
-  ultimately show False
+  then have "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> \<not> (\<exists> x. maximal_on A r x)"
+    by simp
+  then have "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> \<not> (\<exists> x. x \<in> A \<and> (\<forall> y. (x, y) \<in> r \<longrightarrow> y \<notin> A))"
+    by (simp add: maximal_on_def) 
+  then have "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<forall> x. x \<notin> A \<or> (\<exists> y. (x, y) \<in> r \<and> y \<in> A))"
+    by simp 
+  then have "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<forall> x \<in> A. (\<exists> y. (x, y) \<in> r \<and> y \<in> A))"
+    by simp 
+  then show False
     using strict_partial_order_def irrefl_def trans_def
     sorry
 qed
