@@ -23,12 +23,21 @@ lemma (in Protocol) later_type :
 (* Definition 4.3: Messages From a Sender *)
 definition from_sender :: "(validator * state) \<Rightarrow> message set"
   where
-    "from_sender  = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
+    "from_sender = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
 
 lemma (in Protocol) from_sender_type :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<subseteq> M"
   apply (simp add: from_sender_def)
   using state_is_subset_of_M by auto  
+
+lemma (in Protocol) "messages_from_observed_validator_is_non_empty" :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> observed \<sigma> \<longrightarrow> from_sender (v, \<sigma>) \<noteq> \<emptyset>"
+  apply (simp add: observed_def from_sender_def)
+  by auto
+
+lemma (in Protocol) "messages_from_validator_is_finite" :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V\<sigma> \<longrightarrow> finite (from_sender (v, \<sigma>))"
+  by (simp add: from_sender_def state_is_finite)
 
 (* Definition 4.4: Message From a Group *)
 definition from_group :: "(validator set * state) \<Rightarrow> state"
@@ -64,6 +73,76 @@ lemma (in Protocol) latest_messages_from_non_observed_validator_is_empty :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_messages \<sigma> v = \<emptyset>"
   by (simp add: latest_messages_def observed_def later_def from_sender_def)
 
+(* Lemma 10: Observed non-equivocating validators have one latest message *)
+definition observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
+  where
+    "observed_non_equivocating_validators \<sigma> = observed \<sigma> - equivocating_validators \<sigma>"
+
+lemma (in Protocol) observed_non_equivocating_validators_type :
+  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<subseteq> V"
+  apply (simp add: observed_non_equivocating_validators_def)
+  using observed_type equivocating_validators_type by auto
+
+lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
+  using justification_is_well_founded_on_M from_sender_type wfp_on_subset by blast 
+
+lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> Relation.total_on (from_sender (v, \<sigma>)) message_justification)"
+proof -
+  have "\<forall> m1 m2 \<sigma> v. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<and> {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> sender m1 = sender m2 "
+    by (simp add: from_sender_def)
+  then have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
+      \<longrightarrow> (\<forall> m1 m2. {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> m1 = m2 \<or> justified m1 m2 \<or> justified m2 m1))" 
+    apply (simp add: equivocating_validators_def is_equivocating_def equivocation_def from_sender_def observed_def)
+    by blast
+  then show ?thesis
+    apply (simp add: Relation.total_on_def message_justification_def)
+    using from_sender_type by blast
+qed
+
+lemma (in Protocol) justification_is_strict_linear_order_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification)"
+  by (simp add: strict_linear_order_on_def justification_is_total_on_messages_from_non_equivocating_validator 
+      irreflexivity_of_justifications transitivity_of_justifications)
+
+(* FIXME: Use strict_well_order_on in Library/Strict_Order.thy. #84 *)
+lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
+  \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification \<and> wfp_on justified (from_sender (v, \<sigma>)))"
+  using justification_is_well_founded_on_messages_from_validator
+        justification_is_strict_linear_order_on_messages_from_non_equivocating_validator 
+  by blast
+
+lemma (in Protocol) latest_message_is_maximal_element_of_justification :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
+  apply (simp add: latest_messages_def later_from_def later_def message_justification_def maximal_on_def)
+  using from_sender_type apply auto
+  apply (metis (no_types, lifting) IntI empty_iff from_sender_def mem_Collect_eq prod.simps(2))
+  by blast  
+
+(* Lemma 10: Observed non-equivocating validators have one latest message *)
+lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v))"  
+  apply (simp add: observed_non_equivocating_validators_def)
+proof -
+  have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed \<sigma> - equivocating_validators \<sigma>. is_singleton {m. maximal_on (from_sender (v, \<sigma>)) message_justification m})"
+    using 
+        messages_from_observed_validator_is_non_empty
+        messages_from_validator_is_finite
+        observed_type
+        equivocating_validators_def
+        justification_is_strict_linear_order_on_messages_from_non_equivocating_validator
+        strict_linear_order_on_finite_non_empty_set_has_one_maximum
+        maximal_and_maximum_coincide_for_strict_linear_order
+    by (smt Collect_cong DiffD1 DiffD2 set_mp)
+  then show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>v\<in>observed \<sigma> - equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v)"  
+    using latest_message_is_maximal_element_of_justification
+          observed_non_equivocating_validators_def observed_non_equivocating_validators_type 
+    by fastforce
+qed
+
+(* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
 (* Definition 4.7: Latest message driven estimator *)
 (* TODO *)
 
@@ -82,77 +161,6 @@ lemma (in Protocol) latest_estimates_from_non_observed_validator_is_empty :
 
 (* Definition 4.9: Latest estimate driven estimator *)
 (* TODO *)
-
-(* Lemma 10: Observed non-equivocating validators have one latest message *)
-fun observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
-  where
-    "observed_non_equivocating_validators \<sigma> = observed \<sigma> - equivocating_validators \<sigma>"
-
-lemma (in Protocol) observed_non_equivocating_validators_type :
-  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<subseteq> V"
-  using observed_type equivocating_validators_type by auto
-
-lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
-  using justification_is_well_founded_on_M from_sender_type wfp_on_subset by blast 
-
-lemma (in Protocol) justification_is_strict_partial_order_on_messages_from_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  po_on justified (from_sender (v, \<sigma>)))"
-  using justification_is_strict_partial_order_on_M from_sender_type po_on_subset by blast 
-
-(* Modified from: https://isabelle.in.tum.de/library/HOL/HOL/Order_Relation.html *)
-definition strict_linear_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
-  where 
-      "strict_linear_order_on P A \<equiv> po_on P A  \<and> total_on P A"
-
-definition strict_well_order_on :: "('a \<Rightarrow> 'a \<Rightarrow> bool) \<Rightarrow> 'a set \<Rightarrow> bool" 
-  where 
-      "strict_well_order_on P A \<equiv> strict_linear_order_on P A  \<and> wfp_on P A"
-
-lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> total_on justified (from_sender (v, \<sigma>)))"
-proof -
-  have "\<forall> m1 m2 \<sigma> v. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<and> {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> sender m1 = sender m2 "
-    by (simp add: from_sender_def)
-  then have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
-      \<longrightarrow> (\<forall> m1 m2. {m1, m2} \<subseteq> from_sender (v, \<sigma>) \<longrightarrow> m1 = m2 \<or> justified m1 m2 \<or> justified m2 m1))" 
-    apply (simp add: equivocating_validators_def is_equivocating_def equivocation_def from_sender_def observed_def)
-    by blast
-  then show ?thesis
-    by (simp add: total_on_def)
-qed
-
-lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_well_order_on justified (from_sender (v, \<sigma>)))"
-  apply (simp add: strict_well_order_on_def strict_linear_order_on_def)
-  using justification_is_total_on_messages_from_non_equivocating_validator 
-        justification_is_well_founded_on_messages_from_validator
-        justification_is_strict_partial_order_on_messages_from_validator
-  by auto
-
-(* Lemma 10: Observed non-equivocating validators have one latest message *)
-(* TODO #59 *)
-lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_message \<sigma> v) = 1)"
-  oops
-
-(* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
-(* Lemma 5: Non-equivocating validators have at most one latest message *)
-lemma (in Protocol) non_equivocating_validators_have_at_most_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> card (latest_message \<sigma> v) \<le> 1)"
-  oops
-
-(* Definition 4.10: The relation \<succeq> (Comparison of cardinalities of justification)*)
-(* Lemma 6 *)
-
-(* Lemma 7 *)
-lemma (in Protocol) monotonicity_of_justifications :
-  "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> m' \<in> later (m, \<sigma>) \<longrightarrow> justification m \<subseteq> justification m'"
-  apply (simp add: later_def)
-  by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_M_i)
-
-(* Lemma 8 *)
-(* Lemma 9 *)
 
 (* Definition 4.11: Latest messages from non-Equivocating validators *)
 definition latest_messages_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> message set"

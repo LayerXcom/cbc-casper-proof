@@ -1,6 +1,6 @@
 theory CBCCasper
 
-imports Main HOL.Real "AFP/Restricted_Predicates"
+imports Main HOL.Real "Libraries/Strict_Order" "Libraries/Restricted_Predicates"
 
 begin
 
@@ -135,7 +135,7 @@ begin
   
   lemma state_difference_is_valid_message :
     "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
-    \<longrightarrow> is_future_state(\<sigma>', \<sigma>)
+    \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
     \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
     using state_is_subset_of_M by blast
 
@@ -274,7 +274,7 @@ lemma (in Protocol) observed_type :
 (* Definition 2.8: Protocol state transitions \<rightarrow> *)
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
-    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<supseteq> \<sigma>2)"
+    "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<subseteq> \<sigma>2)"
 
 (* Definition 2.9 *)
 definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
@@ -336,15 +336,18 @@ type_synonym consensus_value_property = "consensus_value \<Rightarrow> bool"
 (* Message justification and lemmas *)
 (* ###################################################### *)
 
+definition (in Params) message_justification :: "message rel"
+  where 
+    "message_justification = {(m1, m2). {m1, m2} \<subseteq> M \<and> justified m1 m2}" 
+
 lemma (in Protocol) transitivity_of_justifications :
-  "transp_on justified M"
-  apply (simp add: transp_on_def)
-  by (meson Params.M_type Params.state_is_in_pow_M_i Protocol_axioms contra_subsetD justified_def)
+  "trans message_justification"
+  apply (simp add: trans_def message_justification_def justified_def)
+  by (meson Params.M_type Params.state_is_in_pow_M_i Protocol_axioms contra_subsetD)
 
 lemma (in Protocol) irreflexivity_of_justifications :
-  "irreflp_on justified M"
-  apply (simp add: irreflp_on_def)
-  apply (simp add: justified_def)
+  "irrefl message_justification"
+  apply (simp add: irrefl_def message_justification_def justified_def)
   apply (simp add: M_def)
   apply auto
 proof -
@@ -368,9 +371,18 @@ proof -
     using \<open>m \<in> justification m\<close> by blast
 qed
 
+lemma (in Protocol) message_cannot_justify_itself :
+  "(\<forall> m \<in> M. \<not> justified m m)"
+proof -
+  have "irrefl message_justification"
+    using irreflexivity_of_justifications by simp  
+  then show ?thesis
+    by (simp add: irreflexivity_of_justifications irrefl_def message_justification_def)
+qed
+
 lemma (in Protocol) justification_is_strict_partial_order_on_M :
-  "po_on justified M"
-  apply (simp add: po_on_def)
+  "strict_partial_order message_justification"
+  apply (simp add: strict_partial_order_def)
   by (simp add: irreflexivity_of_justifications transitivity_of_justifications)
 
 lemma (in Protocol) monotonicity_of_justifications :
@@ -380,11 +392,11 @@ lemma (in Protocol) monotonicity_of_justifications :
 
 lemma (in Protocol) strict_monotonicity_of_justifications :
   "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subset> justification m"
-  by (metis M_type irreflexivity_of_justifications irreflp_on_def justified_def message_in_state_is_valid monotonicity_of_justifications psubsetI)
+  by (metis M_type message_cannot_justify_itself  justified_def message_in_state_is_valid monotonicity_of_justifications psubsetI)
 
 lemma (in Protocol) justification_implies_different_messages :
   "\<forall> m m'. m \<in> M \<and> m' \<in> M \<longrightarrow> justified m' m \<longrightarrow> m \<noteq> m'"
-  by (meson irreflexivity_of_justifications irreflp_on_def)
+  using message_cannot_justify_itself by auto
 
 lemma (in Protocol) only_valid_message_is_justified :
   "\<forall> m \<in> M. \<forall> m'. justified m' m \<longrightarrow> m' \<in> M"
@@ -424,6 +436,7 @@ lemma (in Protocol) monotonicity_of_card_of_justification :
   \<longrightarrow> card (justification m') < card (justification m)"
   by (meson M_type Protocol.strict_monotonicity_of_justifications Protocol_axioms justification_is_finite psubset_card_mono)
 
+(* TODO: Use `wf` in HOL/Wellfounded.thy #84 *)
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
 proof (rule ccontr) 

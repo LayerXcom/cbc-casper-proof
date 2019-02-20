@@ -4,12 +4,38 @@ imports Main CBCCasper
 
 begin
 
+definition (in Params) state_transition :: "state rel"
+  where 
+    "state_transition = {(\<sigma>1, \<sigma>2). {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma> \<and> is_future_state(\<sigma>1, \<sigma>2)}" 
+
+lemma (in Params) reflexivity_of_state_transition :
+  "refl_on \<Sigma> state_transition"  
+  apply (simp add: state_transition_def refl_on_def)
+  by auto
+
+lemma (in Params) transitivity_of_state_transition :
+  "trans state_transition"  
+  apply (simp add: state_transition_def trans_def)
+  by auto
+
+lemma (in Params) state_transition_is_preorder :
+  "preorder_on \<Sigma> state_transition"
+  by (simp add: preorder_on_def reflexivity_of_state_transition transitivity_of_state_transition)
+
+lemma (in Params) antisymmetry_of_state_transition :
+  "antisym state_transition"  
+  apply (simp add: state_transition_def antisym_def)
+  by auto
+
+lemma (in Params) state_transition_is_partial_order :
+  "partial_order_on \<Sigma> state_transition"
+  by (simp add: partial_order_on_def state_transition_is_preorder antisymmetry_of_state_transition)
 
 (* Definition 7.17 *)
 definition (in Protocol) minimal_transitions :: "(state * state) set"
   where
-    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>'
-      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>'', \<sigma>) \<and> is_future_state (\<sigma>', \<sigma>'') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
+    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'
+      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
@@ -66,7 +92,7 @@ lemma (in Protocol) state_transition_by_immediately_next_message_at_n:
   by (metis le_add1 plus_1_eq_Suc)
 
 lemma (in Protocol) state_differences_have_immediately_next_messages: 
-  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>', \<sigma>) \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>'-\<sigma>. immediately_next_message (\<sigma>, m))"
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>'-\<sigma>. immediately_next_message (\<sigma>, m))"
   apply (simp add: immediately_next_message_def)
   apply (rule, rule, rule)
 proof -

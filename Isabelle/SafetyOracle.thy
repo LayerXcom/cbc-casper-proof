@@ -32,6 +32,7 @@ fun  agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> va
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
+  apply (simp add: observed_non_equivocating_validators_def)
   using observed_type by auto
 
 (* Definition 7.9 *)
@@ -41,6 +42,7 @@ fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> 
 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
+  apply (simp add: observed_non_equivocating_validators_def)
   using observed_type by auto
 
 (* Definition 7.10 *)
