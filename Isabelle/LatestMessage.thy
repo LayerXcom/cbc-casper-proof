@@ -110,13 +110,12 @@ proof -
     using from_sender_type by blast
 qed
 
-(* The definition of strict_linear_order_on based on that the subset of partial ordered set is partial order. *)
 lemma (in Protocol) justification_is_strict_linear_order_on_messages_from_non_equivocating_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification)"
   by (simp add: strict_linear_order_on_def justification_is_total_on_messages_from_non_equivocating_validator 
       irreflexivity_of_justifications transitivity_of_justifications)
 
-(* FIXME: Use strict_well_order_on. #84 *)
+(* FIXME: Use strict_well_order_on in Library/Strict_Order.thy. #84 *)
 lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
   \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification \<and> wfp_on justified (from_sender (v, \<sigma>)))"
@@ -127,7 +126,7 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. card (latest_messages \<sigma> v) = 1)"
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v))"
   oops
 
 (* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
