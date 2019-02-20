@@ -14,6 +14,15 @@ notation Set.empty ("\<emptyset>")
 
 definition "strict_partial_order r \<equiv> trans r \<and> irrefl r"
 
+(* 
+In HOL/Order_Relation.thy, strict_on_linear_order_on is defined as follows,
+based on the fact that based on the fact that partial order holds in a subset.
+```
+definition "strict_linear_order_on A r \<equiv> trans r \<and> irrefl r \<and> total_on A r"
+```
+*)
+
+(* NOTE: This definition is based on the fact that well-foundedness holds in a subset. *)
 definition "strict_well_order_on A r \<equiv> strict_linear_order_on A r \<and> wf r"
 
 lemma strict_linear_order_is_strict_partial_order :

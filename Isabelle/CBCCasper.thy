@@ -436,7 +436,7 @@ lemma (in Protocol) monotonicity_of_card_of_justification :
   \<longrightarrow> card (justification m') < card (justification m)"
   by (meson M_type Protocol.strict_monotonicity_of_justifications Protocol_axioms justification_is_finite psubset_card_mono)
 
-(* TODO: Use Wellfounded.wf *)
+(* TODO: Use `wf` in HOL/Wellfounded.thy #84 *)
 lemma (in Protocol) justification_is_well_founded_on_M :
   "wfp_on justified M"
 proof (rule ccontr) 

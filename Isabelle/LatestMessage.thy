@@ -116,13 +116,13 @@ lemma (in Protocol) justification_is_strict_linear_order_on_messages_from_non_eq
   by (simp add: strict_linear_order_on_def justification_is_total_on_messages_from_non_equivocating_validator 
       irreflexivity_of_justifications transitivity_of_justifications)
 
-(* FIXME: This can be proved after justification_is_well_founded_on_messages_from_validator is modified to use `wf`. *)
+(* FIXME: Use strict_well_order_on. #84 *)
 lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equivocating_validator:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> strict_well_order_on (from_sender (v, \<sigma>)) message_justification)"
-  apply (simp add: strict_well_order_on_def strict_linear_order_on_def)
-  using justification_is_total_on_messages_from_non_equivocating_validator 
-        justification_is_well_founded_on_messages_from_validator
-  oops
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> 
+  \<longrightarrow> strict_linear_order_on (from_sender (v, \<sigma>)) message_justification \<and> wfp_on justified (from_sender (v, \<sigma>)))"
+  using justification_is_well_founded_on_messages_from_validator
+        justification_is_strict_linear_order_on_messages_from_non_equivocating_validator 
+  by blast
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
