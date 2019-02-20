@@ -79,7 +79,7 @@ proof -
   qed
 qed
 
-lemma strict_partial_order_on_finite_non_empty_set_has_maximal :
+lemma strict_partial_order_on_finite_non_empty_set_has_maximal_by_contradiction :
   "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
 proof (rule ccontr)
   (* NOTE: How to use \<not> for pure logic? #81 *)
