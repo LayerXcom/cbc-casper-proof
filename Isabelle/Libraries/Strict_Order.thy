@@ -16,6 +16,10 @@ definition "strict_partial_order r \<equiv> trans r \<and> irrefl r"
 
 definition "strict_well_order_on A r \<equiv> strict_linear_order_on A r \<and> wf r"
 
+lemma strict_linear_order_is_strict_partial_order :
+  "strict_linear_order_on A r \<Longrightarrow> strict_partial_order r"
+  by (simp add: strict_linear_order_on_def strict_partial_order_def)
+
 (* NOTE: In these definitions r is assumed to be strict partial order. *)
 definition upper_bound_on :: "'a set \<Rightarrow> 'a rel \<Rightarrow> 'a \<Rightarrow> bool"
   where 
@@ -93,6 +97,8 @@ qed
 
 lemma strict_linear_order_on_finite_non_empty_set_has_one_maximum :
   "strict_linear_order_on A r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> is_singleton {x. maximum_on A r x}"
-  oops
+  using strict_linear_order_is_strict_partial_order strict_partial_order_on_finite_non_empty_set_has_maximal 
+        strict_partial_order_has_at_most_one_maximum maximal_and_maximum_coincide_for_strict_linear_order
+  by fastforce
 
 end
