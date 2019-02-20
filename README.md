@@ -11,7 +11,7 @@ Proofs of properties of CBC Casper
 
 Document creation requires `isabelle` as a command line tool. Make sure you have `isabelle` in your `$PATH` or set an `alias`.
 
-Make sure you ahve a suitable `texlive` environment installed. Otherwise, LateX builds will fail.
+Make sure you have a suitable `texlive` environment installed. Otherwise, LaTeX builds will fail.
 
 ### Quick build
 
