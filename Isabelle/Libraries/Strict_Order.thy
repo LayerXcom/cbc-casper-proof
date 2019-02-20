@@ -40,6 +40,39 @@ lemma maximal_and_maximum_coincide_for_strict_linear_order :
 
 lemma strict_partial_order_on_finite_non_empty_set_has_maximal :
   "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
+proof - 
+  have "\<And>n. strict_partial_order r \<Longrightarrow> (\<forall> A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x))"
+  proof - 
+    assume "strict_partial_order r"
+    then have "(\<forall>a. (a, a) \<notin> r)" 
+      by (simp add: strict_partial_order_def irrefl_def) 
+    fix n
+    show "\<forall> A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
+      apply (induction n)
+      unfolding maximal_on_def
+      using \<open>(\<forall>a. (a, a) \<notin> r)\<close>
+      apply (metis card_eq_SucD empty_iff insert_iff)
+    proof -
+      fix n
+      assume "\<forall>A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> A \<and> (\<forall>y. (x, y) \<in> r \<longrightarrow> y \<notin> A))"
+      have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> \<longrightarrow> (\<exists> A' b. B = A' \<union> {b} \<and> card A' = Suc n \<and> b \<notin> A')"
+        by (metis Un_commute add_diff_cancel_left' card_gt_0_iff card_insert_disjoint card_le_Suc_iff insert_is_Un not_le not_less_eq_eq plus_1_eq_Suc)
+      then have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> \<longrightarrow> (\<exists> A' b. B = A' \<union> {b} \<and> card A' = Suc n \<and> finite A' \<and> A' \<noteq> \<emptyset> \<and> b \<notin> A')"
+        by (metis card_gt_0_iff zero_less_Suc)
+      then have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset>
+          \<longrightarrow> (\<exists> A' b x. B = A' \<union> {b} \<and> b \<notin> A' \<and> x \<in> A' \<and> (\<forall>y. (x, y) \<in> r \<longrightarrow> y \<notin> A'))"
+        using \<open>\<forall>A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> A \<and> (\<forall>y. (x, y) \<in> r \<longrightarrow> y \<notin> A))\<close> 
+        by metis
+      then show "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> B \<and> (\<forall>y. (x, y) \<in> r \<longrightarrow> y \<notin> B))"
+        by (metis (no_types, lifting) Un_insert_right \<open>\<forall>a. (a, a) \<notin> r\<close> \<open>strict_partial_order r\<close> insertE insert_iff strict_partial_order_def sup_bot.right_neutral transE)
+    qed
+  qed
+  then show ?thesis
+    by (metis card.insert_remove finite.cases)
+qed
+
+lemma strict_partial_order_on_finite_non_empty_set_has_maximal :
+  "strict_partial_order r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
   apply (rule, rule, rule)
 proof - 
   assume "strict_partial_order r"
@@ -47,12 +80,8 @@ proof -
     by (simp add: strict_partial_order_def irrefl_def) 
   assume "finite A" 
   assume "A \<noteq> \<emptyset>"
-  then have "\<exists> n. n = card A - 1"
-    by (simp add: \<open>finite A\<close> card_gt_0_iff)
-  then obtain n where "n = card A - 1"
-    by simp
-  then show "\<exists> x. maximal_on A r x"
-    apply (induction n)
+  show "\<exists> x. maximal_on A r x"
+    apply (induction "card A - 1")
   proof -
     assume "0 = card A - 1"
     then have "card A = 1"
@@ -70,7 +99,9 @@ proof -
     then have "\<exists> A' x. A = A' \<union> {x} \<and> card A' = Suc n \<and> x \<notin> A'"
       using \<open>A \<noteq> \<emptyset>\<close> \<open>finite A\<close>
       by (metis Un_commute add_diff_cancel_left' card_gt_0_iff card_insert_disjoint card_le_Suc_iff insert_is_Un not_le not_less_eq_eq plus_1_eq_Suc)
-    have "\<forall> A' x. A = A' \<union> {x} \<and> card A' = Suc n \<and> x \<notin> A' \<longrightarrow> (\<exists> x'. maximal_on A' r x')"
+    then obtain A' x where "A = A' \<union> {x} \<and> card A' = Suc n \<and> x \<notin> A'"
+      by auto
+    have "\<exists> x'. maximal_on A' r x'"
       using \<open>Suc n = card A \<Longrightarrow> (\<exists> x. maximal_on A r x)\<close> 
       sorry
     (* Then we do case analysis. *)
