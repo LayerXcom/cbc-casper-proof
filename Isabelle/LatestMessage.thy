@@ -23,7 +23,7 @@ lemma (in Protocol) later_type :
 (* Definition 4.3: Messages From a Sender *)
 definition from_sender :: "(validator * state) \<Rightarrow> message set"
   where
-    "from_sender  = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
+    "from_sender = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
 
 lemma (in Protocol) from_sender_type :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<subseteq> M"
@@ -123,10 +123,18 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
         justification_is_strict_linear_order_on_messages_from_non_equivocating_validator 
   by blast
 
+lemma (in Protocol) latest_message_is_maximal_element_of_justification :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
+  apply (simp add: latest_messages_def later_from_def later_def message_justification_def maximal_on_def)
+  using from_sender_type apply auto
+  apply (metis (no_types, lifting) IntI empty_iff from_sender_def mem_Collect_eq prod.simps(2))
+  by blast  
+
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 (* TODO #59 *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v))"
+  using justification_is_strict_linear_order_on_messages_from_non_equivocating_validator
   oops
 
 (* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
