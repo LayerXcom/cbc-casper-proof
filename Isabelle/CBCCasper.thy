@@ -263,7 +263,7 @@ lemma (in Protocol) M_type_counterexample:
   by (simp add: \<Sigma>_def) 
 
 (* Definition 4.1: Observed validators *)
-definition observed :: "state \<Rightarrow> validator set"
+definition observed :: "message set \<Rightarrow> validator set"
   where
     "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
 
