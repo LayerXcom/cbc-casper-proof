@@ -1,3 +1,5 @@
+section \<open>Description of CBC Casper\<close>
+
 theory CBCCasper
 
 imports Main HOL.Real "Libraries/Strict_Order" "Libraries/Restricted_Predicates"
