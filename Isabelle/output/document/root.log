@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2019.1.21)  19 FEB 2019 16:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2019.1.21)  21 FEB 2019 16:55
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -47,6 +47,17 @@ Including comment 'isatagvisible' Excluding comment 'isadeliminvisible'
 Excluding comment 'isataginvisible' Including comment 'isadelimimportant'
 Including comment 'isatagimportant' Including comment 'isadelimunimportant'
 Including comment 'isatagunimportant') (./isabelletags.sty) (./isabellesym.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\@emptytoks=\toks15
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
 (./pdfsetup.sty (/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
 Package: color 2016/07/10 v1.1e Standard LaTeX Color (DPC)
 
@@ -107,7 +118,7 @@ Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
 )
 (/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
-\KV@toks@=\toks15
+\KV@toks@=\toks16
 )
 (/usr/share/texlive/texmf-dist/tex/generic/ifxetex/ifxetex.sty
 Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
@@ -203,12 +214,12 @@ LaTeX Font Info:    ... okay on input line 36.
 \scratchbox=\box29
 \nofMPsegments=\count100
 \nofMParguments=\count101
-\everyMPshowfont=\toks16
+\everyMPshowfont=\toks17
 \MPscratchCnt=\count102
 \MPscratchDim=\dimen113
 \MPnumerator=\count103
 \makeMPintoPDFobject=\count104
-\everyMPtoPDFconversion=\toks17
+\everyMPtoPDFconversion=\toks18
 )
 \AtBeginShipoutBox=\box30
 Package hyperref Info: Link coloring ON on input line 36.
@@ -228,23 +239,29 @@ LaTeX Info: Redefining \nameref on input line 36.
 \@outlinefile=\write4
 \openout4 = `root.out'.
 
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 41.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 41.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 41.
- (./root.toc)
+LaTeX Font Info:    Try loading font information for U+msa on input line 41.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 41.
+
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) (./root.toc)
 \tf@toc=\write5
 \openout5 = `root.toc'.
 
- (./session.tex
-(./Restricted_Predicates.tex) (./CBCCasper.tex
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 30.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 30.
- [1
+
+(./session.tex (./Restricted_Predicates.tex) (./LaTeXsugar.tex)
+(./Strict_Order.tex) (./CBCCasper.tex
+Overfull \hbox (2.99745pt too wide) in paragraph at lines 29--30
+[][]\OT1/cmr/bx/n/10 imports \OT1/cmr/m/it/10 Main HOL$\OML/cmm/m/it/10 :$\OT1/
+cmr/m/it/10 Real Li-braries$\OML/cmm/m/it/10 =$\OT1/cmr/m/it/10 Strict[]Order L
+i-braries$\OML/cmm/m/it/10 =$\OT1/cmr/m/it/10 Restricted[]Predicates Li-
+ []
+
+[1
 
 {/usr/share/texlive/texmf-dist/fonts/map/pdftex/updmap/pdftex.map}] [2]
 Overfull \hbox (28.52122pt too wide) in paragraph at lines 176--178
@@ -274,22 +291,22 @@ Overfull \hbox (32.01114pt too wide) in paragraph at lines 971--984
 f equivocating[]validators[]def
  []
 
-
-Overfull \hbox (20.52109pt too wide) in paragraph at lines 1048--1055
+[8]
+Overfull \hbox (25.35025pt too wide) in paragraph at lines 1053--1060
 [][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 meson Params$\OML
 /cmm/m/it/10 :$\OT1/cmr/m/it/10 M[]type Params$\OML/cmm/m/it/10 :$\OT1/cmr/m/it
-/10 state[]is[]in[]pow[]M[]i Protocol[]axioms contra[]subsetD
+/10 state[]is[]in[]pow[]M[]i Protocol[]axioms contra[]subsetD$\OT1/cmr/m/n/10 )
+$[] 
  []
 
-[8]
-Overfull \hbox (63.3457pt too wide) in paragraph at lines 1174--1187
-[][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 metis M[]type irr
-eflexivity[]of[]justifications irreflp[]on[]def justified[]def message[]in[]sta
-te[]is[]valid
+[9]
+Overfull \hbox (8.61836pt too wide) in paragraph at lines 1208--1221
+[][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 metis M[]type mes
+sage[]cannot[]justify[]itself  justified[]def message[]in[]state[]is[]valid
  []
 
-[9] [10]
-Overfull \hbox (75.74925pt too wide) in paragraph at lines 1348--1351
+[10]
+Overfull \hbox (75.74925pt too wide) in paragraph at lines 1384--1387
 [][]    \OT1/cmr/bx/n/10 us-ing []$\OMS/cmsy/m/n/10 8 $\OT1/cmr/m/it/10 i$\OML/
 cmm/m/it/10 :$ \OT1/cmr/m/it/10 f i $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 M $\O
 MS/cmsy/m/n/10 ^$ \OT1/cmr/m/it/10 jus-ti-fied $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it
@@ -300,7 +317,7 @@ d[]of[]justification$\OT1/cmr/m/n/10 )$[]
  []
 
 
-Overfull \hbox (6.63387pt too wide) in paragraph at lines 1373--1375
+Overfull \hbox (6.63387pt too wide) in paragraph at lines 1409--1411
 [][]    \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 metis []$\OMS/c
 msy/m/n/10 8 $\OT1/cmr/m/it/10 i$\OML/cmm/m/it/10 :$ \OT1/cmr/m/it/10 f i $\OMS
 /cmsy/m/n/10 2$ \OT1/cmr/m/it/10 M $\OMS/cmsy/m/n/10 ^$ \OT1/cmr/m/it/10 jus-ti
@@ -311,7 +328,7 @@ ght$\OT1/cmr/m/n/10 )$[]
  []
 
 
-Overfull \hbox (3.42763pt too wide) in paragraph at lines 1388--1401
+Overfull \hbox (3.42763pt too wide) in paragraph at lines 1424--1437
 [][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 metis justificati
 on[]is[]well[]founded[]on[]M wfp[]on[]imp[]has[]min[]elt wfp[]on[]mono$\OT1/cmr
 /m/n/10 )$[] 
@@ -326,7 +343,7 @@ operty[]is[]decided $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 p$\OML/cmm/m/it/10 ;$ $
 ty[]not
  []
 
-
+[13]
 Overfull \hbox (37.89784pt too wide) in paragraph at lines 259--261
 [][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$$\OMS/c
 msy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$ $\OMS/
@@ -348,7 +365,7 @@ T1/cmr/m/it/10 set$\OML/cmm/m/it/10 :$ $\OT1/cmr/m/n/10 ($$\OMS/cmsy/m/n/10 8 $
 ions s$\OML/cmm/m/it/10 :$ \OT1/cmr/m/it/10 state[]property[]is[]decided
  []
 
-[13]
+
 Overfull \hbox (34.05345pt too wide) in paragraph at lines 267--269
 [][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$$\OMS/c
 msy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$ $\OMS/
@@ -404,7 +421,7 @@ are[]consistent $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 consensus[]value[]prope
 rty
  []
 
-[14]
+[14] [15]
 Overfull \hbox (23.02252pt too wide) in paragraph at lines 405--407
 [][]\OT1/cmr/bx/n/10 fun $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it/1
 0 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 consensus[]value[]property[]de
@@ -419,7 +436,7 @@ re[]consistent $\OT1/cmr/m/n/10 ($$[] $ $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 co
 nsensus[]value[]property[]decisions
  []
 
-[15]
+
 Overfull \hbox (38.37221pt too wide) in paragraph at lines 448--450
 [][]  \OT1/cmr/bx/n/10 hence \OT1/cmr/m/it/10 consensus[]value[]properties[]are
 []consistent $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 q$\OML/cmm/m/it/10 :$ \OT1/cm
@@ -448,32 +465,40 @@ r/m/n/10 ($$[] $ $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 consensus[]value[]propert
 y[]decisions
  []
 
-) (./LatestMessage.tex [16] [17]
-Overfull \hbox (6.74617pt too wide) in paragraph at lines 303--305
-[][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
-/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 justification[]is[]strict[]p
-artial[]order[]on[]messages[]from[]validator$\OT1/cmr/m/n/10 :$[] 
- []
-
-[18]
-Overfull \hbox (21.31276pt too wide) in paragraph at lines 334--336
+[16]) (./LatestMessage.tex [17]
+Overfull \hbox (21.31276pt too wide) in paragraph at lines 293--295
 [][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
 /10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 justification[]is[]total[]on
 []messages[]from[]non[]equivocating[]validator$\OT1/cmr/m/n/10 :$[] 
  []
 
-
-Overfull \hbox (6.52596pt too wide) in paragraph at lines 336--337
+[18]
+Overfull \hbox (9.688pt too wide) in paragraph at lines 295--296
 [][]  $\OMS/cmsy/m/n/10 8 $ $\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 2$ $\OT1/c
 mr/m/n/10 ^^F$$\OML/cmm/m/it/10 :$ $\OT1/cmr/m/n/10 ($$\OMS/cmsy/m/n/10 8 $ \OT
 1/cmr/m/it/10 v $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 V$\OML/cmm/m/it/10 :$ \OT
 1/cmr/m/it/10 v $[]$ equivocating[]validators $\OML/cmm/m/it/10 ^^[$ $[][]\OMS/
-cmsy/m/n/10 !$ \OT1/cmr/m/it/10 total[]on jus-ti-fied $\OT1/cmr/m/n/10 ($\OT1/c
-mr/m/it/10 from[]sender
+cmsy/m/n/10 !$ \OT1/cmr/m/it/10 Re-la-tion$\OML/cmm/m/it/10 :$\OT1/cmr/m/it/10 
+total[]on $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 from[]sender
  []
 
 
-Overfull \hbox (71.27347pt too wide) in paragraph at lines 372--374
+Overfull \hbox (79.06784pt too wide) in paragraph at lines 334--336
+[][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
+/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 justification[]is[]strict[]l
+inear[]order[]on[]messages[]from[]non[]equivocating[]validator$\OT1/cmr/m/n/10 
+:$[] 
+ []
+
+
+Overfull \hbox (101.85107pt too wide) in paragraph at lines 337--345
+[][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1/cmr
+/m/n/10 :$ \OT1/cmr/m/it/10 strict[]linear[]order[]on[]def justification[]is[]t
+otal[]on[]messages[]from[]non[]equivocating[]validator
+ []
+
+
+Overfull \hbox (71.27347pt too wide) in paragraph at lines 355--357
 [][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
 /10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 justification[]is[]strict[]w
 ell[]order[]on[]messages[]from[]non[]equivocating[]validator$\OT1/cmr/m/n/10 :$
@@ -481,35 +506,69 @@ ell[]order[]on[]messages[]from[]non[]equivocating[]validator$\OT1/cmr/m/n/10 :$
  []
 
 
-Overfull \hbox (3.35449pt too wide) in paragraph at lines 399--401
+Overfull \hbox (1.09744pt too wide) in paragraph at lines 367--368
+[][]        \OT1/cmr/m/it/10 justification[]is[]strict[]linear[]order[]on[]mess
+ages[]from[]non[]equivocating[]validator
+ []
+
+
+Overfull \hbox (16.01701pt too wide) in paragraph at lines 381--389
+[][]  \OT1/cmr/bx/n/10 ap-ply $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1
+/cmr/m/n/10 :$ \OT1/cmr/m/it/10 latest[]messages[]def later[]from[]def later[]d
+ef message[]justification[]def
+ []
+
+
+Overfull \hbox (3.35449pt too wide) in paragraph at lines 405--407
 [][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
 /10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 observed[]non[]equivocating[
 ]validators[]have[]one[]latest[]message$\OT1/cmr/m/n/10 :$[] 
  []
 
+
+Overfull \hbox (11.59692pt too wide) in paragraph at lines 407--408
+[][]  $\OMS/cmsy/m/n/10 8 $ $\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 2$ $\OT1/c
+mr/m/n/10 ^^F$$\OML/cmm/m/it/10 :$ $\OT1/cmr/m/n/10 ($$\OMS/cmsy/m/n/10 8 $ \OT
+1/cmr/m/it/10 v $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 observed[]non[]equivocati
+ng[]validators $\OML/cmm/m/it/10 ^^[$$:$ \OT1/cmr/m/it/10 is[]singleton $\OT1/c
+mr/m/n/10 ($\OT1/cmr/m/it/10 latest[]messages
+ []
+
 [19]
-Overfull \hbox (31.44884pt too wide) in paragraph at lines 476--489
+Overfull \hbox (1.09744pt too wide) in paragraph at lines 426--427
+[][]        \OT1/cmr/m/it/10 justification[]is[]strict[]linear[]order[]on[]mess
+ages[]from[]non[]equivocating[]validator[] 
+ []
+
+
+Overfull \hbox (21.28612pt too wide) in paragraph at lines 436--437
+[][]          \OT1/cmr/m/it/10 observed[]non[]equivocating[]validators[]def obs
+erved[]non[]equivocating[]validators[]type
+ []
+
+[20]
+Overfull \hbox (31.44884pt too wide) in paragraph at lines 511--524
 [][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1/cmr
 /m/n/10 :$ \OT1/cmr/m/it/10 latest[]messages[]type latest[]messages[]from[]non[
 ]equivocating[]validators[]def$\OT1/cmr/m/n/10 )$[] 
  []
 
 
-Overfull \hbox (189.41557pt too wide) in paragraph at lines 504--518
+Overfull \hbox (189.41557pt too wide) in paragraph at lines 539--553
 [][]  \OT1/cmr/bx/n/10 us-ing \OT1/cmr/m/it/10 Pro-to-col$\OML/cmm/m/it/10 :$\O
 T1/cmr/m/it/10 latest[]estimates[]type Protocol[]axioms latest[]estimates[]def 
 latest[]estimates[]from[]non[]equivocating[]validators[]def
  []
 
 
-Overfull \hbox (112.39676pt too wide) in paragraph at lines 521--523
+Overfull \hbox (112.39676pt too wide) in paragraph at lines 556--558
 [][]\OT1/cmr/bx/n/10 lemma $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr/m/it
 /10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 latest[]estimates[]from[]non
 []equivocating[]validators[]from[]non[]observed[]validator[]is[]empty
  []
 
 
-Overfull \hbox (46.74301pt too wide) in paragraph at lines 523--524
+Overfull \hbox (46.74301pt too wide) in paragraph at lines 558--559
 [][]  $\OMS/cmsy/m/n/10 8 $ $\OML/cmm/m/it/10 ^^[$ \OT1/cmr/m/it/10 v$\OML/cmm/
 m/it/10 :$ $^^[$ $\OMS/cmsy/m/n/10 2$ $\OT1/cmr/m/n/10 ^^F$ $\OMS/cmsy/m/n/10 ^
 $ \OT1/cmr/m/it/10 v $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 V $\OMS/cmsy/m/n/10 
@@ -518,13 +577,13 @@ $ \OT1/cmr/m/it/10 v $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 V $\OMS/cmsy/m/n/10
  []
 
 
-Overfull \hbox (167.01727pt too wide) in paragraph at lines 524--537
+Overfull \hbox (167.01727pt too wide) in paragraph at lines 559--572
 [][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1/cmr
 /m/n/10 :$ \OT1/cmr/m/it/10 latest[]estimates[]from[]non[]equivocating[]validat
 ors[]def latest[]messages[]from[]non[]equivocating[]validators[]def
  []
 
-[20]))
+))
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 54.
  [21]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 54.
@@ -536,11 +595,11 @@ Package rerunfilecheck Info: File `root.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 54.
  ) 
 Here is how much of TeX's memory you used:
- 5499 strings out of 494587
- 79401 string characters out of 6177759
- 169349 words of memory out of 5000000
- 9079 multiletter control sequences out of 15000+600000
- 8648 words of font info for 31 fonts, out of 8000000 for 9000
+ 5790 strings out of 494587
+ 82635 string characters out of 6177759
+ 169861 words of memory out of 5000000
+ 9343 multiletter control sequences out of 15000+600000
+ 12256 words of font info for 48 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  34i,8n,28p,1545b,415s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
@@ -554,7 +613,7 @@ public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
 /amsfonts/cm/cmsy5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
 ts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mti10.pfb>
-Output written on root.pdf (21 pages, 161831 bytes).
+Output written on root.pdf (21 pages, 163352 bytes).
 PDF statistics:
  164 PDF objects out of 1000 (max. 8388607)
  128 compressed objects within 2 object streams

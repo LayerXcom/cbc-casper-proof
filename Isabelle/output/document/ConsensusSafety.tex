@@ -27,7 +27,7 @@
 \isacommand{theory}\isamarkupfalse%
 \ ConsensusSafety\isanewline
 \isanewline
-\isakeyword{imports}\ Main\ CBCCasper\isanewline
+\isakeyword{imports}\ Main\ CBCCasper\ {\isachardoublequoteopen}Libraries{\isacharslash}LaTeXsugar{\isachardoublequoteclose}\isanewline
 \isanewline
 \isakeyword{begin}%
 \endisatagtheory
@@ -45,7 +45,7 @@
 \isacommand{fun}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ futures\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ state\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}futures\ {\isasymsigma}\ {\isacharequal}\ {\isacharbraceleft}{\isasymsigma}{\isacharprime}\ {\isasymin}\ {\isasymSigma}t{\isachardot}\ is{\isacharunderscore}future{\isacharunderscore}state\ {\isacharparenleft}{\isasymsigma}{\isacharprime}{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}futures\ {\isasymsigma}\ {\isacharequal}\ {\isacharbraceleft}{\isasymsigma}{\isacharprime}\ {\isasymin}\ {\isasymSigma}t{\isachardot}\ is{\isacharunderscore}future{\isacharunderscore}state\ {\isacharparenleft}{\isasymsigma}{\isacharcomma}\ {\isasymsigma}{\isacharprime}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
