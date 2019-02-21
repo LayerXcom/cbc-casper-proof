@@ -33,7 +33,7 @@ fun  agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> va
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
   apply (simp add: observed_non_equivocating_validators_def)
-  using observed_type by auto
+  using observed_type_for_state by auto
 
 (* Definition 7.9 *)
 fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
@@ -43,7 +43,7 @@ fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
   apply (simp add: observed_non_equivocating_validators_def)
-  using observed_type by auto
+  using observed_type_for_state by auto
 
 (* Definition 7.10 *)
 definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
@@ -73,7 +73,7 @@ fun later_disagreeing_messages :: "(consensus_value_property * message * validat
 
 lemma (in Protocol) later_disagreeing_messages_type :
   "\<forall> p \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_disagreeing_messages (p, m, v, \<sigma>) \<subseteq> M"
-  using later_from_type by auto
+  using later_from_type_for_state by auto
 
 (* Definition 7.15 *)
 (* `the_elem` is built-in  *)

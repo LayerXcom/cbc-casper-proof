@@ -270,6 +270,10 @@ definition observed :: "message set \<Rightarrow> validator set"
     "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
 
 lemma (in Protocol) observed_type :
+  "\<forall> \<sigma> \<in> Pow M. observed \<sigma> \<subseteq> V"
+  using Params.M_type Protocol_axioms observed_def by fastforce
+
+lemma (in Protocol) observed_type_for_state :
   "\<forall> \<sigma> \<in> \<Sigma>. observed \<sigma> \<subseteq> V"
   using Params.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 
@@ -299,7 +303,7 @@ definition equivocating_validators :: "state \<Rightarrow> validator set"
 
 lemma (in Protocol) equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> \<subseteq> V"
-  using observed_type equivocating_validators_def by blast
+  using observed_type_for_state equivocating_validators_def by blast
 
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
@@ -307,7 +311,7 @@ definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> val
 
 lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
-  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type observed_def subsetCE)
+  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type_for_state observed_def subsetCE)
 
 
 (* Definition 2.11 *)
