@@ -4,14 +4,17 @@ imports Main CBCCasper SafetyOracle TFGCasper
 
 begin
 
-code_printing
-  type_constructor bool => (Haskell) "bool"
-  | constant True => (Haskell) "true"
-  | constant False => (Haskell) "false"
-
 definition member :: "'a list \<Rightarrow> 'a \<Rightarrow> bool"
   where
     [code del]: "member xs x \<longleftrightarrow> x \<in> set xs"
+
+(* Here, we use ByteString as an internal representation. *)
+code_printing code_module Params \<rightharpoonup> (Haskell)\<open>
+import qualified Data.ByteString as BS;
+import qualified Data.Map as M;
+
+newtype ConsensusValue = ConsensusValue (M.Map BS.ByteString BS.ByteString);
+newtype Validator = Validator BS.ByteString\<close>
 
 instantiation consensus_value :: equal
 begin 
@@ -22,8 +25,7 @@ instance  by standard (simp add: equal_consensus_value_def)
 end
 
 code_printing
-  class_instance consensus_value :: "HOL.equal" => (Haskell) -
-  (* |type_constructor consensus_value => (Haskell) "Map String String" *)
+  type_constructor consensus_value => (Haskell) "Params.ConsensusValue"
 
 
 instantiation validator :: equal
@@ -35,8 +37,7 @@ instance  by standard (simp add: equal_validator_def)
 end
 
 code_printing
-  class_instance validator :: "HOL.equal" => (Haskell) -
-  (* | type_constructor validator => (Haskell) "Map String String" *)
+  type_constructor validator => (Haskell) "Params.Validator"
 
 interpretation p: Params V W t C \<epsilon> for V W t C \<epsilon>
   done
@@ -45,7 +46,7 @@ interpretation p: Params V W t C \<epsilon> for V W t C \<epsilon>
 definition "is_clique_oracle = p.is_clique_oracle"
 
 export_code is_clique is_clique_oracle in Haskell
-  module_name SafetyOracle file GeneratedCode
+  module_name SafetyOracle file "GeneratedCode/src"
 
 
 interpretation gp: GhostParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev 
