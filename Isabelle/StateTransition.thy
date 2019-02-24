@@ -145,6 +145,25 @@ proof -
     by (metis Nats_1 Nats_add Un_insert_right \<open>\<exists>n\<in>\<nat>. \<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)\<close> sup_bot.right_neutral)
 qed
 
+lemma (in Protocol) state_transition_imps_immediately_next_message: 
+  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longrightarrow> immediately_next_message (\<sigma>,m)"
+proof - 
+  have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<longrightarrow> (\<forall> m' \<in> \<sigma> \<union> {m}. justification m' \<subseteq> \<sigma> \<union> {m})"
+    using state_is_in_pow_M_i by blast
+  then have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<longrightarrow> justification m \<subseteq> \<sigma> \<union> {m}"
+    by auto
+  then have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>"
+    using justification_implies_different_messages justified_def by fastforce
+  then show ?thesis
+    by (simp add: immediately_next_message_def)
+qed
+
+lemma (in Protocol) state_transition_only_made_by_immediately_next_message: 
+  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longleftrightarrow> immediately_next_message (\<sigma>,m)"
+  using state_transition_imps_immediately_next_message state_transition_by_immediately_next_message
+  apply (simp add: immediately_next_message_def)
+  by blast
+
 lemma (in Protocol) state_differences_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>'-\<sigma>. immediately_next_message (\<sigma>, m))"
   apply (simp add: immediately_next_message_def)
