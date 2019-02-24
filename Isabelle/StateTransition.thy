@@ -42,7 +42,7 @@ protocol state *)
 definition immediately_next_message where
   "immediately_next_message = (\<lambda>(\<sigma>,m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
 
-lemma (in Protocol) state_transition_by_immediately_next_message_induction: 
+lemma (in Protocol) state_transition_by_immediately_next_message_of_same_depth_non_zero: 
   "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
   apply (rule, rule, rule, rule, rule)
 proof-
@@ -84,12 +84,66 @@ proof-
     \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by auto
 qed
 
-lemma (in Protocol) state_transition_by_immediately_next_message_at_n: 
+lemma (in Protocol) state_transition_by_immediately_next_message_of_same_depth: 
   "\<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
   apply (cases n)
   apply auto[1]
-  using state_transition_by_immediately_next_message_induction
+  using state_transition_by_immediately_next_message_of_same_depth_non_zero
   by (metis le_add1 plus_1_eq_Suc)
+
+lemma (in Params) past_state_exists_in_same_depth :
+  "\<forall> \<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>_i (V,C,\<epsilon>) n \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<longrightarrow> \<sigma> \<in> \<Sigma> \<longrightarrow> \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n"
+  apply (rule, rule, rule, rule, rule) 
+proof (cases n)
+  case 0
+  show "\<And>\<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = 0 \<Longrightarrow> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+    by auto
+next
+  case (Suc nat)
+  show "\<And>\<sigma> \<sigma>' nat. \<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = Suc nat \<Longrightarrow> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  proof -
+  fix \<sigma> \<sigma>'
+  assume "\<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  and "\<sigma> \<subseteq> \<sigma>'" 
+  and "\<sigma> \<in> \<Sigma>"
+  have "n > 0"
+    by (simp add: Suc)
+  have "finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)"
+    using \<open>\<sigma> \<in> \<Sigma>\<close> state_is_finite state_is_in_pow_M_i by blast
+  moreover have "\<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
+    using \<open>\<sigma> \<subseteq> \<sigma>'\<close>
+    by (smt Pow_iff Suc_eq_plus1 \<Sigma>i_monotonic \<Sigma>i_subset_Mi \<open>\<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> add_diff_cancel_left' add_eq_if diff_is_0_eq diff_le_self plus_1_eq_Suc subset_iff)
+  ultimately have  "\<sigma> \<in> {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
+    by blast
+  then show "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+    by (simp add: Suc)
+  qed
+qed
+
+lemma (in Protocol) immediately_next_message_exists_in_same_depth: 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> M. immediately_next_message (\<sigma>,m) \<longrightarrow> (\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n \<and> m \<in> M_i (V,C,\<epsilon>) n)"
+  apply (simp add: immediately_next_message_def M_def \<Sigma>_def)
+  using past_state_exists_in_same_depth
+  using \<Sigma>i_is_subset_of_\<Sigma> by blast
+
+lemma (in Protocol) state_transition_by_immediately_next_message: 
+  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>"
+  apply (rule, rule, rule)
+proof - 
+  fix \<sigma> m
+  assume "\<sigma> \<in> \<Sigma>" 
+  and "m \<in> M" 
+  and "immediately_next_message (\<sigma>, m)" 
+  then have "(\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n \<and> m \<in> M_i (V,C,\<epsilon>) n)"
+    using immediately_next_message_exists_in_same_depth \<open>\<sigma> \<in> \<Sigma>\<close> \<open>m \<in> M\<close>
+    by blast
+  then have "\<exists> n \<in> \<nat>. \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n + 1)"
+    using state_transition_by_immediately_next_message_of_same_depth
+    using \<open>immediately_next_message (\<sigma>, m)\<close> by blast
+  show "\<sigma> \<union> {m} \<in> \<Sigma>"
+    apply (simp add: \<Sigma>_def)
+    by (metis Nats_1 Nats_add Un_insert_right \<open>\<exists>n\<in>\<nat>. \<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)\<close> sup_bot.right_neutral)
+qed
 
 lemma (in Protocol) state_differences_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>'-\<sigma>. immediately_next_message (\<sigma>, m))"

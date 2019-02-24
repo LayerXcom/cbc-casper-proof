@@ -86,6 +86,14 @@ begin
     apply auto
     done
 
+  lemma \<Sigma>i_monotonicity: "\<forall> m \<in> \<nat>. \<forall> n \<in> \<nat>. m \<le> n \<longrightarrow> \<Sigma>_i (V,C,\<epsilon>) m \<subseteq> \<Sigma>_i (V,C,\<epsilon>) n"
+    using \<Sigma>i_monotonic
+    by (metis Suc_eq_plus1 lift_Suc_mono_le)
+
+  lemma Mi_monotonicity: "\<forall> m \<in> \<nat>. \<forall> n \<in> \<nat>. m \<le> n \<longrightarrow> M_i (V,C,\<epsilon>) m \<subseteq> M_i (V,C,\<epsilon>) n"
+    using Mi_monotonic
+    by (metis Suc_eq_plus1 lift_Suc_mono_le)
+
   lemma message_is_in_M_i :
     "\<forall> m \<in> M. \<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)"
     apply (simp add: M_def \<Sigma>_i.elims)
