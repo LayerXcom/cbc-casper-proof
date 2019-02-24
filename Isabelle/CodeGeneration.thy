@@ -9,10 +9,9 @@ code_printing
   | constant True => (Haskell) "true"
   | constant False => (Haskell) "false"
 
-(* FIXME: How can we remove member func? *)
 definition member :: "'a list \<Rightarrow> 'a \<Rightarrow> bool"
   where
-    [code_abbrev]: "member xs x \<longleftrightarrow> x \<in> set xs"
+    [code del]: "member xs x \<longleftrightarrow> x \<in> set xs"
 
 instantiation consensus_value :: equal
 begin 
