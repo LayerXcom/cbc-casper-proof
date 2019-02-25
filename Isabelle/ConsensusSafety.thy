@@ -2,7 +2,7 @@ section \<open>Safety Proof\<close>
 
 theory ConsensusSafety
 
-imports Main CBCCasper
+imports Main CBCCasper StateTransition
 
 begin
 
@@ -23,22 +23,19 @@ lemma (in Protocol) monotonic_futures :
 (* Theorem 1 *)
 theorem (in Protocol) two_party_common_futures :
   "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t
-  \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
-  by auto
-
-theorem (in Protocol) two_party_common_futures_fix :
-  "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
   \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
   \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
-  oops
+  apply (simp add: \<Sigma>t_def) using union_of_two_states_is_state
+  by blast
 
 (* Theorem 2 *)
 theorem (in Protocol) n_party_common_futures :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
   \<longrightarrow> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
-  by auto
+  apply (simp add: \<Sigma>t_def) using union_of_finite_set_of_states_is_state
+  by blast
 
 (* Section 3.2: Guaranteeing Consistent Decisions *)
 (* Section 3.2.1: Guaranteeing Consistent Decisions on Properties of Protocol States *)
