@@ -201,38 +201,66 @@ lemma non_empty_non_singleton_imps_two_elements :
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
-lemma (in Protocol) minimal_transition_implies_recieving_a_single_message :
+lemma (in Protocol) minimal_transition_implies_recieving_single_message :
   "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
 proof (rule ccontr)
   assume "\<not> (\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> is_singleton (\<sigma>'- \<sigma>))"
-(*   
-  have "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2)"
-  proof -
-    have "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2)"
-      using \<open>\<not> (\<forall>\<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> is_singleton (\<sigma>' - \<sigma>))\<close> minimal_transitions_def minimal_transitions_def by force
-    then show ?thesis
-      apply (simp add: minimal_transitions_def \<Sigma>t_def)
-      using state_difference_is_valid_message
-      by auto
-  qed          
- *)  
+  then have  "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not>  is_singleton (\<sigma>'- \<sigma>)"
+    by blast
   have "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow>
               (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')"
     by (simp add: minimal_transitions_def)
-  have "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1))"
-    (* NOTE: Why state_differences_have_immediately_next_messages, non_empty_non_singleton_imps_two_elements, state_difference_is_valid_message is not needed here?    *)
-    using M_def minimal_transitions_def state_is_subset_of_M subset_antisym by auto
-  then have "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow>
-              (\<exists> m. \<sigma> \<union> {m} \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma> \<union> {m}) \<and> is_future_state (\<sigma> \<union> {m}, \<sigma>') \<and> \<sigma> \<noteq> \<sigma> \<union> {m} \<and> \<sigma> \<union> {m} \<noteq> \<sigma>')"
-    (* NOTE: state_transition_by_immediately_next_message is not needed here? *)
-    using minimal_transitions_def by auto
-  then have "\<exists> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow>
-              (\<exists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')"    
-    by blast
+  have "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>'- \<sigma>)
+    \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1))"
+    apply (rule, rule, rule)
+  proof -
+    fix \<sigma> \<sigma>'
+    assume "(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)"
+    then have "\<sigma>' - \<sigma> \<noteq> \<emptyset>"
+      apply (simp add: minimal_transitions_def)
+      by blast
+    have "\<sigma>' \<in> \<Sigma> \<and> \<sigma> \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')"
+      using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)\<close>
+      by (simp add: minimal_transitions_def \<Sigma>t_def)    
+    then have "\<sigma>' - \<sigma> \<subseteq> M"
+      using state_difference_is_valid_message by auto      
+    then have "\<exists>m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>' - \<sigma> \<and> m2 \<in> \<sigma>' - \<sigma> \<and> m1 \<noteq> m2"
+      using non_empty_non_singleton_imps_two_elements 
+            \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)\<close>  \<open>\<sigma>' - \<sigma> \<noteq> \<emptyset>\<close>
+      by (metis (full_types) contra_subsetD insert_subset subsetI)
+    then show "\<exists>m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>' - \<sigma> \<and> m2 \<in> \<sigma>' - \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)"
+      using state_differences_have_immediately_next_messages
+      by (metis Diff_iff \<open>\<sigma>' \<in> \<Sigma> \<and> \<sigma> \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')\<close> insert_subset message_in_state_is_valid)
+  qed      
+  have "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>'- \<sigma>) \<longrightarrow>
+              (\<exists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')"
+    apply (rule, rule, rule)
+  proof -
+    fix \<sigma> \<sigma>'
+    assume "(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)"
+    then have "\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)"
+      using \<open>\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>'- \<sigma>)
+    \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1))\<close>
+      by simp
+    then obtain m1 m2 where "{m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)"
+      by auto
+    have "\<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>"
+      using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)\<close>
+      by (simp add: minimal_transitions_def \<Sigma>t_def)
+    then have "\<sigma> \<union> {m1} \<in> \<Sigma>"
+      using \<open>{m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)\<close>
+            state_transition_by_immediately_next_message
+      by simp
+    have "is_future_state (\<sigma>, \<sigma> \<union> {m1}) \<and> is_future_state (\<sigma> \<union> {m1}, \<sigma>')"
+      using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)\<close> \<open>{m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>' - \<sigma> \<and> m2 \<in> \<sigma>' - \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)\<close> minimal_transitions_def by auto
+    have "\<sigma> \<noteq> \<sigma> \<union> {m1} \<and> \<sigma> \<union> {m1} \<noteq> \<sigma>'"
+      using \<open>{m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>' - \<sigma> \<and> m2 \<in> \<sigma>' - \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1)\<close> by auto
+    then show " \<exists>\<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>'"    
+      using \<open>\<sigma> \<union> {m1} \<in> \<Sigma>\<close> \<open>is_future_state (\<sigma>, \<sigma> \<union> {m1}) \<and> is_future_state (\<sigma> \<union> {m1}, \<sigma>')\<close>
+      by auto      
+  qed
   then show False
-    using \<open>\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow>
-          (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')\<close>
-    sorry
+    using \<open>\<forall>\<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> (\<nexists>\<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')\<close> \<open>\<not> (\<forall>\<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> is_singleton (\<sigma>' - \<sigma>))\<close> by blast
 qed
 
 lemma (in Protocol) minimal_transitions_reconstruction :
@@ -242,7 +270,7 @@ proof -
   fix \<sigma> \<sigma>'
   assume "(\<sigma>, \<sigma>') \<in> minimal_transitions"
   then have "is_singleton (\<sigma>'- \<sigma>)"
-    using  minimal_transitions_def minimal_transition_implies_recieving_a_single_message by auto 
+    using  minimal_transitions_def minimal_transition_implies_recieving_single_message by auto 
   then have "\<sigma> \<subseteq> \<sigma>'"
     using \<open>(\<sigma>, \<sigma>') \<in> minimal_transitions\<close> minimal_transitions_def by auto
   then show "\<sigma> \<union> {the_elem (\<sigma>'- \<sigma>)} = \<sigma>'"
