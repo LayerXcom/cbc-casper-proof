@@ -143,12 +143,6 @@ begin
   lemma state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
     using message_in_state_is_valid by blast
   
-  lemma state_difference_is_valid_message :
-    "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
-    \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
-    \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
-    using state_is_subset_of_M by blast
-
   lemma state_is_finite : "\<forall> \<sigma> \<in> \<Sigma>. finite \<sigma>"
     apply (simp add:  \<Sigma>_def)
     using Params.\<Sigma>i_monotonic by fastforce
@@ -289,6 +283,12 @@ lemma (in Protocol) observed_type_for_state :
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
     "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<subseteq> \<sigma>2)"
+
+lemma (in Params) state_difference_is_valid_message :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
+  \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
+  \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
+  using state_is_subset_of_M by blast
 
 (* Definition 2.9 *)
 definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
