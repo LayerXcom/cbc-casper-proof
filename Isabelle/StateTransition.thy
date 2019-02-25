@@ -191,10 +191,6 @@ proof -
   qed
 qed
 
-lemma (in Protocol) minimal_transition_implies_recieving_single_message :
-  "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions  \<longrightarrow> is_singleton (\<sigma>'- \<sigma>)"
-  oops
-
 lemma non_empty_non_singleton_imps_two_elements : 
   "A \<noteq> \<emptyset> \<Longrightarrow> \<not> is_singleton A \<Longrightarrow> \<exists> a1 a2. a1 \<noteq> a2 \<and> {a1, a2} \<subseteq> A"
   by (metis inf.orderI inf_bot_left insert_subset is_singletonI')
