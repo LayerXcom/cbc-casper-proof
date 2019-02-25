@@ -267,10 +267,35 @@ proof -
   qed
 qed
 
-lemma (in Protocol) union_of_n_states_is_state :
-  "\<forall> \<sigma>_set \<subseteq> \<Sigma>. \<Union> \<sigma>_set \<in> \<Sigma>"
-  apply (simp add: \<Sigma>_def)
-  oops
+
+lemma (in Protocol) union_of_finite_set_of_states_is_state :
+  "\<forall> \<sigma>_set \<subseteq> \<Sigma>. finite \<sigma>_set \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>"
+  apply auto
+proof -
+  have "\<forall> n. \<forall> \<sigma>_set \<subseteq> \<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>"
+    apply (rule)
+  proof -
+    fix n
+    show "\<forall>\<sigma>_set\<subseteq>\<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>"
+      apply (induction n)
+      apply (rule, rule, rule, rule)
+       apply (simp add: empty_set_exists_in_\<Sigma>)
+      apply (rule, rule, rule, rule)
+    proof - 
+      fix n \<sigma>_set
+      assume "\<forall>\<sigma>_set\<subseteq>\<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>" and "\<sigma>_set \<subseteq> \<Sigma>" and "Suc n = card \<sigma>_set" and "finite \<sigma>_set" 
+      then have "\<forall> \<sigma> \<in> \<sigma>_set. \<sigma>_set - {\<sigma>} \<subseteq> \<Sigma> \<and> \<Union> (\<sigma>_set - {\<sigma>}) \<in> \<Sigma>"
+        using \<open>\<sigma>_set \<subseteq> \<Sigma>\<close> \<open>Suc n = card \<sigma>_set\<close> \<open>\<forall>\<sigma>_set\<subseteq>\<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>\<close>
+        by (metis (mono_tags, lifting) Suc_inject card.remove finite_Diff insert_Diff insert_subset)  
+      then have "\<forall> \<sigma> \<in> \<sigma>_set. \<sigma>_set - {\<sigma>} \<subseteq> \<Sigma> \<and> \<Union> (\<sigma>_set - {\<sigma>}) \<in> \<Sigma> \<and> \<Union> (\<sigma>_set - {\<sigma>}) \<union> \<sigma> \<in> \<Sigma>"
+        using union_of_two_states_is_state \<open>\<sigma>_set \<subseteq> \<Sigma>\<close> by auto
+      then show "\<Union>\<sigma>_set \<in> \<Sigma>"
+        by (metis Sup_bot_conv(1) Sup_insert Un_commute empty_set_exists_in_\<Sigma> insert_Diff)
+    qed
+  qed
+  then show " \<And>\<sigma>_set. \<sigma>_set \<subseteq> \<Sigma> \<Longrightarrow> finite \<sigma>_set \<Longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>"
+    by blast
+qed
 
 
 lemma (in Protocol) state_differences_have_immediately_next_messages: 
