@@ -27,6 +27,12 @@ theorem (in Protocol) two_party_common_futures :
   \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
   by auto
 
+theorem (in Protocol) two_party_common_futures_fix :
+  "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
+  \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
+  \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
+  oops
+
 (* Theorem 2 *)
 theorem (in Protocol) n_party_common_futures :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
