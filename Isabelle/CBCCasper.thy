@@ -86,6 +86,14 @@ begin
     apply auto
     done
 
+  lemma \<Sigma>i_monotonicity: "\<forall> m \<in> \<nat>. \<forall> n \<in> \<nat>. m \<le> n \<longrightarrow> \<Sigma>_i (V,C,\<epsilon>) m \<subseteq> \<Sigma>_i (V,C,\<epsilon>) n"
+    using \<Sigma>i_monotonic
+    by (metis Suc_eq_plus1 lift_Suc_mono_le)
+
+  lemma Mi_monotonicity: "\<forall> m \<in> \<nat>. \<forall> n \<in> \<nat>. m \<le> n \<longrightarrow> M_i (V,C,\<epsilon>) m \<subseteq> M_i (V,C,\<epsilon>) n"
+    using Mi_monotonic
+    by (metis Suc_eq_plus1 lift_Suc_mono_le)
+
   lemma message_is_in_M_i :
     "\<forall> m \<in> M. \<exists> n \<in> \<nat>. m \<in> M_i (V, C, \<epsilon>) (n - 1)"
     apply (simp add: M_def \<Sigma>_i.elims)
@@ -135,12 +143,6 @@ begin
   lemma state_is_subset_of_M : "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<subseteq> M"
     using message_in_state_is_valid by blast
   
-  lemma state_difference_is_valid_message :
-    "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
-    \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
-    \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
-    using state_is_subset_of_M by blast
-
   lemma state_is_finite : "\<forall> \<sigma> \<in> \<Sigma>. finite \<sigma>"
     apply (simp add:  \<Sigma>_def)
     using Params.\<Sigma>i_monotonic by fastforce
@@ -270,6 +272,10 @@ definition observed :: "message set \<Rightarrow> validator set"
     "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
 
 lemma (in Protocol) observed_type :
+  "\<forall> \<sigma> \<in> Pow M. observed \<sigma> \<subseteq> V"
+  using Params.M_type Protocol_axioms observed_def by fastforce
+
+lemma (in Protocol) observed_type_for_state :
   "\<forall> \<sigma> \<in> \<Sigma>. observed \<sigma> \<subseteq> V"
   using Params.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 
@@ -277,6 +283,12 @@ lemma (in Protocol) observed_type :
 fun is_future_state :: "(state * state) \<Rightarrow> bool"
   where
     "is_future_state (\<sigma>1, \<sigma>2) = (\<sigma>1 \<subseteq> \<sigma>2)"
+
+lemma (in Params) state_difference_is_valid_message :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma>
+  \<longrightarrow> is_future_state(\<sigma>, \<sigma>')
+  \<longrightarrow> \<sigma>' - \<sigma> \<subseteq> M"
+  using state_is_subset_of_M by blast
 
 (* Definition 2.9 *)
 definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
@@ -299,7 +311,7 @@ definition equivocating_validators :: "state \<Rightarrow> validator set"
 
 lemma (in Protocol) equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> \<subseteq> V"
-  using observed_type equivocating_validators_def by blast
+  using observed_type_for_state equivocating_validators_def by blast
 
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
@@ -307,7 +319,7 @@ definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> val
 
 lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
-  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type observed_def subsetCE)
+  by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type_for_state observed_def subsetCE)
 
 
 (* Definition 2.11 *)

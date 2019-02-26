@@ -1,9 +1,6 @@
 {-# LANGUAGE EmptyDataDecls, RankNTypes, ScopedTypeVariables #-}
 
-module
-  SafetyOracle(Real, Consensus_value, Validator, Message, Set, is_clique,
-                is_clique_oracle)
-  where {
+module SafetyOracle(Real, Message, Set, is_clique, is_clique_oracle) where {
 
 import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
   (>>=), (>>), (=<<), (&&), (||), (^), (^^), (.), ($), ($!), (++), (!!), Eq,
@@ -11,6 +8,7 @@ import Prelude ((==), (/=), (<), (<=), (>=), (>), (+), (-), (*), (/), (**),
   zip, null, takeWhile, dropWhile, all, any, Integer, negate, abs, divMod,
   String, Bool(True, False), Maybe(Nothing, Just));
 import qualified Prelude;
+import qualified Params;
 
 data Num = One | Bit0 Num | Bit1 Num;
 
@@ -116,34 +114,34 @@ newtype Rat = Frct (Int, Int);
 quotient_of :: Rat -> (Int, Int);
 quotient_of (Frct x) = x;
 
-less_eq_num :: Num -> Num -> bool;
+less_eq_num :: Num -> Num -> Bool;
 less_eq_num (Bit1 m) (Bit0 n) = less_num m n;
 less_eq_num (Bit1 m) (Bit1 n) = less_eq_num m n;
 less_eq_num (Bit0 m) (Bit1 n) = less_eq_num m n;
 less_eq_num (Bit0 m) (Bit0 n) = less_eq_num m n;
-less_eq_num (Bit1 m) One = false;
-less_eq_num (Bit0 m) One = false;
-less_eq_num One n = true;
+less_eq_num (Bit1 m) One = False;
+less_eq_num (Bit0 m) One = False;
+less_eq_num One n = True;
 
-less_num :: Num -> Num -> bool;
+less_num :: Num -> Num -> Bool;
 less_num (Bit1 m) (Bit0 n) = less_num m n;
 less_num (Bit1 m) (Bit1 n) = less_num m n;
 less_num (Bit0 m) (Bit1 n) = less_eq_num m n;
 less_num (Bit0 m) (Bit0 n) = less_num m n;
-less_num One (Bit1 n) = true;
-less_num One (Bit0 n) = true;
-less_num m One = false;
+less_num One (Bit1 n) = True;
+less_num One (Bit0 n) = True;
+less_num m One = False;
 
-less_eq_int :: Int -> Int -> bool;
+less_eq_int :: Int -> Int -> Bool;
 less_eq_int (Neg k) (Neg l) = less_eq_num l k;
-less_eq_int (Neg k) (Pos l) = true;
-less_eq_int (Neg k) Zero_int = true;
-less_eq_int (Pos k) (Neg l) = false;
+less_eq_int (Neg k) (Pos l) = True;
+less_eq_int (Neg k) Zero_int = True;
+less_eq_int (Pos k) (Neg l) = False;
 less_eq_int (Pos k) (Pos l) = less_eq_num k l;
-less_eq_int (Pos k) Zero_int = false;
-less_eq_int Zero_int (Neg l) = false;
-less_eq_int Zero_int (Pos l) = true;
-less_eq_int Zero_int Zero_int = true;
+less_eq_int (Pos k) Zero_int = False;
+less_eq_int Zero_int (Neg l) = False;
+less_eq_int Zero_int (Pos l) = True;
+less_eq_int Zero_int Zero_int = True;
 
 divmod_step_int :: Num -> (Int, Int) -> (Int, Int);
 divmod_step_int l (q, r) =
@@ -171,31 +169,31 @@ divmod_int (Bit1 m) One = (Pos (Bit1 m), Zero_int);
 divmod_int (Bit0 m) One = (Pos (Bit0 m), Zero_int);
 divmod_int One One = (Pos One, Zero_int);
 
-of_bool :: forall a. (Zero_neq_one a) => bool -> a;
-of_bool true = one;
-of_bool false = zero;
+of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
+of_bool True = one;
+of_bool False = zero;
 
-equal_num :: Num -> Num -> bool;
-equal_num (Bit0 x2) (Bit1 x3) = false;
-equal_num (Bit1 x3) (Bit0 x2) = false;
-equal_num One (Bit1 x3) = false;
-equal_num (Bit1 x3) One = false;
-equal_num One (Bit0 x2) = false;
-equal_num (Bit0 x2) One = false;
+equal_num :: Num -> Num -> Bool;
+equal_num (Bit0 x2) (Bit1 x3) = False;
+equal_num (Bit1 x3) (Bit0 x2) = False;
+equal_num One (Bit1 x3) = False;
+equal_num (Bit1 x3) One = False;
+equal_num One (Bit0 x2) = False;
+equal_num (Bit0 x2) One = False;
 equal_num (Bit1 x3) (Bit1 y3) = equal_num x3 y3;
 equal_num (Bit0 x2) (Bit0 y2) = equal_num x2 y2;
-equal_num One One = true;
+equal_num One One = True;
 
-equal_int :: Int -> Int -> bool;
+equal_int :: Int -> Int -> Bool;
 equal_int (Neg k) (Neg l) = equal_num k l;
-equal_int (Neg k) (Pos l) = false;
-equal_int (Neg k) Zero_int = false;
-equal_int (Pos k) (Neg l) = false;
+equal_int (Neg k) (Pos l) = False;
+equal_int (Neg k) Zero_int = False;
+equal_int (Pos k) (Neg l) = False;
 equal_int (Pos k) (Pos l) = equal_num k l;
-equal_int (Pos k) Zero_int = false;
-equal_int Zero_int (Neg l) = false;
-equal_int Zero_int (Pos l) = false;
-equal_int Zero_int Zero_int = true;
+equal_int (Pos k) Zero_int = False;
+equal_int Zero_int (Neg l) = False;
+equal_int Zero_int (Pos l) = False;
+equal_int Zero_int Zero_int = True;
 
 adjust_div :: (Int, Int) -> Int;
 adjust_div (q, r) = plus_int q (of_bool (not (equal_int r Zero_int)));
@@ -210,16 +208,16 @@ divide_int k (Pos One) = k;
 divide_int Zero_int k = Zero_int;
 divide_int k Zero_int = Zero_int;
 
-less_int :: Int -> Int -> bool;
+less_int :: Int -> Int -> Bool;
 less_int (Neg k) (Neg l) = less_num l k;
-less_int (Neg k) (Pos l) = true;
-less_int (Neg k) Zero_int = true;
-less_int (Pos k) (Neg l) = false;
+less_int (Neg k) (Pos l) = True;
+less_int (Neg k) Zero_int = True;
+less_int (Pos k) (Neg l) = False;
 less_int (Pos k) (Pos l) = less_num k l;
-less_int (Pos k) Zero_int = false;
-less_int Zero_int (Neg l) = false;
-less_int Zero_int (Pos l) = true;
-less_int Zero_int Zero_int = false;
+less_int (Pos k) Zero_int = False;
+less_int Zero_int (Neg l) = False;
+less_int Zero_int (Pos l) = True;
+less_int Zero_int Zero_int = False;
 
 adjust_mod :: Int -> Int -> Int;
 adjust_mod l r = (if equal_int r Zero_int then Zero_int else minus_int l r);
@@ -318,25 +316,36 @@ instance Ab_semigroup_add Real where {
 instance Comm_monoid_add Real where {
 };
 
-data Consensus_value;
+newtype Message = Message
+  (Params.ConsensusValue, (Params.Validator, [Message]));
 
-data Validator;
+equal_consensus_value :: Params.ConsensusValue -> Params.ConsensusValue -> Bool;
+equal_consensus_value x y = equal_consensus_value x y;
 
-newtype Message = Message (Consensus_value, (Validator, [Message]));
+instance Eq Params.ConsensusValue where {
+  a == b = equal_consensus_value a b;
+};
+
+equal_validator :: Params.Validator -> Params.Validator -> Bool;
+equal_validator x y = equal_validator x y;
+
+instance Eq Params.Validator where {
+  a == b = equal_validator a b;
+};
 
 instance Eq Message where {
   a == b = equal_message a b;
 };
 
-equal_message :: Message -> Message -> bool;
+equal_message :: Message -> Message -> Bool;
 equal_message (Message x) (Message ya) = x == ya;
 
 data Set a = Set [a] | Coset [a];
 
-bex :: forall a. Set a -> (a -> bool) -> bool;
+bex :: forall a. Set a -> (a -> Bool) -> Bool;
 bex (Set xs) p = any p xs;
 
-ball :: forall a. Set a -> (a -> bool) -> bool;
+ball :: forall a. Set a -> (a -> Bool) -> Bool;
 ball (Set xs) p = all p xs;
 
 fold :: forall a b. (a -> b -> b) -> [a] -> b -> b;
@@ -353,14 +362,14 @@ foldr f (x : xs) = f x . foldr f xs;
 of_int :: Int -> Rat;
 of_int a = Frct (a, one_int);
 
-filtera :: forall a. (a -> bool) -> Set a -> Set a;
+filtera :: forall a. (a -> Bool) -> Set a -> Set a;
 filtera p (Set xs) = Set (filter p xs);
 
-membera :: forall a. (Eq a) => [a] -> a -> bool;
-membera [] y = false;
+membera :: forall a. (Eq a) => [a] -> a -> Bool;
+membera [] y = False;
 membera (x : xs) y = x == y || membera xs y;
 
-member :: forall a. (Eq a) => a -> Set a -> bool;
+member :: forall a. (Eq a) => a -> Set a -> Bool;
 member x (Coset xs) = not (membera xs x);
 member x (Set xs) = membera xs x;
 
@@ -382,42 +391,40 @@ remdups (x : xs) = (if membera xs x then remdups xs else x : remdups xs);
 the_elem :: forall a. Set a -> a;
 the_elem (Set [x]) = x;
 
-est :: Message -> Consensus_value;
+est :: Message -> Params.ConsensusValue;
 est (Message (c, (uu, uv))) = c;
 
-sender :: Message -> Validator;
+sender :: Message -> Params.Validator;
 sender (Message (uu, (v, uv))) = v;
 
-observed :: Set Message -> Set Validator;
+observed :: Set Message -> Set Params.Validator;
 observed sigma = image sender sigma;
 
 justification :: Message -> Set Message;
 justification (Message (uu, (uv, s))) = Set s;
 
-justified :: Message -> Message -> bool;
+justified :: Message -> Message -> Bool;
 justified m1 m2 = member m1 (justification m2);
 
 later :: (Message, Set Message) -> Set Message;
 later = (\ (m, a) -> filtera (justified m) a);
 
-equal_validator :: Validator -> Validator -> bool;
-equal_validator x y = equal_validator x y;
+equivocation :: (Message, Message) -> Bool;
+equivocation =
+  (\ (m1, m2) ->
+    equal_validator (sender m1) (sender m2) &&
+      not (equal_message m1 m2) &&
+        not (justified m1 m2) && not (justified m2 m1));
 
-equivocation :: (Message, Message) -> bool;
-equivocation (m1, m2) =
-  equal_validator (sender m1) (sender m2) &&
-    not (equal_message m1 m2) &&
-      not (member m1 (justification m2)) && not (member m2 (justification m1));
-
-less_eq_set :: forall a. (Eq a) => Set a -> Set a -> bool;
-less_eq_set (Coset []) (Set []) = false;
+less_eq_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
+less_eq_set (Coset []) (Set []) = False;
 less_eq_set a (Coset ys) = all (\ y -> not (member y a)) ys;
 less_eq_set (Set xs) b = all (\ x -> member x b) xs;
 
-equal_set :: forall a. (Eq a) => Set a -> Set a -> bool;
+equal_set :: forall a. (Eq a) => Set a -> Set a -> Bool;
 equal_set a b = less_eq_set a b && less_eq_set b a;
 
-from_sender :: (Validator, Set Message) -> Set Message;
+from_sender :: (Params.Validator, Set Message) -> Set Message;
 from_sender = (\ (v, a) -> filtera (\ m -> equal_validator (sender m) v) a);
 
 bot_set :: forall a. Set a;
@@ -427,16 +434,16 @@ inf_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
 inf_set a (Coset xs) = fold remove xs a;
 inf_set a (Set xs) = Set (filter (\ x -> member x a) xs);
 
-later_from :: (Message, (Validator, Set Message)) -> Set Message;
+later_from :: (Message, (Params.Validator, Set Message)) -> Set Message;
 later_from =
   (\ (m, (v, sigma)) -> inf_set (later (m, sigma)) (from_sender (v, sigma)));
 
-latest_messages :: Set Message -> Validator -> Set Message;
+latest_messages :: Set Message -> Params.Validator -> Set Message;
 latest_messages sigma v =
   filtera (\ m -> equal_set (later_from (m, (v, sigma))) bot_set)
     (from_sender (v, sigma));
 
-is_equivocating :: Set Message -> Validator -> bool;
+is_equivocating :: Set Message -> Params.Validator -> Bool;
 is_equivocating sigma v =
   bex sigma
     (\ m1 ->
@@ -444,27 +451,28 @@ is_equivocating sigma v =
         (\ m2 -> equivocation (m1, m2) && equal_validator (sender m1) v));
 
 latest_messages_from_non_equivocating_validators ::
-  Set Message -> Validator -> Set Message;
+  Set Message -> Params.Validator -> Set Message;
 latest_messages_from_non_equivocating_validators sigma v =
   (if is_equivocating sigma v then bot_set else latest_messages sigma v);
 
 latest_justifications_from_non_equivocating_validators ::
-  Set Message -> Validator -> Set (Set Message);
+  Set Message -> Params.Validator -> Set (Set Message);
 latest_justifications_from_non_equivocating_validators sigma v =
   image justification
     (latest_messages_from_non_equivocating_validators sigma v);
 
 later_disagreeing_messages ::
-  (Consensus_value -> bool, (Message, (Validator, Set Message))) -> Set Message;
+  (Params.ConsensusValue -> Bool, (Message, (Params.Validator, Set Message))) ->
+    Set Message;
 later_disagreeing_messages (p, (m, (v, sigma))) =
   filtera (\ ma -> not (p (est ma))) (later_from (m, (v, sigma)));
 
 latest_estimates_from_non_equivocating_validators ::
-  Set Message -> Validator -> Set Consensus_value;
+  Set Message -> Params.Validator -> Set Params.ConsensusValue;
 latest_estimates_from_non_equivocating_validators sigma v =
   image est (latest_messages_from_non_equivocating_validators sigma v);
 
-equivocating_validators :: Set Message -> Set Validator;
+equivocating_validators :: Set Message -> Set Params.Validator;
 equivocating_validators sigma =
   filtera (is_equivocating sigma) (observed sigma);
 
@@ -472,17 +480,19 @@ minus_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
 minus_set a (Coset xs) = Set (filter (\ x -> member x a) xs);
 minus_set a (Set xs) = fold remove xs a;
 
-observed_non_equivocating_validators :: Set Message -> Set Validator;
+observed_non_equivocating_validators :: Set Message -> Set Params.Validator;
 observed_non_equivocating_validators sigma =
   minus_set (observed sigma) (equivocating_validators sigma);
 
-agreeing_validators :: (Consensus_value -> bool, Set Message) -> Set Validator;
+agreeing_validators ::
+  (Params.ConsensusValue -> Bool, Set Message) -> Set Params.Validator;
 agreeing_validators (p, sigma) =
   filtera
     (\ v -> ball (latest_estimates_from_non_equivocating_validators sigma v) p)
     (observed_non_equivocating_validators sigma);
 
-is_clique :: (Set Validator, (Consensus_value -> bool, Set Message)) -> bool;
+is_clique ::
+  (Set Params.Validator, (Params.ConsensusValue -> Bool, Set Message)) -> Bool;
 is_clique (v_set, (p, sigma)) =
   ball v_set
     (\ v ->
@@ -504,7 +514,7 @@ is_clique (v_set, (p, sigma)) =
                       (va, sigma))))
               bot_set));
 
-less_rat :: Rat -> Rat -> bool;
+less_rat :: Rat -> Rat -> Bool;
 less_rat p q =
   let {
     a = quotient_of p;
@@ -533,7 +543,7 @@ minus_rat p q =
                       });
              }));
 
-less_real :: Real -> Real -> bool;
+less_real :: Real -> Real -> Bool;
 less_real (Ratreal x) (Ratreal y) = less_rat x y;
 
 divide_rat :: Rat -> Rat -> Rat;
@@ -555,7 +565,7 @@ sum_list xs = foldr plus xs zero;
 sum :: forall a b. (Eq a, Comm_monoid_add b) => (a -> b) -> Set a -> b;
 sum g (Set xs) = sum_list (map g (remdups xs));
 
-weight_measure :: (Validator -> Real) -> Set Validator -> Real;
+weight_measure :: (Params.Validator -> Real) -> Set Params.Validator -> Real;
 weight_measure w v_set = sum w v_set;
 
 divide_real :: Real -> Real -> Real;
@@ -565,7 +575,8 @@ minus_real :: Real -> Real -> Real;
 minus_real (Ratreal x) (Ratreal y) = Ratreal (minus_rat x y);
 
 gt_threshold ::
-  (Validator -> Real) -> Real -> (Set Validator, Set Message) -> bool;
+  (Params.Validator -> Real) ->
+    Real -> (Set Params.Validator, Set Message) -> Bool;
 gt_threshold w t (v_set, sigma) =
   less_real
     (minus_real
@@ -577,15 +588,19 @@ gt_threshold w t (v_set, sigma) =
     (weight_measure w v_set);
 
 is_clique_oraclea ::
-  (Validator -> Real) ->
-    Real -> (Set Validator, (Set Message, Consensus_value -> bool)) -> bool;
+  (Params.Validator -> Real) ->
+    Real ->
+      (Set Params.Validator, (Set Message, Params.ConsensusValue -> Bool)) ->
+        Bool;
 is_clique_oraclea w t (v_set, (sigma, p)) =
   is_clique (minus_set v_set (equivocating_validators sigma), (p, sigma)) &&
     gt_threshold w t (minus_set v_set (equivocating_validators sigma), sigma);
 
 is_clique_oracle ::
-  (Validator -> Real) ->
-    Real -> (Set Validator, (Set Message, Consensus_value -> bool)) -> bool;
+  (Params.Validator -> Real) ->
+    Real ->
+      (Set Params.Validator, (Set Message, Params.ConsensusValue -> Bool)) ->
+        Bool;
 is_clique_oracle = is_clique_oraclea;
 
 }

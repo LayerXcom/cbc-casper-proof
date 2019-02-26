@@ -1,0 +1,452 @@
+%
+\begin{isabellebody}%
+\setisabellecontext{Strict{\isacharunderscore}Order}%
+%
+\isadelimtheory
+\isanewline
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{theory}\isamarkupfalse%
+\ Strict{\isacharunderscore}Order\isanewline
+\isanewline
+\isakeyword{imports}\ Main\isanewline
+\isanewline
+\isakeyword{begin}%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+\isanewline
+\isacommand{notation}\isamarkupfalse%
+\ Set{\isachardot}empty\ {\isacharparenleft}{\isachardoublequoteopen}{\isasymemptyset}{\isachardoublequoteclose}{\isacharparenright}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymequiv}\ trans\ r\ {\isasymand}\ irrefl\ r{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}well{\isacharunderscore}order{\isacharunderscore}on\ A\ r\ {\isasymequiv}\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on\ A\ r\ {\isasymand}\ wf\ r{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}partial{\isacharunderscore}order\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on\ A\ r\ {\isasymLongrightarrow}\ strict{\isacharunderscore}partial{\isacharunderscore}order\ r{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on{\isacharunderscore}def\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}def{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ upper{\isacharunderscore}bound{\isacharunderscore}on\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}a\ set\ {\isasymRightarrow}\ {\isacharprime}a\ rel\ {\isasymRightarrow}\ {\isacharprime}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ \isanewline
+\ \ \ \ {\isachardoublequoteopen}upper{\isacharunderscore}bound{\isacharunderscore}on\ A\ r\ x\ {\isacharequal}\ {\isacharparenleft}{\isasymforall}\ y{\isachardot}\ y\ {\isasymin}\ A\ {\isasymlongrightarrow}\ {\isacharparenleft}y{\isacharcomma}\ x{\isacharparenright}\ {\isasymin}\ r\ {\isasymor}\ x\ {\isacharequal}\ y{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ maximum{\isacharunderscore}on\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}a\ set\ {\isasymRightarrow}\ {\isacharprime}a\ rel\ {\isasymRightarrow}\ {\isacharprime}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ \isanewline
+\ \ \ \ {\isachardoublequoteopen}maximum{\isacharunderscore}on\ A\ r\ x\ {\isacharequal}\ {\isacharparenleft}x\ {\isasymin}\ A\ {\isasymand}\ upper{\isacharunderscore}bound{\isacharunderscore}on\ A\ r\ x{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ minimal{\isacharunderscore}on\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}a\ set\ {\isasymRightarrow}\ {\isacharprime}a\ rel\ {\isasymRightarrow}\ {\isacharprime}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ \isanewline
+\ \ \ \ {\isachardoublequoteopen}minimal{\isacharunderscore}on\ A\ r\ x\ {\isacharequal}\ {\isacharparenleft}x\ {\isasymin}\ A\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ y{\isachardot}\ {\isacharparenleft}y{\isacharcomma}\ x{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ A{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ maximal{\isacharunderscore}on\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharprime}a\ set\ {\isasymRightarrow}\ {\isacharprime}a\ rel\ {\isasymRightarrow}\ {\isacharprime}a\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\ \isanewline
+\ \ \ \ {\isachardoublequoteopen}maximal{\isacharunderscore}on\ A\ r\ x\ {\isacharequal}\ {\isacharparenleft}x\ {\isasymin}\ A\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ y{\isachardot}\ {\isacharparenleft}x{\isacharcomma}\ y{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ A{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ maximal{\isacharunderscore}and{\isacharunderscore}maximum{\isacharunderscore}coincide{\isacharunderscore}for{\isacharunderscore}strict{\isacharunderscore}linear{\isacharunderscore}order\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on\ A\ r\ {\isasymLongrightarrow}\ maximal{\isacharunderscore}on\ A\ r\ x\ {\isacharequal}\ maximum{\isacharunderscore}on\ A\ r\ x{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on{\isacharunderscore}def\ irrefl{\isacharunderscore}def\ total{\isacharunderscore}on{\isacharunderscore}def\ trans{\isacharunderscore}def\ maximal{\isacharunderscore}on{\isacharunderscore}def\ maximum{\isacharunderscore}on{\isacharunderscore}def\ upper{\isacharunderscore}bound{\isacharunderscore}on{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}on{\isacharunderscore}finite{\isacharunderscore}non{\isacharunderscore}empty{\isacharunderscore}set{\isacharunderscore}has{\isacharunderscore}maximal\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isachardot}\ maximal{\isacharunderscore}on\ A\ r\ x{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharminus}\ \isanewline
+\ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymAnd}n{\isachardot}\ strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymLongrightarrow}\ {\isacharparenleft}{\isasymforall}\ A{\isachardot}\ Suc\ n\ {\isacharequal}\ card\ A\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isachardot}\ maximal{\isacharunderscore}on\ A\ r\ x{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \isacommand{proof}\isamarkupfalse%
+\ {\isacharminus}\ \isanewline
+\ \ \ \ \isacommand{assume}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isacharparenleft}{\isasymforall}a{\isachardot}\ {\isacharparenleft}a{\isacharcomma}\ a{\isacharparenright}\ {\isasymnotin}\ r{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}def\ irrefl{\isacharunderscore}def{\isacharparenright}\ \isanewline
+\ \ \ \ \isacommand{fix}\isamarkupfalse%
+\ n\isanewline
+\ \ \ \ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}\ A{\isachardot}\ Suc\ n\ {\isacharequal}\ card\ A\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isachardot}\ maximal{\isacharunderscore}on\ A\ r\ x{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}induction\ n{\isacharparenright}\isanewline
+\ \ \ \ \ \ \isacommand{unfolding}\isamarkupfalse%
+\ maximal{\isacharunderscore}on{\isacharunderscore}def\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ {\isacartoucheopen}{\isacharparenleft}{\isasymforall}a{\isachardot}\ {\isacharparenleft}a{\isacharcomma}\ a{\isacharparenright}\ {\isasymnotin}\ r{\isacharparenright}{\isacartoucheclose}\isanewline
+\ \ \ \ \ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}metis\ card{\isacharunderscore}eq{\isacharunderscore}SucD\ empty{\isacharunderscore}iff\ insert{\isacharunderscore}iff{\isacharparenright}\isanewline
+\ \ \ \ \isacommand{proof}\isamarkupfalse%
+\ {\isacharminus}\isanewline
+\ \ \ \ \ \ \isacommand{fix}\isamarkupfalse%
+\ n\isanewline
+\ \ \ \ \ \ \isacommand{assume}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}A{\isachardot}\ Suc\ n\ {\isacharequal}\ card\ A\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}x{\isachardot}\ x\ {\isasymin}\ A\ {\isasymand}\ {\isacharparenleft}{\isasymforall}y{\isachardot}\ {\isacharparenleft}x{\isacharcomma}\ y{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ A{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}B{\isachardot}\ Suc\ {\isacharparenleft}Suc\ n{\isacharparenright}\ {\isacharequal}\ card\ B\ {\isasymlongrightarrow}\ finite\ B\ {\isasymlongrightarrow}\ B\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ A{\isacharprime}\ b{\isachardot}\ B\ {\isacharequal}\ A{\isacharprime}\ {\isasymunion}\ {\isacharbraceleft}b{\isacharbraceright}\ {\isasymand}\ card\ A{\isacharprime}\ {\isacharequal}\ Suc\ n\ {\isasymand}\ b\ {\isasymnotin}\ A{\isacharprime}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ Un{\isacharunderscore}commute\ add{\isacharunderscore}diff{\isacharunderscore}cancel{\isacharunderscore}left{\isacharprime}\ card{\isacharunderscore}gt{\isacharunderscore}{\isadigit{0}}{\isacharunderscore}iff\ card{\isacharunderscore}insert{\isacharunderscore}disjoint\ card{\isacharunderscore}le{\isacharunderscore}Suc{\isacharunderscore}iff\ insert{\isacharunderscore}is{\isacharunderscore}Un\ not{\isacharunderscore}le\ not{\isacharunderscore}less{\isacharunderscore}eq{\isacharunderscore}eq\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc{\isacharparenright}\isanewline
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}B{\isachardot}\ Suc\ {\isacharparenleft}Suc\ n{\isacharparenright}\ {\isacharequal}\ card\ B\ {\isasymlongrightarrow}\ finite\ B\ {\isasymlongrightarrow}\ B\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ A{\isacharprime}\ b{\isachardot}\ B\ {\isacharequal}\ A{\isacharprime}\ {\isasymunion}\ {\isacharbraceleft}b{\isacharbraceright}\ {\isasymand}\ card\ A{\isacharprime}\ {\isacharequal}\ Suc\ n\ {\isasymand}\ finite\ A{\isacharprime}\ {\isasymand}\ A{\isacharprime}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymand}\ b\ {\isasymnotin}\ A{\isacharprime}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ card{\isacharunderscore}gt{\isacharunderscore}{\isadigit{0}}{\isacharunderscore}iff\ zero{\isacharunderscore}less{\isacharunderscore}Suc{\isacharparenright}\isanewline
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}B{\isachardot}\ Suc\ {\isacharparenleft}Suc\ n{\isacharparenright}\ {\isacharequal}\ card\ B\ {\isasymlongrightarrow}\ finite\ B\ {\isasymlongrightarrow}\ B\ {\isasymnoteq}\ {\isasymemptyset}\isanewline
+\ \ \ \ \ \ \ \ \ \ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ A{\isacharprime}\ b\ x{\isachardot}\ B\ {\isacharequal}\ A{\isacharprime}\ {\isasymunion}\ {\isacharbraceleft}b{\isacharbraceright}\ {\isasymand}\ b\ {\isasymnotin}\ A{\isacharprime}\ {\isasymand}\ x\ {\isasymin}\ A{\isacharprime}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}y{\isachardot}\ {\isacharparenleft}x{\isacharcomma}\ y{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ A{\isacharprime}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ {\isacartoucheopen}{\isasymforall}A{\isachardot}\ Suc\ n\ {\isacharequal}\ card\ A\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}x{\isachardot}\ x\ {\isasymin}\ A\ {\isasymand}\ {\isacharparenleft}{\isasymforall}y{\isachardot}\ {\isacharparenleft}x{\isacharcomma}\ y{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ A{\isacharparenright}{\isacharparenright}{\isacartoucheclose}\ \isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ metis\isanewline
+\ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymforall}B{\isachardot}\ Suc\ {\isacharparenleft}Suc\ n{\isacharparenright}\ {\isacharequal}\ card\ B\ {\isasymlongrightarrow}\ finite\ B\ {\isasymlongrightarrow}\ B\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}x{\isachardot}\ x\ {\isasymin}\ B\ {\isasymand}\ {\isacharparenleft}{\isasymforall}y{\isachardot}\ {\isacharparenleft}x{\isacharcomma}\ y{\isacharparenright}\ {\isasymin}\ r\ {\isasymlongrightarrow}\ y\ {\isasymnotin}\ B{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ {\isacharparenleft}no{\isacharunderscore}types{\isacharcomma}\ lifting{\isacharparenright}\ Un{\isacharunderscore}insert{\isacharunderscore}right\ {\isacartoucheopen}{\isasymforall}a{\isachardot}\ {\isacharparenleft}a{\isacharcomma}\ a{\isacharparenright}\ {\isasymnotin}\ r{\isacartoucheclose}\ {\isacartoucheopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r{\isacartoucheclose}\ insertE\ insert{\isacharunderscore}iff\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}def\ sup{\isacharunderscore}bot{\isachardot}right{\isacharunderscore}neutral\ transE{\isacharparenright}\isanewline
+\ \ \ \ \isacommand{qed}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{qed}\isamarkupfalse%
+\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ {\isacharquery}thesis\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ card{\isachardot}insert{\isacharunderscore}remove\ finite{\isachardot}cases{\isacharparenright}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}has{\isacharunderscore}at{\isacharunderscore}most{\isacharunderscore}one{\isacharunderscore}maximum\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\isanewline
+\ \ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ \isanewline
+\ \ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+%
+\endisadelimproof
+%
+\isatagproof
+\isacommand{proof}\isamarkupfalse%
+\ {\isacharparenleft}rule\ ccontr{\isacharparenright}\isanewline
+\ \ \isacommand{assume}\isamarkupfalse%
+\ {\isachardoublequoteopen}{\isasymnot}\ {\isacharparenleft}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isasymnot}\ is{\isacharunderscore}singleton\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ simp\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isadigit{1}}\ x{\isadigit{2}}{\isachardot}\ x{\isadigit{1}}\ {\isasymnoteq}\ x{\isadigit{2}}\ {\isasymand}\ {\isacharbraceleft}x{\isadigit{1}}{\isacharcomma}\ x{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}meson\ empty{\isacharunderscore}subsetI\ insert{\isacharunderscore}subset\ is{\isacharunderscore}singletonI{\isacharprime}{\isacharparenright}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isadigit{1}}\ x{\isadigit{2}}{\isachardot}\ x{\isadigit{1}}\ {\isasymnoteq}\ x{\isadigit{2}}\ {\isasymand}\ {\isacharbraceleft}x{\isadigit{1}}{\isacharcomma}\ x{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ {\isacharbraceleft}x\ {\isasymin}\ A{\isachardot}\ {\isasymforall}\ y{\isachardot}\ y\ {\isasymin}\ A\ {\isasymlongrightarrow}\ {\isacharparenleft}y{\isacharcomma}\ x{\isacharparenright}\ {\isasymin}\ r\ {\isasymor}\ x\ {\isacharequal}\ y{\isacharbraceright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ maximum{\isacharunderscore}on{\isacharunderscore}def\ upper{\isacharunderscore}bound{\isacharunderscore}on{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{have}\isamarkupfalse%
+\ {\isachardoublequoteopen}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ x{\isadigit{1}}\ x{\isadigit{2}}{\isachardot}\ x{\isadigit{1}}\ {\isasymnoteq}\ x{\isadigit{2}}\ {\isasymand}\ {\isacharbraceleft}x{\isadigit{1}}{\isacharcomma}\ x{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ A\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ y{\isachardot}\ y\ {\isasymin}\ A\ {\isasymlongrightarrow}\ {\isacharparenleft}y{\isacharcomma}\ x{\isadigit{1}}{\isacharparenright}\ {\isasymin}\ r\ {\isasymor}\ x{\isadigit{1}}\ {\isacharequal}\ y{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ y{\isachardot}\ y\ {\isasymin}\ A\ {\isasymlongrightarrow}\ {\isacharparenleft}y{\isacharcomma}\ x{\isadigit{2}}{\isacharparenright}\ {\isasymin}\ r\ {\isasymor}\ x{\isadigit{2}}\ {\isacharequal}\ y{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ auto\isanewline
+\ \ \isacommand{then}\isamarkupfalse%
+\ \isacommand{show}\isamarkupfalse%
+\ False\isanewline
+\ \ \ \ \isacommand{using}\isamarkupfalse%
+\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}def\isanewline
+\ \ \ \ \isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ {\isacartoucheopen}{\isasymnot}\ {\isacharparenleft}strict{\isacharunderscore}partial{\isacharunderscore}order\ r\ {\isasymlongrightarrow}\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isacharparenright}{\isacartoucheclose}\ insert{\isacharunderscore}subset\ irrefl{\isacharunderscore}def\ transE{\isacharparenright}\isanewline
+\isacommand{qed}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on{\isacharunderscore}finite{\isacharunderscore}non{\isacharunderscore}empty{\isacharunderscore}set{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}maximum\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}on\ A\ r\ {\isasymlongrightarrow}\ finite\ A\ {\isasymlongrightarrow}\ A\ {\isasymnoteq}\ {\isasymemptyset}\ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharbraceleft}x{\isachardot}\ maximum{\isacharunderscore}on\ A\ r\ x{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ strict{\isacharunderscore}linear{\isacharunderscore}order{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}partial{\isacharunderscore}order\ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}on{\isacharunderscore}finite{\isacharunderscore}non{\isacharunderscore}empty{\isacharunderscore}set{\isacharunderscore}has{\isacharunderscore}maximal\ \isanewline
+\ \ \ \ \ \ \ \ strict{\isacharunderscore}partial{\isacharunderscore}order{\isacharunderscore}has{\isacharunderscore}at{\isacharunderscore}most{\isacharunderscore}one{\isacharunderscore}maximum\ maximal{\isacharunderscore}and{\isacharunderscore}maximum{\isacharunderscore}coincide{\isacharunderscore}for{\isacharunderscore}strict{\isacharunderscore}linear{\isacharunderscore}order\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ fastforce%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+%
+\isadelimtheory
+\isanewline
+%
+\endisadelimtheory
+%
+\isatagtheory
+\isacommand{end}\isamarkupfalse%
+%
+\endisatagtheory
+{\isafoldtheory}%
+%
+\isadelimtheory
+%
+\endisadelimtheory
+%
+\end{isabellebody}%
+\endinput
+%:%file=~/work/LayerXcom/cbc-casper-proof/Isabelle/Libraries/Strict_Order.thy%:%
+%:%6=5%:%
+%:%7=6%:%
+%:%12=7%:%
+%:%13=7%:%
+%:%14=8%:%
+%:%15=9%:%
+%:%16=10%:%
+%:%17=11%:%
+%:%22=11%:%
+%:%25=12%:%
+%:%26=13%:%
+%:%27=13%:%
+%:%28=14%:%
+%:%29=15%:%
+%:%30=15%:%
+%:%31=16%:%
+%:%32=23%:%
+%:%33=24%:%
+%:%34=25%:%
+%:%35=26%:%
+%:%36=26%:%
+%:%37=27%:%
+%:%38=28%:%
+%:%39=28%:%
+%:%40=29%:%
+%:%43=30%:%
+%:%47=30%:%
+%:%48=30%:%
+%:%53=30%:%
+%:%56=31%:%
+%:%57=32%:%
+%:%58=33%:%
+%:%59=33%:%
+%:%60=34%:%
+%:%61=35%:%
+%:%62=36%:%
+%:%63=37%:%
+%:%64=37%:%
+%:%65=38%:%
+%:%66=39%:%
+%:%67=40%:%
+%:%68=41%:%
+%:%69=41%:%
+%:%70=42%:%
+%:%71=43%:%
+%:%72=44%:%
+%:%73=45%:%
+%:%74=45%:%
+%:%75=46%:%
+%:%76=47%:%
+%:%77=48%:%
+%:%78=49%:%
+%:%79=49%:%
+%:%80=50%:%
+%:%83=51%:%
+%:%87=51%:%
+%:%88=51%:%
+%:%89=52%:%
+%:%90=52%:%
+%:%95=52%:%
+%:%98=53%:%
+%:%99=54%:%
+%:%100=54%:%
+%:%101=55%:%
+%:%108=56%:%
+%:%109=56%:%
+%:%110=57%:%
+%:%111=57%:%
+%:%112=58%:%
+%:%113=58%:%
+%:%114=59%:%
+%:%115=59%:%
+%:%116=60%:%
+%:%117=60%:%
+%:%118=60%:%
+%:%119=61%:%
+%:%120=61%:%
+%:%121=62%:%
+%:%122=62%:%
+%:%123=63%:%
+%:%124=63%:%
+%:%125=64%:%
+%:%126=64%:%
+%:%127=65%:%
+%:%128=65%:%
+%:%129=66%:%
+%:%130=66%:%
+%:%131=67%:%
+%:%132=67%:%
+%:%133=68%:%
+%:%134=68%:%
+%:%135=69%:%
+%:%136=69%:%
+%:%137=70%:%
+%:%138=70%:%
+%:%139=71%:%
+%:%140=71%:%
+%:%141=72%:%
+%:%142=72%:%
+%:%143=73%:%
+%:%144=73%:%
+%:%145=73%:%
+%:%146=74%:%
+%:%147=74%:%
+%:%148=75%:%
+%:%149=75%:%
+%:%150=75%:%
+%:%151=76%:%
+%:%152=77%:%
+%:%153=77%:%
+%:%154=78%:%
+%:%155=78%:%
+%:%156=79%:%
+%:%157=79%:%
+%:%158=79%:%
+%:%159=80%:%
+%:%160=80%:%
+%:%161=81%:%
+%:%162=81%:%
+%:%163=82%:%
+%:%164=82%:%
+%:%165=83%:%
+%:%166=83%:%
+%:%167=83%:%
+%:%168=84%:%
+%:%169=84%:%
+%:%170=85%:%
+%:%176=85%:%
+%:%179=86%:%
+%:%180=87%:%
+%:%181=87%:%
+%:%182=88%:%
+%:%184=90%:%
+%:%191=91%:%
+%:%192=91%:%
+%:%193=92%:%
+%:%194=92%:%
+%:%195=93%:%
+%:%196=93%:%
+%:%197=93%:%
+%:%198=94%:%
+%:%199=94%:%
+%:%200=95%:%
+%:%201=95%:%
+%:%202=95%:%
+%:%203=96%:%
+%:%204=96%:%
+%:%205=97%:%
+%:%206=97%:%
+%:%207=97%:%
+%:%208=98%:%
+%:%209=98%:%
+%:%210=99%:%
+%:%211=99%:%
+%:%212=99%:%
+%:%213=100%:%
+%:%214=100%:%
+%:%215=101%:%
+%:%216=101%:%
+%:%217=101%:%
+%:%218=102%:%
+%:%219=102%:%
+%:%220=103%:%
+%:%221=104%:%
+%:%222=104%:%
+%:%223=105%:%
+%:%229=105%:%
+%:%232=106%:%
+%:%233=107%:%
+%:%234=107%:%
+%:%235=108%:%
+%:%238=109%:%
+%:%242=109%:%
+%:%243=109%:%
+%:%244=110%:%
+%:%245=111%:%
+%:%246=111%:%
+%:%251=111%:%
+%:%256=112%:%
+%:%261=113%:%

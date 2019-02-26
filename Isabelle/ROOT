@@ -12,11 +12,14 @@ session "Documentation" = HOL +
   options [document = pdf, document_output = "output", quick_and_dirty]
   theories [document = false]
     "Libraries/Restricted_Predicates"
-    "Libraries/LaTeXsugar"
-    "Libraries/Strict_Order"
+    "Libraries/LaTeXsugar"    
  theories
     CBCCasper
-    ConsensusSafety
     LatestMessage
+    StateTransition
+    ConsensusSafety
+    SafetyOracle
+    TFGCasper
+    "Libraries/Strict_Order"
   document_files
     "root.tex"

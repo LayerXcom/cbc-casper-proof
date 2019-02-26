@@ -13,21 +13,31 @@ begin
 (* Section 4.1:  Preliminary Definitions *)
 
 (* Definition 4.2 *)
-definition later :: "(message * state) \<Rightarrow> message set"
+definition later :: "(message * message set) \<Rightarrow> message set"
   where
     "later = (\<lambda>(m, \<sigma>). {m' \<in> \<sigma>. justified m m'})"
 
 lemma (in Protocol) later_type :
+  "\<forall> \<sigma> m. \<sigma> \<in> Pow M \<and> m \<in> M \<longrightarrow> later (m, \<sigma>) \<subseteq> M"
+  apply (simp add: later_def)
+  by auto
+
+lemma (in Protocol) later_type_for_state :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<longrightarrow> later (m, \<sigma>) \<subseteq> M"
   apply (simp add: later_def)
   using state_is_subset_of_M by auto
 
 (* Definition 4.3: Messages From a Sender *)
-definition from_sender :: "(validator * state) \<Rightarrow> message set"
+definition from_sender :: "(validator * message set) \<Rightarrow> message set"
   where
     "from_sender = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
 
 lemma (in Protocol) from_sender_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<subseteq> M"
+  apply (simp add: from_sender_def)
+  by auto  
+
+lemma (in Protocol) from_sender_type_for_state :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<subseteq> M"
   apply (simp add: from_sender_def)
   using state_is_subset_of_M by auto  
@@ -42,34 +52,49 @@ lemma (in Protocol) "messages_from_validator_is_finite" :
   by (simp add: from_sender_def state_is_finite)
 
 (* Definition 4.4: Message From a Group *)
-definition from_group :: "(validator set * state) \<Rightarrow> state"
+definition from_group :: "(validator set * message set) \<Rightarrow> state"
   where
     "from_group = (\<lambda>(v_set, \<sigma>). {m \<in> \<sigma>. sender m \<in> v_set})"
 
 lemma (in Protocol) from_group_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v_set \<subseteq> V \<longrightarrow> from_group (v_set, \<sigma>) \<subseteq> M"
+  apply (simp add: from_group_def)
+  by auto
+
+lemma (in Protocol) from_group_type_for_state :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V \<longrightarrow> from_group (v_set, \<sigma>) \<subseteq> M"
   apply (simp add: from_group_def)
   using state_is_subset_of_M by auto
 
 (* Definition 4.5 *)
-definition later_from :: "(message * validator * state) \<Rightarrow> message set"
+definition later_from :: "(message * validator * message set) \<Rightarrow> message set"
   where
     "later_from = (\<lambda>(m, v, \<sigma>). later (m, \<sigma>) \<inter> from_sender (v, \<sigma>))"
 
 lemma (in Protocol) later_from_type :
-  "\<forall> \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
+  "\<forall> \<sigma> v m. \<sigma> \<in> Pow M \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
   apply (simp add: later_from_def)
   using later_type from_sender_type by auto
 
+lemma (in Protocol) later_from_type_for_state :
+  "\<forall> \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
+  apply (simp add: later_from_def)
+  using later_type_for_state from_sender_type_for_state by auto
+
 (* Definition 4.6: Latest Messages *)
-definition latest_messages :: "state \<Rightarrow> (validator \<Rightarrow> state)"
+definition latest_messages :: "message set \<Rightarrow> (validator \<Rightarrow> message set)"
   where
     "latest_messages \<sigma> v = {m \<in> from_sender (v, \<sigma>). later_from (m, v, \<sigma>) = \<emptyset>}"
 
 lemma (in Protocol) latest_messages_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<subseteq> M"
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<subseteq> M"
   apply (simp add: latest_messages_def later_from_def)
   using from_sender_type by auto
+
+lemma (in Protocol) latest_messages_type_for_state :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<subseteq> M"
+  apply (simp add: latest_messages_def later_from_def)
+  using from_sender_type_for_state by auto
 
 lemma (in Protocol) latest_messages_from_non_observed_validator_is_empty :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_messages \<sigma> v = \<emptyset>"
@@ -83,11 +108,11 @@ definition observed_non_equivocating_validators :: "state \<Rightarrow> validato
 lemma (in Protocol) observed_non_equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<subseteq> V"
   apply (simp add: observed_non_equivocating_validators_def)
-  using observed_type equivocating_validators_type by auto
+  using observed_type_for_state equivocating_validators_type by auto
 
 lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
-  using justification_is_well_founded_on_M from_sender_type wfp_on_subset by blast 
+  using justification_is_well_founded_on_M from_sender_type_for_state wfp_on_subset by blast 
 
 lemma (in Protocol) justification_is_total_on_messages_from_non_equivocating_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V. v \<notin> equivocating_validators \<sigma> \<longrightarrow> Relation.total_on (from_sender (v, \<sigma>)) message_justification)"
@@ -100,7 +125,7 @@ proof -
     by blast
   then show ?thesis
     apply (simp add: Relation.total_on_def message_justification_def)
-    using from_sender_type by blast
+    using from_sender_type_for_state by blast
 qed
 
 lemma (in Protocol) justification_is_strict_linear_order_on_messages_from_non_equivocating_validator:
@@ -119,7 +144,7 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
 lemma (in Protocol) latest_message_is_maximal_element_of_justification :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
   apply (simp add: latest_messages_def later_from_def later_def message_justification_def maximal_on_def)
-  using from_sender_type apply auto
+  using from_sender_type_for_state apply auto
   apply (metis (no_types, lifting) IntI empty_iff from_sender_def mem_Collect_eq prod.simps(2))
   by blast  
 
@@ -132,7 +157,7 @@ proof -
     using 
         messages_from_observed_validator_is_non_empty
         messages_from_validator_is_finite
-        observed_type
+        observed_type_for_state
         equivocating_validators_def
         justification_is_strict_linear_order_on_messages_from_non_equivocating_validator
         strict_linear_order_on_finite_non_empty_set_has_one_maximum
@@ -155,7 +180,7 @@ definition latest_estimates :: "state \<Rightarrow> validator \<Rightarrow> cons
 
 lemma (in Protocol) latest_estimates_type :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates \<sigma> v \<subseteq> C"
-  using M_type Protocol.latest_messages_type Protocol_axioms latest_estimates_def by fastforce
+  using M_type Protocol.latest_messages_type_for_state Protocol_axioms latest_estimates_def by fastforce
 
 lemma (in Protocol) latest_estimates_from_non_observed_validator_is_empty :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_estimates \<sigma> v = \<emptyset>"
@@ -171,7 +196,7 @@ definition latest_messages_from_non_equivocating_validators :: "state \<Rightarr
 
 lemma (in Protocol) latest_messages_from_non_equivocating_validators_type :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages_from_non_equivocating_validators \<sigma> v \<subseteq> M"
-  by (simp add: latest_messages_type latest_messages_from_non_equivocating_validators_def)
+  by (simp add: latest_messages_type_for_state latest_messages_from_non_equivocating_validators_def)
 
 (* Definition 4.12: Latest honest message driven estimator *)
 (* TODO *)

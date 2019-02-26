@@ -2,7 +2,7 @@ section \<open>Safety Proof\<close>
 
 theory ConsensusSafety
 
-imports Main CBCCasper "Libraries/LaTeXsugar"
+imports Main CBCCasper StateTransition "Libraries/LaTeXsugar"
 
 begin
 
@@ -10,7 +10,7 @@ begin
 (* Section 3.1: Guaranteeing Common Futures *)
 
 (* Definition 3.1 *)
-fun (in Protocol) futures :: "state \<Rightarrow> state set"
+definition (in Protocol) futures :: "state \<Rightarrow> state set"
   where
     "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>, \<sigma>')}"
 
@@ -18,29 +18,40 @@ fun (in Protocol) futures :: "state \<Rightarrow> state set"
 lemma (in Protocol) monotonic_futures :
   "\<forall> \<sigma>' \<sigma>. \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t
    \<longrightarrow> \<sigma>' \<in> futures \<sigma> \<longleftrightarrow> futures \<sigma>' \<subseteq> futures \<sigma>"
-  by auto
+  apply (simp add: futures_def) by auto
 
 (* Theorem 1 *)
 theorem (in Protocol) two_party_common_futures :
   "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t
+  \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
   \<longrightarrow> futures \<sigma>1 \<inter> futures \<sigma>2 \<noteq> \<emptyset>"
-  by auto
+  apply (simp add: futures_def \<Sigma>t_def) using union_of_two_states_is_state
+  by blast
 
 (* Theorem 2 *)
 theorem (in Protocol) n_party_common_futures :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
   \<longrightarrow> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
-  by auto
+  apply (simp add: futures_def \<Sigma>t_def) using union_of_finite_set_of_states_is_state
+  by blast
+
+lemma (in Protocol) n_party_common_futures_exists :
+  "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
+  \<longrightarrow> (\<exists> \<sigma> \<in>\<Sigma>t. \<sigma> \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
+  apply (simp add: futures_def \<Sigma>t_def) using union_of_finite_set_of_states_is_state
+  by blast
 
 (* Section 3.2: Guaranteeing Consistent Decisions *)
 (* Section 3.2.1: Guaranteeing Consistent Decisions on Properties of Protocol States *)
 
 (* Definition 3.3  *)
-fun (in Protocol) state_property_is_decided :: "(state_property * state) \<Rightarrow> bool"
+definition (in Protocol) state_property_is_decided :: "(state_property * state) \<Rightarrow> bool"
   where
-    "state_property_is_decided (p, \<sigma>) = (\<forall> \<sigma>' \<in> futures \<sigma> . p \<sigma>')"
+    "state_property_is_decided  = (\<lambda>(p, \<sigma>). (\<forall> \<sigma>' \<in> futures \<sigma> . p \<sigma>'))"
 
 (* Lemma 2 *)
 lemma (in Protocol) forward_consistency :
@@ -48,7 +59,7 @@ lemma (in Protocol) forward_consistency :
   \<longrightarrow> \<sigma>' \<in> futures \<sigma> 
   \<longrightarrow> state_property_is_decided (p, \<sigma>)
   \<longrightarrow> state_property_is_decided (p, \<sigma>')"
-  apply simp
+  apply (simp add: futures_def state_property_is_decided_def)
   by auto
 
 (* Lemma 3 *)
@@ -61,54 +72,56 @@ lemma (in Protocol) backword_consistency :
   \<longrightarrow> \<sigma>' \<in> futures \<sigma> 
   \<longrightarrow> state_property_is_decided (p, \<sigma>')
   \<longrightarrow> \<not>state_property_is_decided (state_property_not p, \<sigma>)"
-  apply simp
+  apply (simp add: futures_def state_property_is_decided_def)
   by auto
   
 (* Theorem 3 *)
 theorem (in Protocol) two_party_consensus_safety :
   "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
-  \<longrightarrow> (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>t
+  \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
   \<longrightarrow> \<not>(state_property_is_decided (p, \<sigma>1) \<and> state_property_is_decided (state_property_not p, \<sigma>2))"
-  by auto
+  apply (simp add: state_property_is_decided_def)
+  using two_party_common_futures
+  by (metis Int_emptyI)
 
 (* Definition 3.4 *)
-fun (in Protocol) state_properties_are_inconsistent :: "state_property set \<Rightarrow> bool"
+definition (in Protocol) state_properties_are_inconsistent :: "state_property set \<Rightarrow> bool"
   where
     "state_properties_are_inconsistent p_set = (\<forall> \<sigma> \<in> \<Sigma>. \<not> (\<forall> p \<in> p_set. p \<sigma>))"
 
 (* Definition 3.5 *)
-fun (in Protocol) state_properties_are_consistent :: "state_property set \<Rightarrow> bool"
+definition (in Protocol) state_properties_are_consistent :: "state_property set \<Rightarrow> bool"
   where
     "state_properties_are_consistent p_set = (\<exists> \<sigma> \<in> \<Sigma>. \<forall> p \<in> p_set. p \<sigma>)"
 
 (* Definition 3.6 *)
-fun (in Protocol) state_property_decisions :: "state \<Rightarrow> state_property set"
+definition (in Protocol) state_property_decisions :: "state \<Rightarrow> state_property set"
   where 
     "state_property_decisions \<sigma> = {p. state_property_is_decided (p, \<sigma>)}"
 
 (* Theorem 4 *)
 theorem (in Protocol) n_party_safety_for_state_properties :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
   \<longrightarrow> state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
   apply rule+
 proof-
   fix \<sigma>_set
   assume \<sigma>_set: "\<sigma>_set \<subseteq> \<Sigma>t"
-
-  assume "\<Union> \<sigma>_set \<in> \<Sigma>t"
-  hence "\<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set} \<noteq> \<emptyset>"
-    using \<sigma>_set by auto
+  and "finite \<sigma>_set"
+  and "is_faults_lt_threshold (\<Union> \<sigma>_set)"
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<sigma> \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}"
-    using \<open>\<Union>\<sigma>_set \<in> \<Sigma>t\<close> by fastforce
+    using n_party_common_futures_exists
+    by (simp add: \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> \<sigma>_set)
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s"
     by blast
   hence "\<exists>\<sigma>\<in>\<Sigma>t. (\<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s) \<and> (\<forall>s\<in>\<sigma>_set. \<sigma> \<in> futures s \<longrightarrow> (\<forall>p. state_property_is_decided (p,s) \<longrightarrow> state_property_is_decided (p,\<sigma>)))"
-    by (simp add: subset_eq)
+    by (simp add: subset_eq state_property_is_decided_def futures_def)
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. (\<forall>p. state_property_is_decided (p,s) \<longrightarrow> state_property_is_decided (p,\<sigma>))"
     by blast
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>s\<in>\<sigma>_set. (\<forall>p \<in> state_property_decisions s. state_property_is_decided (p,\<sigma>))"
-    by simp
+    by (simp add: state_property_decisions_def)
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. state_property_is_decided (p,\<sigma>)"
   proof-
     obtain \<sigma> where "\<sigma> \<in> \<Sigma>t" "\<forall>s\<in>\<sigma>_set. (\<forall>p \<in> state_property_decisions s. state_property_is_decided (p,\<sigma>))"
@@ -119,20 +132,21 @@ proof-
       using \<open>\<sigma> \<in> \<Sigma>t\<close> by blast
   qed
   hence "\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. \<forall>\<sigma>'\<in>futures \<sigma>. p \<sigma>'"
-    by simp
+    by (simp add: state_property_decisions_def futures_def state_property_is_decided_def)
   show "state_properties_are_consistent (\<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set})"
-    by (metis (mono_tags, lifting) \<Sigma>t_def \<open>\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}. \<forall>\<sigma>'\<in>futures \<sigma>. p \<sigma>'\<close> mem_Collect_eq monotonic_futures order_refl state_properties_are_consistent.simps)
+    unfolding state_properties_are_consistent_def 
+    by (metis (mono_tags, lifting) \<Sigma>t_def \<open>\<exists>\<sigma>\<in>\<Sigma>t. \<forall>p\<in>\<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}. \<forall>\<sigma>'\<in>futures \<sigma>. p \<sigma>'\<close> mem_Collect_eq monotonic_futures order_refl)
 qed
 
 (* Section 3.2.2: Guaranteeing Consistent Decisions on Properties of Consensus Values *)
 
 (* Definition 3.8 *)
-fun (in Protocol) naturally_corresponding_state_property :: "consensus_value_property \<Rightarrow> state_property"
+definition (in Protocol) naturally_corresponding_state_property :: "consensus_value_property \<Rightarrow> state_property"
   where 
     "naturally_corresponding_state_property q = (\<lambda>\<sigma>. \<forall> c \<in> \<epsilon> \<sigma>. q c)"
 
 (* Definition 3.9 *)
-fun (in Protocol) consensus_value_properties_are_consistent :: "consensus_value_property set \<Rightarrow> bool"
+definition (in Protocol) consensus_value_properties_are_consistent :: "consensus_value_property set \<Rightarrow> bool"
   where
     "consensus_value_properties_are_consistent q_set = (\<exists> c \<in> C. \<forall> q \<in> q_set. q c)"
 
@@ -143,11 +157,10 @@ lemma (in Protocol) naturally_corresponding_consistency :
   apply (rule, rule)
 proof -
   fix q_set
-
   have 
     "state_properties_are_consistent {naturally_corresponding_state_property q | q. q \<in> q_set}
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma>. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)"
-    by simp
+    by (simp add: naturally_corresponding_state_property_def state_properties_are_consistent_def)
   moreover have
     "(\<exists> \<sigma> \<in> \<Sigma>. \<forall> p \<in> {\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> \<sigma>'. q c | q. q \<in> q_set}. p \<sigma>)
     \<longrightarrow> (\<exists> \<sigma> \<in> \<Sigma>. \<forall> q' \<in> q_set. (\<lambda>\<sigma>'. \<forall> c \<in> \<epsilon> \<sigma>'. q' c) \<sigma>)"
@@ -171,35 +184,37 @@ proof -
   ultimately show
     "state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set}
     \<Longrightarrow> consensus_value_properties_are_consistent q_set"
-    by simp
+    by (simp add: consensus_value_properties_are_consistent_def)
 qed
 
 (* Definition 3.10 *)
-fun (in Protocol) consensus_value_property_is_decided :: "(consensus_value_property * state) \<Rightarrow> bool"
+definition (in Protocol) consensus_value_property_is_decided :: "(consensus_value_property * state) \<Rightarrow> bool"
   where
-    "consensus_value_property_is_decided (q, \<sigma>)
-      = state_property_is_decided (naturally_corresponding_state_property q, \<sigma>)"
+    "consensus_value_property_is_decided 
+      = (\<lambda>(q, \<sigma>). state_property_is_decided (naturally_corresponding_state_property q, \<sigma>))"
 
 (* Definition 3.11 *)
-fun (in Protocol) consensus_value_property_decisions :: "state \<Rightarrow> consensus_value_property set"
+definition (in Protocol) consensus_value_property_decisions :: "state \<Rightarrow> consensus_value_property set"
   where
     "consensus_value_property_decisions \<sigma> = {q. consensus_value_property_is_decided (q, \<sigma>)}"
 
 (* Theorem 5 *)
 theorem (in Protocol) n_party_safety_for_consensus_value_properties :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
-  \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
   \<longrightarrow> consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-  apply (rule, rule, rule)
+  apply (rule, rule, rule, rule)
 proof -
   fix \<sigma>_set
   assume "\<sigma>_set \<subseteq> \<Sigma>t"
-
-  assume "\<Union> \<sigma>_set \<in> \<Sigma>t"
+  and "finite \<sigma>_set"
+  and "is_faults_lt_threshold (\<Union> \<sigma>_set)"
   hence "state_properties_are_consistent (\<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     using \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> n_party_safety_for_state_properties by auto
   hence "state_properties_are_consistent {p \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}. \<exists> q. p = naturally_corresponding_state_property q}"
-    apply simp
+    unfolding naturally_corresponding_state_property_def state_properties_are_consistent_def
+    apply (simp)
     by meson 
   hence "state_properties_are_consistent {naturally_corresponding_state_property q | q. naturally_corresponding_state_property q \<in> \<Union> {state_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}}"
     by (smt Collect_cong)
@@ -209,9 +224,9 @@ proof -
     show ?thesis
       by (metis (no_types) Setcompr_eq_image \<open>\<forall>q_set. state_properties_are_consistent {naturally_corresponding_state_property q |q. q \<in> q_set} \<longrightarrow> consensus_value_properties_are_consistent q_set\<close> \<open>state_properties_are_consistent {naturally_corresponding_state_property q |q. naturally_corresponding_state_property q \<in> \<Union>{state_property_decisions \<sigma> |\<sigma>. \<sigma> \<in> \<sigma>_set}}\<close> setcompr_eq_image)
   qed
-  hence "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
-    apply simp
-    by (smt mem_Collect_eq)
+  hence "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})" 
+    apply (simp add: consensus_value_property_decisions_def consensus_value_property_is_decided_def state_property_decisions_def consensus_value_properties_are_consistent_def)
+    by (metis mem_Collect_eq)
   thus
     "consensus_value_properties_are_consistent (\<Union> {consensus_value_property_decisions \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set})"
     by simp
