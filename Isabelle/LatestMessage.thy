@@ -2,7 +2,7 @@ section \<open>Latest Message\<close>
 
 theory LatestMessage
 
-imports Main CBCCasper
+imports Main CBCCasper "Libraries/LaTeXsugar"
 
 begin
 
