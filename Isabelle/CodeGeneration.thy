@@ -4,6 +4,10 @@ imports Main CBCCasper SafetyOracle TFGCasper
 
 begin
 
+
+lemma "A \<and> B \<longrightarrow> C"
+  by auto  
+
 definition member :: "'a list \<Rightarrow> 'a \<Rightarrow> bool"
   where
     [code del]: "member xs x \<longleftrightarrow> x \<in> set xs"

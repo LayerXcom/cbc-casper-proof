@@ -164,6 +164,11 @@ lemma (in Protocol) state_transition_only_made_by_immediately_next_message:
   apply (simp add: immediately_next_message_def)
   by blast
 
+lemma (in Protocol) state_transition_is_immediately_next_message: 
+  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma>  \<longleftrightarrow> justification m \<subseteq> \<sigma>"
+  using state_transition_only_made_by_immediately_next_message 
+  apply (simp add: immediately_next_message_def) 
+  using insert_Diff state_is_in_pow_M_i by fastforce
 
 lemma (in Protocol) strict_subset_of_state_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'. \<sigma>' \<subset> \<sigma> \<longrightarrow> (\<exists> m \<in> \<sigma> - \<sigma>'. immediately_next_message (\<sigma>', m))"
