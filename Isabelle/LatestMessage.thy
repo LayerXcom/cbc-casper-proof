@@ -33,7 +33,7 @@ definition from_sender :: "(validator * message set) \<Rightarrow> message set"
     "from_sender = (\<lambda>(v, \<sigma>). {m \<in> \<sigma>. sender m = v})"
 
 lemma (in Protocol) from_sender_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<subseteq> M"
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> from_sender (v, \<sigma>) \<in> Pow M"
   apply (simp add: from_sender_def)
   by auto  
 
@@ -42,12 +42,12 @@ lemma (in Protocol) from_sender_type_for_state :
   apply (simp add: from_sender_def)
   using state_is_subset_of_M by auto  
 
-lemma (in Protocol) "messages_from_observed_validator_is_non_empty" :
+lemma (in Protocol) messages_from_observed_validator_is_non_empty :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> observed \<sigma> \<longrightarrow> from_sender (v, \<sigma>) \<noteq> \<emptyset>"
   apply (simp add: observed_def from_sender_def)
   by auto
 
-lemma (in Protocol) "messages_from_validator_is_finite" :
+lemma (in Protocol) messages_from_validator_is_finite :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V\<sigma> \<longrightarrow> finite (from_sender (v, \<sigma>))"
   by (simp add: from_sender_def state_is_finite)
 
@@ -57,7 +57,7 @@ definition from_group :: "(validator set * message set) \<Rightarrow> state"
     "from_group = (\<lambda>(v_set, \<sigma>). {m \<in> \<sigma>. sender m \<in> v_set})"
 
 lemma (in Protocol) from_group_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v_set \<subseteq> V \<longrightarrow> from_group (v_set, \<sigma>) \<subseteq> M"
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v_set \<subseteq> V \<longrightarrow> from_group (v_set, \<sigma>) \<in> Pow M"
   apply (simp add: from_group_def)
   by auto
 
@@ -72,7 +72,7 @@ definition later_from :: "(message * validator * message set) \<Rightarrow> mess
     "later_from = (\<lambda>(m, v, \<sigma>). later (m, \<sigma>) \<inter> from_sender (v, \<sigma>))"
 
 lemma (in Protocol) later_from_type :
-  "\<forall> \<sigma> v m. \<sigma> \<in> Pow M \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
+  "\<forall> \<sigma> v m. \<sigma> \<in> Pow M \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<in> Pow M"
   apply (simp add: later_from_def)
   using later_type from_sender_type by auto
 
@@ -87,7 +87,7 @@ definition latest_messages :: "message set \<Rightarrow> (validator \<Rightarrow
     "latest_messages \<sigma> v = {m \<in> from_sender (v, \<sigma>). later_from (m, v, \<sigma>) = \<emptyset>}"
 
 lemma (in Protocol) latest_messages_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<subseteq> M"
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<in> Pow M"
   apply (simp add: latest_messages_def later_from_def)
   using from_sender_type by auto
 
@@ -106,7 +106,7 @@ definition observed_non_equivocating_validators :: "state \<Rightarrow> validato
     "observed_non_equivocating_validators \<sigma> = observed \<sigma> - equivocating_validators \<sigma>"
 
 lemma (in Protocol) observed_non_equivocating_validators_type :
-  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<subseteq> V"
+  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<in> Pow V"
   apply (simp add: observed_non_equivocating_validators_def)
   using observed_type_for_state equivocating_validators_type by auto
 
@@ -207,7 +207,7 @@ definition latest_estimates_from_non_equivocating_validators :: "state \<Rightar
     "latest_estimates_from_non_equivocating_validators \<sigma> v = {est m | m. m \<in> latest_messages_from_non_equivocating_validators \<sigma> v}"
 
 lemma (in Protocol) latest_estimates_from_non_equivocating_validators_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates_from_non_equivocating_validators \<sigma> v \<subseteq> C"
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates_from_non_equivocating_validators \<sigma> v \<in> Pow C"
   using Protocol.latest_estimates_type Protocol_axioms latest_estimates_def latest_estimates_from_non_equivocating_validators_def latest_messages_from_non_equivocating_validators_def by auto
 
 lemma (in Protocol) latest_estimates_from_non_equivocating_validators_from_non_observed_validator_is_empty :

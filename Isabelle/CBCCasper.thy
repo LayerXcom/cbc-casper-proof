@@ -272,7 +272,7 @@ definition observed :: "message set \<Rightarrow> validator set"
     "observed \<sigma> = {sender m | m. m \<in> \<sigma>}"
 
 lemma (in Protocol) observed_type :
-  "\<forall> \<sigma> \<in> Pow M. observed \<sigma> \<subseteq> V"
+  "\<forall> \<sigma> \<in> Pow M. observed \<sigma> \<in> Pow V"
   using Params.M_type Protocol_axioms observed_def by fastforce
 
 lemma (in Protocol) observed_type_for_state :
