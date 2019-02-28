@@ -507,4 +507,8 @@ lemma (in Protocol) subset_of_M_have_minimal_of_justification :
   "\<forall> S \<subseteq> M. S \<noteq> \<emptyset> \<longrightarrow> (\<exists> m_min \<in> S. \<forall> m. justified m m_min \<longrightarrow> m \<notin> S)"
   by (metis justification_is_well_founded_on_M wfp_on_imp_has_min_elt wfp_on_mono)
 
+lemma (in Protocol) message_in_state_is_strict_subset_of_the_state :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> \<sigma>. justification m \<subset> \<sigma>"
+  using justification_implies_different_messages justified_def message_in_state_is_valid state_is_in_pow_M_i by fastforce
+
 end
