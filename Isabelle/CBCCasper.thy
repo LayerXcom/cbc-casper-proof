@@ -162,7 +162,7 @@ end
 
 (* Locale for proofs *)
 locale Protocol = Params +
-  assumes V_type: "V \<noteq> \<emptyset>"
+  assumes V_type: "V \<noteq> \<emptyset> \<and> finite V"
   and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
   and t_type: "0 \<le> t" "t < Sum (W ` V)"
   and C_type: "card C > 1"
@@ -313,6 +313,10 @@ lemma (in Protocol) equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> \<subseteq> V"
   using observed_type_for_state equivocating_validators_def by blast
 
+lemma (in Protocol) equivocating_validators_is_finite :
+  "\<forall> \<sigma> \<in> \<Sigma>. finite (equivocating_validators \<sigma>)"
+  using V_type equivocating_validators_type rev_finite_subset by blast
+
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators_paper \<sigma> = {v \<in> V. is_equivocating \<sigma> v}"
@@ -321,11 +325,33 @@ lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
   by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type_for_state observed_def subsetCE)
 
+(* Definition 7.10 *)
+definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
+  where
+    (* "weight_measure v_set = sum W v_set" *)
+    "weight_measure v_set = Sum (W `v_set)"
+
+lemma (in Protocol) weight_measure_comparison_strict_subset_gte :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> A \<Longrightarrow> weight_measure A \<ge> weight_measure B"
+  apply (simp add:  weight_measure_def)
+  using W_type
+  by (smt Diff_iff finite_imageI subsetCE subset_UNIV subset_image_iff sum_mono2)
+
+lemma (in Protocol) weight_measure_comparison_stritct_subset_gt :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subset> A \<Longrightarrow> weight_measure A > weight_measure B"
+  apply (simp add:  weight_measure_def)
+  using W_type
+  oops
+
+lemma (in Protocol) weight_measure_gt_set_difference :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<noteq> \<emptyset> \<Longrightarrow> weight_measure A > weight_measure (A - B)"
+  oops
 
 (* Definition 2.11 *)
 definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
-    "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)"
+    (* "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)" *)
+    "equivocation_fault_weight \<sigma> = weight_measure (equivocating_validators \<sigma>)"
 
 (* Definition 2.12 *)
 definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"

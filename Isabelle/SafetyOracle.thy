@@ -26,34 +26,34 @@ lemma (in Protocol) latest_justifications_from_non_equivocating_validators_type 
 
 (* Definition 7.8 *)
 (* NOTE: Modified from the original draft with observed_non_equivocating_validators *)
-fun  agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
+definition  agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "agreeing_validators (p, \<sigma>) = {v \<in> observed_non_equivocating_validators \<sigma>. \<forall> c \<in> latest_estimates_from_non_equivocating_validators \<sigma> v. p c}"
+    "agreeing_validators  = (\<lambda>(p, \<sigma>).{v \<in> observed_non_equivocating_validators \<sigma>. \<forall> c \<in> latest_estimates_from_non_equivocating_validators \<sigma> v. p c})"
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
-  apply (simp add: observed_non_equivocating_validators_def)
+  apply (simp add: observed_non_equivocating_validators_def agreeing_validators_def)
   using observed_type_for_state by auto
 
+lemma (in Protocol) agreeing_validators_finite :
+  "\<forall> \<sigma> \<in> \<Sigma>. finite (agreeing_validators (p, \<sigma>))"
+  by (meson V_type agreeing_validators_type rev_finite_subset)
+
 (* Definition 7.9 *)
-fun disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
+definition disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "disagreeing_validators (p, \<sigma>) = {v \<in> observed_non_equivocating_validators \<sigma>. \<exists> c \<in> latest_estimates_from_non_equivocating_validators \<sigma> v. \<not> p c}"
+    "disagreeing_validators  = (\<lambda>(p, \<sigma>). {v \<in> observed_non_equivocating_validators \<sigma>. \<exists> c \<in> latest_estimates_from_non_equivocating_validators \<sigma> v. \<not> p c})"
 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
-  apply (simp add: observed_non_equivocating_validators_def)
+  apply (simp add: observed_non_equivocating_validators_def disagreeing_validators_def)
   using observed_type_for_state by auto
 
-(* Definition 7.10 *)
-definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
-  where
-    "weight_measure v_set = sum W v_set"
 
 (* Definition 7.11 *)
-fun (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
+definition (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
   where
-    "is_majority (v_set, \<sigma>) = (weight_measure v_set > (weight_measure V - weight_measure (equivocating_validators \<sigma>)) div 2)"
+    "is_majority  = (\<lambda>(v_set, \<sigma>). (weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2))"
    
 (* Definition 7.12 *)
 definition (in Protocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
@@ -67,12 +67,13 @@ definition (in Protocol) is_max_driven :: "consensus_value_property \<Rightarrow
       (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
 
 (* Definition 7.14 *)
-fun later_disagreeing_messages :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
+definition later_disagreeing_messages :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
   where 
-    "later_disagreeing_messages (p, m, v, \<sigma>) = {m' \<in> later_from (m, v, \<sigma>). \<not> p (est m')}"
+    "later_disagreeing_messages = (\<lambda>(p, m, v, \<sigma>).{m' \<in> later_from (m, v, \<sigma>). \<not> p (est m')})"
 
 lemma (in Protocol) later_disagreeing_messages_type :
   "\<forall> p \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_disagreeing_messages (p, m, v, \<sigma>) \<subseteq> M"
+  unfolding later_disagreeing_messages_def
   using later_from_type_for_state by auto
 
 (* Definition 7.15 *)
@@ -81,11 +82,11 @@ lemma (in Protocol) later_disagreeing_messages_type :
 (* Section 7.2: Validator Cliques *)
 
 (* Definition 7.16: Clique with 1 layers *)
-fun is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
+definition is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
  where
-   "is_clique (v_set, p, \<sigma>) = 
+   "is_clique = (\<lambda>(v_set, p, \<sigma>). 
      (\<forall> v \<in> v_set. v_set \<subseteq> agreeing_validators (p, the_elem (latest_justifications_from_non_equivocating_validators \<sigma> v))
-     \<and>  (\<forall>  v' \<in> v_set. later_disagreeing_messages (p, the_elem (latest_messages_from_non_equivocating_validators (the_elem (latest_justifications_from_non_equivocating_validators \<sigma> v)) v'), v', \<sigma>) = \<emptyset>))"
+     \<and>  (\<forall>  v' \<in> v_set. later_disagreeing_messages (p, the_elem (latest_messages_from_non_equivocating_validators (the_elem (latest_justifications_from_non_equivocating_validators \<sigma> v)) v'), v', \<sigma>) = \<emptyset>)))"
 
 
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
@@ -313,7 +314,7 @@ lemma (in Protocol) clique_not_affected_by_minimal_transitions_outside_clique :
 definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
   where
     "gt_threshold 
-       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure v_set) div 2 + t  - weight_measure (equivocating_validators \<sigma>)))"
+       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure V) div 2 + t  - weight_measure (equivocating_validators \<sigma>)))"
 
 (* Lemma 32 *)
 lemma (in Protocol) gt_threshold_imps_majority_for_any_validator :
@@ -369,39 +370,78 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
 
 (* Lemma 37 *)
 lemma (in Protocol) clique_imps_everyone_agreeing :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V 
   \<longrightarrow> is_majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique (v_set, p, \<sigma>) 
   \<longrightarrow> v_set \<subseteq> agreeing_validators (p, \<sigma>)"
-  oops
+  sorry
 
 (* Lemma 37 *)
 lemma (in Protocol) threshold_sized_clique_imps_estimator_agreeing :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> finite v_set
   \<longrightarrow> is_majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>) 
   \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c)"
-  oops
+  apply (rule, rule, rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma> v_set p c
+  assume  "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V"
+  and "finite v_set"
+  and "is_majority_driven p"
+  and "is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>)"
+  and "c \<in> \<epsilon> \<sigma>"
+  then have "v_set - equivocating_validators \<sigma> \<subseteq> agreeing_validators (p, \<sigma>)" 
+    using clique_imps_everyone_agreeing
+    by (meson Diff_subset \<Sigma>t_is_subset_of_\<Sigma> subsetCE subset_trans)
+  then have "weight_measure (v_set - equivocating_validators \<sigma>) \<le> weight_measure (agreeing_validators (p, \<sigma>))"
+    using agreeing_validators_finite equivocating_validators_def weight_measure_comparison_strict_subset_gte
+          \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>finite v_set\<close> by auto
+  have "weight_measure (v_set - equivocating_validators \<sigma>) > (weight_measure V) div 2 + t  - weight_measure (equivocating_validators \<sigma>)"
+    using \<open>is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>)\<close>
+    unfolding gt_threshold_def by simp
+  then have "weight_measure (v_set - equivocating_validators \<sigma>) > (weight_measure V) div 2"
+    using  \<Sigma>t_def \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> equivocation_fault_weight_def is_faults_lt_threshold_def 
+    by auto
+  then have "weight_measure (v_set - equivocating_validators \<sigma>) > (weight_measure (V - equivocating_validators \<sigma>)) div 2"
+  proof - 
+    have "finite (V - equivocating_validators \<sigma>)"
+      using  V_type equivocating_validators_is_finite
+      by simp
+    moreover have "V - equivocating_validators \<sigma> \<subseteq> V"
+      by (simp add: Diff_subset)
+    ultimately have "(weight_measure V) div 2 \<ge> (weight_measure (V - equivocating_validators \<sigma>)) div 2" 
+      using weight_measure_comparison_strict_subset_gte
+      by (simp add: V_type)  
+    then show ?thesis
+      using \<open>weight_measure V / 2 < weight_measure (v_set - equivocating_validators \<sigma>)\<close> by linarith
+  qed
+  then have "weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (V - equivocating_validators \<sigma>) div 2" 
+    using \<open>weight_measure (v_set - equivocating_validators \<sigma>) \<le> weight_measure (agreeing_validators (p, \<sigma>))\<close>
+    by linarith  
+  then show "p c"
+    using \<open>is_majority_driven p\<close> unfolding is_majority_driven_def is_majority_def gt_threshold_def
+    using \<open>c \<in> \<epsilon> \<sigma>\<close> 
+    using M_i.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
+qed
 
 (* Lemma 39 (Cliques exist in all futures) *)
 lemma (in Protocol) clique_oracle_for_all_futures :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> is_majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma> \<in> futures \<sigma>. is_clique_oracle (v_set, \<sigma>', p))"
-  oops
+  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. is_clique_oracle (v_set, \<sigma>', p))"
+  sorry
 
 (* Lemma 40 (Clique oracle is a safety oracle) *)
 lemma (in Protocol) clique_oracle_is_safety_oracle :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> finite v_set
   \<longrightarrow> is_majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma> \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>)"
-  oops
-
-
+  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>')"    
+  using clique_oracle_for_all_futures threshold_sized_clique_imps_estimator_agreeing
+  apply (simp add: is_clique_oracle_def naturally_corresponding_state_property_def)
+  by (metis (mono_tags, lifting) futures_def mem_Collect_eq)
+  
 end
