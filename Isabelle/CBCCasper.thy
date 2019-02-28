@@ -295,6 +295,10 @@ definition justified :: "message \<Rightarrow> message \<Rightarrow> bool"
   where
     "justified m1 m2 = (m1 \<in> justification m2)"
 
+(* ###################################################### *)
+(* Equivocation *)
+(* ###################################################### *)
+
 definition equivocation :: "(message * message) \<Rightarrow> bool"
   where
     "equivocation =
@@ -325,6 +329,17 @@ lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
   by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type_for_state observed_def subsetCE)
 
+lemma (in Protocol) equivocation_is_monotonic :
+  "\<forall> \<sigma> \<sigma>' v. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>') \<and> v \<in> V
+  \<longrightarrow> v \<in> equivocating_validators \<sigma>
+  \<longrightarrow> v \<in> equivocating_validators \<sigma>'"
+  apply (simp add: equivocating_validators_def is_equivocating_def)
+  using observed_def by fastforce
+
+(* ###################################################### *)
+(* Weight *)
+(* ###################################################### *)
+
 (* Definition 7.10 *)
 definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
   where
@@ -352,6 +367,12 @@ definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
   where
     (* "equivocation_fault_weight \<sigma> = sum W (equivocating_validators \<sigma>)" *)
     "equivocation_fault_weight \<sigma> = weight_measure (equivocating_validators \<sigma>)"
+
+lemma (in Protocol) equivocation_fault_weight_is_monotonic :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
+  \<longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
+  using equivocation_is_monotonic weight_measure_comparison_strict_subset_gte 
+  by (smt equivocating_validators_is_finite equivocating_validators_type equivocation_fault_weight_def subset_iff)
 
 (* Definition 2.12 *)
 definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
