@@ -370,10 +370,7 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
-  oops
-
-lemma (in Protocol) latest_message_in_latest_justification_is_latest_message_for_non_equivocating_validator
-  oops
+  sorry
 
 (* Lemma 37 *)
 (* Based on no later disagreeing message imps keep agreeing  *)
@@ -486,6 +483,7 @@ proof -
   fix \<sigma> v_set p \<sigma>'
   assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "is_majority_driven p" and "is_clique_oracle (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
   show "is_clique_oracle (v_set, \<sigma>', p)"
+    using clique_oracles_preserved_over_minimal_transitions
   sorry
 qed
 
