@@ -80,7 +80,9 @@ lemma (in Protocol) later_disagreeing_messages_type :
 
 (* Definition 7.16: Clique with 1 layers *)
 (* NOTE: The original definition implies that validators in clique are not equivocating. 
-         Here we explicitly states thats. *)
+         Here we explicitly states this. *)
+(* NOTE: The original definition implies that validators in clique see each other have a single
+         latest message. Here we explicitly states this. *)
 definition is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
  where
    "is_clique = (\<lambda>(v_set, p, \<sigma>). (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
@@ -372,9 +374,17 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
   sorry
 
+lemma (in Protocol) clique_oracles_preserved_over_nice_message :
+  "\<forall> \<sigma> m' v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> \<sigma> \<union> {m'} \<in> \<Sigma>t
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m'}, p)"
+  sorry
+
+
 (* Lemma 37 *)
 (* Based on no later disagreeing message imps keep agreeing  *)
-(* Unlike the original, v_set are non equivocating *)
 lemma (in Protocol) clique_imps_everyone_agreeing :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V 
   \<longrightarrow> is_clique (v_set, p, \<sigma>) 

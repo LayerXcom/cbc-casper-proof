@@ -390,4 +390,11 @@ proof -
     by (metis Diff_partition \<open>is_singleton (\<sigma>' - \<sigma>)\<close> is_singleton_the_elem)
 qed
 
+lemma (in Protocol) road_to_future_state :
+  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state(\<sigma>, \<sigma>')
+  \<longrightarrow> n = card (\<sigma>' - \<sigma>)  
+  \<longrightarrow> (\<exists> f. f 0 = \<sigma> \<and> f n = \<sigma>' \<and> (\<forall> i. 0 \<le> i \<and> i \<le> n - 1 \<longrightarrow> f i \<in> \<Sigma> \<and> (\<exists> m \<in> M. f i \<union> {m} = f (Suc i))))" 
+  apply (rule, rule, rule, rule) 
+  oops
+
 end
