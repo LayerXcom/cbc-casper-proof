@@ -81,8 +81,8 @@ lemma (in Protocol) later_disagreeing_messages_type :
 (* Definition 7.16: Clique with 1 layers *)
 (* NOTE: The original definition implies that validators in clique are not equivocating. 
          Here we explicitly states this. *)
-(* NOTE: The original definition implies that validators in clique see each other have a single
-         latest message. Here we explicitly states this. *)
+(* FIXME: We should prove that validators in clique see each other have a single latest message, 
+          by the monotonicity of equivocations. The original definition implies it.  *)
 definition is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
  where
    "is_clique = (\<lambda>(v_set, p, \<sigma>). (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
