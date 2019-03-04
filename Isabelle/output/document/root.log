@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.13)  27 FEB 2019 11:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.13)  4 MAR 2019 11:26
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -595,7 +595,7 @@ ty[]not
  []
 
 [30]
-Overfull \hbox (37.89784pt too wide) in paragraph at lines 292--294
+Overfull \hbox (37.89784pt too wide) in paragraph at lines 291--293
 [][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$$\OMS/c
 msy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$ $\OMS/
 cmsy/m/n/10 8 $\OT1/cmr/m/it/10 s$\OMS/cmsy/m/n/10 2$$\OML/cmm/m/it/10 ^^[$[]\O
@@ -607,7 +607,7 @@ cided $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 p$\OML/cmm/m/it/10 ;$\OT1/cmr/m/it/10
  []
 
 
-Overfull \hbox (8.0555pt too wide) in paragraph at lines 296--298
+Overfull \hbox (8.0555pt too wide) in paragraph at lines 295--297
 [][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$$\OMS/c
 msy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$ $\OMS/
 cmsy/m/n/10 8 $\OT1/cmr/m/it/10 s$\OMS/cmsy/m/n/10 2$$\OML/cmm/m/it/10 ^^[$[]\O
@@ -617,7 +617,7 @@ ions s$\OML/cmm/m/it/10 :$ \OT1/cmr/m/it/10 state[]property[]is[]decided
  []
 
 
-Overfull \hbox (34.05345pt too wide) in paragraph at lines 300--302
+Overfull \hbox (34.05345pt too wide) in paragraph at lines 299--301
 [][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$$\OMS/c
 msy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$ $\OMS/
 cmsy/m/n/10 8 $\OT1/cmr/m/it/10 p$\OMS/cmsy/m/n/10 2$$[] $$f$\OT1/cmr/m/it/10 s
@@ -628,7 +628,7 @@ rty[]is[]decided
  []
 
 
-Overfull \hbox (52.78787pt too wide) in paragraph at lines 304--306
+Overfull \hbox (52.78787pt too wide) in paragraph at lines 303--305
 [][]    \OT1/cmr/bx/n/10 ob-tain $\OML/cmm/m/it/10 ^^[$ \OT1/cmr/bx/n/10 where 
 $\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 2$ $\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/
 10 t $\OMS/cmsy/m/n/10 8 $\OT1/cmr/m/it/10 s$\OMS/cmsy/m/n/10 2$$\OML/cmm/m/it/
@@ -639,7 +639,7 @@ ided
  []
 
 
-Overfull \hbox (10.25131pt too wide) in paragraph at lines 306--309
+Overfull \hbox (10.25131pt too wide) in paragraph at lines 305--308
 [][]      \OT1/cmr/bx/n/10 us-ing []$\OMS/cmsy/m/n/10 9 $$\OML/cmm/m/it/10 ^^[$
 $\OMS/cmsy/m/n/10 2$$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t$\OML/cmm/m/it/10 :$
  $\OMS/cmsy/m/n/10 8 $\OT1/cmr/m/it/10 s$\OMS/cmsy/m/n/10 2$$\OML/cmm/m/it/10 ^
@@ -649,14 +649,14 @@ m/m/it/10 :$ \OT1/cmr/m/it/10 state[]property[]is[]decided
  []
 
 
-Overfull \hbox (10.36555pt too wide) in paragraph at lines 323--325
+Overfull \hbox (10.36555pt too wide) in paragraph at lines 322--324
 [][]    \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1/c
 mr/m/n/10 :$ \OT1/cmr/m/it/10 state[]property[]decisions[]def futures[]def stat
 e[]property[]is[]decided[]def$\OT1/cmr/m/n/10 )$[] 
  []
 
 
-Overfull \hbox (2.17422pt too wide) in paragraph at lines 325--327
+Overfull \hbox (2.17422pt too wide) in paragraph at lines 324--326
 [][]  \OT1/cmr/bx/n/10 show \OT1/cmr/m/it/10 state[]properties[]are[]consistent
  $\OT1/cmr/m/n/10 ($$[] $$\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 state[]property[]
 decisions $\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 j$$\OML/cmm/m/it/10 ^^[$$:$ 
@@ -665,7 +665,7 @@ sy/m/n/10 g$$\OT1/cmr/m/n/10 )$[]
  []
 
 [31]
-Overfull \hbox (32.87514pt too wide) in paragraph at lines 344--346
+Overfull \hbox (32.87514pt too wide) in paragraph at lines 343--345
 [][]\OT1/cmr/bx/n/10 definition $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr
 /m/it/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 naturally[]correspondin
 g[]state[]property $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 consensus[]value[]pr
@@ -673,7 +673,7 @@ operty
  []
 
 
-Overfull \hbox (45.9723pt too wide) in paragraph at lines 350--352
+Overfull \hbox (45.9723pt too wide) in paragraph at lines 349--351
 [][]\OT1/cmr/bx/n/10 definition $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr
 /m/it/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 consensus[]value[]prope
 rties[]are[]consistent $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 consensus[]value
@@ -681,14 +681,14 @@ rties[]are[]consistent $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 consensus[]value
  []
 
 
-Overfull \hbox (49.84857pt too wide) in paragraph at lines 376--378
+Overfull \hbox (49.84857pt too wide) in paragraph at lines 375--377
 [][]    \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\OT1/c
 mr/m/n/10 :$ \OT1/cmr/m/it/10 naturally[]corresponding[]state[]property[]def st
 ate[]properties[]are[]consistent[]def$\OT1/cmr/m/n/10 )$[] 
  []
 
 [32]
-Overfull \hbox (25.02945pt too wide) in paragraph at lines 432--434
+Overfull \hbox (25.02945pt too wide) in paragraph at lines 431--433
 [][]\OT1/cmr/bx/n/10 definition $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr
 /m/it/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 consensus[]value[]prope
 rty[]is[]decided $\OT1/cmr/m/n/10 :$$:$ $($\OT1/cmr/m/it/10 consensus[]value[]p
@@ -696,7 +696,7 @@ roperty
  []
 
 
-Overfull \hbox (54.1682pt too wide) in paragraph at lines 439--441
+Overfull \hbox (54.1682pt too wide) in paragraph at lines 438--440
 [][]\OT1/cmr/bx/n/10 definition $\OT1/cmr/m/n/10 ($\OT1/cmr/bx/n/10 in \OT1/cmr
 /m/it/10 Pro-to-col$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 consensus[]value[]prope
 rty[]decisions $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 state $\OMS/cmsy/m/n/10 
@@ -704,27 +704,27 @@ rty[]decisions $\OT1/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 state $\OMS/cmsy/m/n/10
  []
 
 
-Overfull \hbox (16.72958pt too wide) in paragraph at lines 450--451
+Overfull \hbox (16.72958pt too wide) in paragraph at lines 449--450
 [][]  $[][]\OMS/cmsy/m/n/10 !$ \OT1/cmr/m/it/10 consensus[]value[]properties[]a
 re[]consistent $\OT1/cmr/m/n/10 ($$[] $ $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 co
 nsensus[]value[]property[]decisions
  []
 
 
-Overfull \hbox (29.91106pt too wide) in paragraph at lines 474--476
+Overfull \hbox (29.91106pt too wide) in paragraph at lines 473--475
 [][]    \OT1/cmr/bx/n/10 un-fold-ing \OT1/cmr/m/it/10 naturally[]corresponding[
 ]state[]property[]def state[]properties[]are[]consistent[]def[] 
  []
 
-[33]
-Overfull \hbox (38.37221pt too wide) in paragraph at lines 484--486
+
+Overfull \hbox (38.37221pt too wide) in paragraph at lines 483--485
 [][]  \OT1/cmr/bx/n/10 hence \OT1/cmr/m/it/10 consensus[]value[]properties[]are
 []consistent $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 q$\OML/cmm/m/it/10 :$ \OT1/cm
 r/m/it/10 naturally[]corresponding[]state[]property
  []
 
-
-Overfull \hbox (76.76663pt too wide) in paragraph at lines 492--494
+[33]
+Overfull \hbox (76.76663pt too wide) in paragraph at lines 491--493
 \OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 naturally[]corresponding[]state[]property q
  $\OMS/cmsy/m/n/10 j$\OT1/cmr/m/it/10 q$\OML/cmm/m/it/10 :$ \OT1/cmr/m/it/10 q 
 $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 q[]set$\OMS/cmsy/m/n/10 g$ $[][]!$ \OT1/c
@@ -732,27 +732,64 @@ mr/m/it/10 consensus[]value[]properties[]are[]consistent
  []
 
 
-Overfull \hbox (29.04881pt too wide) in paragraph at lines 496--498
+Overfull \hbox (29.04881pt too wide) in paragraph at lines 495--497
 [][]  \OT1/cmr/bx/n/10 hence \OT1/cmr/m/it/10 consensus[]value[]properties[]are
 []consistent $\OT1/cmr/m/n/10 ($$[] $ $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 cons
 ensus[]value[]property[]decisions
  []
 
 
-Overfull \hbox (67.51102pt too wide) in paragraph at lines 498--500
+Overfull \hbox (67.51102pt too wide) in paragraph at lines 497--499
 [][]    \OT1/cmr/bx/n/10 ap-ply $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\O
 T1/cmr/m/n/10 :$ \OT1/cmr/m/it/10 consensus[]value[]property[]decisions[]def co
 nsensus[]value[]property[]is[]decided[]def
  []
 
 
-Overfull \hbox (3.17393pt too wide) in paragraph at lines 504--505
+Overfull \hbox (3.17393pt too wide) in paragraph at lines 503--504
 [][]    \OT1/cmr/m/it/10 consensus[]value[]properties[]are[]consistent $\OT1/cm
 r/m/n/10 ($$[] $ $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 consensus[]value[]propert
 y[]decisions
  []
 
-) (./SafetyOracle.tex [34]
+
+Overfull \hbox (26.85573pt too wide) in paragraph at lines 516--518
+[][]\OT1/cmr/bx/n/10 fun \OT1/cmr/m/it/10 consensus[]value[]property[]not $\OT1
+/cmr/m/n/10 :$$:$ \OT1/cmr/m/it/10 consensus[]value[]property $\OMS/cmsy/m/n/10
+ )$ \OT1/cmr/m/it/10 consensus[]value[]property[] 
+ []
+
+
+Overfull \hbox (108.62997pt too wide) in paragraph at lines 552--554
+[][]    \OT1/cmr/bx/n/10 us-ing []$\OMS/cmsy/m/n/10 f$$\OML/cmm/m/it/10 ^^[$$;$
+ $^^[$$ [] $$\OMS/cmsy/m/n/10 g$ $^^R$ $\OML/cmm/m/it/10 ^^[$[]\OT1/cmr/m/it/10
+ set $\OMS/cmsy/m/n/10 ^$ \OT1/cmr/m/it/10 p $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it
+/10 consensus[]value[]property[]decisions $\OML/cmm/m/it/10 ^^[$[] \OT1/cmr/m/i
+t/10 consensus[]value[]property[]decisions[]def
+ []
+
+
+Overfull \hbox (47.35963pt too wide) in paragraph at lines 563--565
+[][]  \OT1/cmr/bx/n/10 hence $\OMS/cmsy/m/n/10 :$ \OT1/cmr/m/it/10 state[]prope
+rty[]is[]decided $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 state[]property[]not $\OT1
+/cmr/m/n/10 ($\OT1/cmr/m/it/10 naturally[]corresponding[]state[]property
+ []
+
+[34]
+Overfull \hbox (59.6595pt too wide) in paragraph at lines 566--568
+[][]      \OT1/cmr/bx/n/10 us-ing \OT1/cmr/m/it/10 backword[]consistency []stat
+e[]property[]is[]decided $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 naturally[]corresp
+onding[]state[]property
+ []
+
+
+Overfull \hbox (67.51102pt too wide) in paragraph at lines 574--576
+[][]    \OT1/cmr/bx/n/10 ap-ply $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 simp add$\O
+T1/cmr/m/n/10 :$ \OT1/cmr/m/it/10 consensus[]value[]property[]decisions[]def co
+nsensus[]value[]property[]is[]decided[]def
+ []
+
+) (./SafetyOracle.tex [35]
 Overfull \hbox (21.78873pt too wide) in paragraph at lines 127--128
 [][]    \OT1/cmr/m/it/10 is[]majority $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 v[]se
 t$\OML/cmm/m/it/10 ;$ $^^[$$\OT1/cmr/m/n/10 )$ $=$ $($\OT1/cmr/m/it/10 weight[]
@@ -760,7 +797,7 @@ measure v[]set $\OML/cmm/m/it/10 >$ $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 weight[
 ]measure V $\OMS/cmsy/m/n/10 ^^@$ \OT1/cmr/m/it/10 weight[]measure
  []
 
-[35]
+[36]
 Overfull \hbox (114.43422pt too wide) in paragraph at lines 178--179
 [][]     $\OT1/cmr/m/n/10 ($$\OMS/cmsy/m/n/10 8 $ \OT1/cmr/m/it/10 v $\OMS/cmsy
 /m/n/10 2$ \OT1/cmr/m/it/10 v[]set$\OML/cmm/m/it/10 :$ \OT1/cmr/m/it/10 v[]set 
@@ -779,7 +816,7 @@ m/it/10 p$\OML/cmm/m/it/10 ;$ \OT1/cmr/m/it/10 the[]elem $\OT1/cmr/m/n/10 ($\OT
 1/cmr/m/it/10 latest[]messages[]from[]non[]equivocating[]validators
  []
 
-[36]
+[37]
 Overfull \hbox (78.02388pt too wide) in paragraph at lines 265--268
 [][]      \OT1/cmr/bx/n/10 us-ing []$\OT1/cmr/m/n/10 ($$\OML/cmm/m/it/10 ^^[$$;
 $ $^^[$$ [] $$\OT1/cmr/m/n/10 )$ $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 minimal[
@@ -798,7 +835,7 @@ Overfull \hbox (2.70755pt too wide) in paragraph at lines 306--308
 1/cmr/m/n/10 )$
  []
 
-[37]) (./TFGCasper.tex
+) (./TFGCasper.tex [38]
 Overfull \hbox (89.10988pt too wide) in paragraph at lines 57--58
 [][]    \OT1/cmr/m/it/10 score $\OML/cmm/m/it/10 ^^[$ \OT1/cmr/m/it/10 b $\OT1/
 cmr/m/n/10 =$ \OT1/cmr/m/it/10 sum W $\OMS/cmsy/m/n/10 f$\OT1/cmr/m/it/10 v $\O
@@ -808,9 +845,9 @@ sy/m/n/10 9 $ \OT1/cmr/m/it/10 b$ [] $ $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 B$
 /10 ($\OT1/cmr/m/it/10 latest[]estimates[]from[]non[]equivocating[]validators
  []
 
-[38] [39]))
+[39] [40]))
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 54.
- [40]
+ [41]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 54.
  (./root.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 54.
@@ -820,8 +857,8 @@ Package rerunfilecheck Info: File `root.out' has not changed.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 54.
  ) 
 Here is how much of TeX's memory you used:
- 5818 strings out of 492649
- 83211 string characters out of 6129621
+ 5819 strings out of 492649
+ 83218 string characters out of 6129621
  181598 words of memory out of 5000000
  9590 multiletter control sequences out of 15000+600000
  12256 words of font info for 48 fonts, out of 8000000 for 9000
@@ -840,10 +877,10 @@ al/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local
 exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/te
 xlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/loca
 l/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on root.pdf (40 pages, 218871 bytes).
+Output written on root.pdf (41 pages, 221673 bytes).
 PDF statistics:
- 259 PDF objects out of 1000 (max. 8388607)
- 201 compressed objects within 3 object streams
- 45 named destinations out of 1000 (max. 500000)
+ 263 PDF objects out of 1000 (max. 8388607)
+ 204 compressed objects within 3 object streams
+ 46 named destinations out of 1000 (max. 500000)
  25 words of extra memory for PDF output out of 10000 (max. 10000000)
 
