@@ -65,8 +65,7 @@ abbreviation (in GhostParams) P :: "consensus_value_property set"
 
 (* Locale for proofs *)
 locale Blockchain = GhostParams + Protocol +
-  assumes block_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
-  and blockchain_type : "b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<Longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
+  assumes blockchain_type : "b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<Longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "B = C"
 
 definition (in GhostParams) block_finalized_property :: "block \<Rightarrow> consensus_value_property"
