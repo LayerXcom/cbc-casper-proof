@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper LatestMessage SafetyOracle
+imports Main HOL.Real CBCCasper LatestMessage SafetyOracle ConsensusSafety
 
 begin
 
@@ -64,8 +64,57 @@ abbreviation (in GhostParams) P :: "consensus_value_property set"
     "P \<equiv> {p. \<exists>!b \<in> B. \<forall>b' \<in> B. (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False)}"
 
 (* Locale for proofs *)
+locale Blockchain = GhostParams + Protocol +
+  assumes block_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
+  and blockchain_type : "b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<Longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
+  and block_is_consensus_value : "B = C"
+
+definition (in GhostParams) block_finalized_property :: "block \<Rightarrow> consensus_value_property"
+  where
+    "block_finalized_property b = (\<lambda>b'. b \<downharpoonright> b')"
+
+definition (in GhostParams) block_conflicting :: "(block * block) \<Rightarrow> bool"
+  where
+    "block_conflicting = (\<lambda>(b1, b2). \<not> (b1 \<downharpoonright> b2 \<or> b2 \<downharpoonright> b1))"
+
+lemma (in Blockchain) conflicting_blocks_imps_conflicting_decision :
+  "\<forall> b1 b2 \<sigma>. {b1, b2} \<subseteq> B \<and> \<sigma> \<in> \<Sigma> 
+    \<longrightarrow> block_conflicting (b1, b2) 
+    \<longrightarrow> consensus_value_property_is_decided (block_finalized_property b1, \<sigma>) 
+    \<longrightarrow> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b2), \<sigma>)"
+  apply (simp add: block_conflicting_def block_finalized_property_def consensus_value_property_is_decided_def
+          naturally_corresponding_state_property_def  state_property_is_decided_def)
+  apply (rule, rule, rule, rule, rule, rule) 
+proof -
+  fix b1 b2 \<sigma>
+  assume "b1 \<in> B \<and> b2 \<in> B \<and> \<sigma> \<in> \<Sigma>" and "(\<forall>n. n \<in> \<nat> \<longrightarrow> b1 \<noteq> n_cestor (b2, n)) \<and> (\<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (b1, n))" and "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b1 = n_cestor (b', n)" 
+  show  "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (c, n)"
+  proof (rule ccontr)
+    assume "\<not> (\<forall> \<sigma> \<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (c, n))"
+    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b2 = n_cestor (c, n)"
+      by blast
+    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. (\<exists>n. n \<in> \<nat> \<and> b2 = n_cestor (c, n)) \<and> (\<exists>n'. n' \<in> \<nat> \<and> b1 = n_cestor (c, n'))"
+      using \<open>\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b1 = n_cestor (b', n)\<close> by simp
+    hence "\<exists> n \<in> \<nat>. b1 = n_cestor (b2, n) \<or> b2 = n_cestor (b1, n)"
+      using blockchain_type
+      by (metis GhostParams.blockchain_membership.elims(3) blockchain_membership.elims(2))
+    then show False
+      by (simp add: \<open>(\<forall>n. n \<in> \<nat> \<longrightarrow> b1 \<noteq> n_cestor (b2, n)) \<and> (\<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (b1, n))\<close>)
+  qed
+qed
+
+theorem (in Blockchain) blockchain__safety :
+  "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
+  \<longrightarrow> (\<forall> \<sigma> \<sigma>' b1 b2. {\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma> 
+      \<longrightarrow> block_finalized_property b2 \<notin> consensus_value_property_decisions \<sigma>')"
+proof (rule ccontr)
+  oops
+
+(* Locale for proofs *)
 locale Ghost = GhostParams + Protocol +
-  assumes prev_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
+  assumes block_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
   and block_is_consensus_value : "B = C"
   and ghost_is_estimator : "\<epsilon> = GHOST_estimator"
   and genesis_type : "genesis \<in> C"
