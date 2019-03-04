@@ -115,14 +115,14 @@ proof -
    and "{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>" 
    and "block_finalized_property b2 \<in> consensus_value_property_decisions \<sigma>'" 
    hence "\<not> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')"
-      using n_party_safety \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> apply (simp add: consensus_value_property_decisions_def) 
+      using negation_is_not_decided_by_other_validator \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> apply (simp add: consensus_value_property_decisions_def) 
       using \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
    have "{b1, b2} \<subseteq> B \<and> \<sigma> \<in> \<Sigma> \<and> block_conflicting (b1, b2)"
      using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
    hence "consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')"
      using \<open>block_finalized_property b2 \<in> consensus_value_property_decisions \<sigma>'\<close> conflicting_blocks_imps_conflicting_decision
      apply (simp add: consensus_value_property_decisions_def)
-     by (metis \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> conflicting_blocks_imps_conflicting_decision consensus_value_property_decisions_def insert_subset mem_Collect_eq n_party_safety) 
+     by (metis \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> conflicting_blocks_imps_conflicting_decision consensus_value_property_decisions_def insert_subset mem_Collect_eq negation_is_not_decided_by_other_validator) 
    then show False
      using \<open>\<not> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')\<close> by blast
  qed
