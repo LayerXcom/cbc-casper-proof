@@ -268,13 +268,13 @@ lemma (in Protocol) n_party_consensus_safety :
   \<longrightarrow> finite \<sigma>_set
   \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
   \<longrightarrow> (\<forall> \<sigma> p_set. \<sigma> \<in> \<sigma>_set \<and> p_set \<in> Pow (\<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}) - \<emptyset> 
-      \<longrightarrow> consensus_value_property_not (\<lambda>c. \<forall> p \<in> p_set. p c) \<notin> consensus_value_property_decisions \<sigma>)"
+      \<longrightarrow> (\<lambda>c. \<not> (\<forall> p \<in> p_set. p c)) \<notin> consensus_value_property_decisions \<sigma>)"
   apply (rule, rule, rule, rule, rule, rule, rule, rule)
 proof -
   fix \<sigma>_set \<sigma> p_set
   assume "\<sigma>_set \<subseteq> \<Sigma>t" and "finite \<sigma>_set" and "is_faults_lt_threshold (\<Union>\<sigma>_set)" 
   and "\<sigma> \<in> \<sigma>_set \<and> p_set \<in> Pow (\<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}) - \<emptyset>"
-  and "consensus_value_property_not (\<lambda>c. \<forall>p\<in>p_set. p c) \<in> consensus_value_property_decisions \<sigma>"
+  and "(\<lambda>c. \<not> (\<forall> p \<in> p_set. p c)) \<in> consensus_value_property_decisions \<sigma>"
   hence "\<exists> \<sigma>. \<sigma> \<in> \<Sigma>t \<and> \<sigma> \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}"
     using n_party_common_futures_exists by meson
   then obtain \<sigma>' where "\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}" by auto
@@ -291,7 +291,7 @@ proof -
     apply (simp add: naturally_corresponding_state_property_def state_property_is_decided_def)
     by auto
   then show False
-    using \<open>consensus_value_property_not (\<lambda>c. \<forall>p\<in>p_set. p c) \<in> consensus_value_property_decisions \<sigma>\<close> 
+    using \<open>(\<lambda>c. \<not> (\<forall> p \<in> p_set. p c)) \<in> consensus_value_property_decisions \<sigma>\<close> 
     apply (simp add: consensus_value_property_decisions_def  consensus_value_property_is_decided_def naturally_corresponding_state_property_def  state_property_is_decided_def)
     using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<sigma>_set \<and> p_set \<in> Pow (\<Union>_Collect (consensus_value_property_decisions \<sigma>') (\<sigma>' \<in> \<sigma>_set)) - \<emptyset>\<close> \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> estimates_are_non_empty monotonic_futures by fastforce
 qed
