@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.28)  5 MAR 2019 13:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.28)  5 MAR 2019 13:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -849,19 +849,6 @@ OT1/cmr/m/it/10 Collect $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 consensus[]value[]p
 roperty[]decisions
  []
 
-
-Overfull \hbox (58.2665pt too wide) in paragraph at lines 703--706
-\OML/cmm/m/it/10 ^^[$$ [] $$\OT1/cmr/m/n/10 )$ $($$\OML/cmm/m/it/10 ^^[$$ [] $ 
-$\OMS/cmsy/m/n/10 2$ $\OML/cmm/m/it/10 ^^[$[]\OT1/cmr/m/it/10 set$\OT1/cmr/m/n/
-10 )$$)$ $\OMS/cmsy/m/n/10 ^^@$ $;$[] []$\OML/cmm/m/it/10 ^^[$$ [] $ $\OMS/cmsy
-/m/n/10 2$ $\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 t $\OMS/cmsy/m/n/10 ^$ $\OML/c
-mm/m/it/10 ^^[$$ [] $ $\OMS/cmsy/m/n/10 2$ $[] $[]\OT1/cmr/m/it/10 Collect $\OT
-1/cmr/m/n/10 ($\OT1/cmr/m/it/10 futures $\OML/cmm/m/it/10 ^^[$$\OT1/cmr/m/n/10 
-)$ $($$\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 2$ $\OML/cmm/m/it/10 ^^[$[]\OT1/
-cmr/m/it/10 set$\OT1/cmr/m/n/10 )$[] \OT1/cmr/m/it/10 estimates[]are[]non[]empt
-y
- []
-
 ) (./SafetyOracle.tex [36]
 Overfull \hbox (21.78873pt too wide) in paragraph at lines 127--128
 [][]    \OT1/cmr/m/it/10 is[]majority $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 v[]se
@@ -1068,7 +1055,7 @@ al/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local
 exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/te
 xlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/loca
 l/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on root.pdf (45 pages, 231715 bytes).
+Output written on root.pdf (45 pages, 231728 bytes).
 PDF statistics:
  281 PDF objects out of 1000 (max. 8388607)
  218 compressed objects within 3 object streams
