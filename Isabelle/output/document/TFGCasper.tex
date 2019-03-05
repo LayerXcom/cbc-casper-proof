@@ -42,7 +42,7 @@
 \ \ {\isacharbar}\ {\isachardoublequoteopen}n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isacharcomma}\ n{\isacharparenright}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}prev\ b{\isacharcomma}\ n{\isacharminus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isanewline
-\isacommand{fun}\isamarkupfalse%
+\isacommand{definition}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ GhostParams{\isacharparenright}\ blockchain{\isacharunderscore}membership\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}block\ {\isasymRightarrow}\ block\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\ {\isacharparenleft}\isakeyword{infixl}\ {\isachardoublequoteopen}{\isasymdownharpoonright}{\isachardoublequoteclose}\ {\isadigit{7}}{\isadigit{0}}{\isacharparenright}\isanewline
 \ \ \isakeyword{where}\isanewline
 \ \ \ \ {\isachardoublequoteopen}b{\isadigit{1}}\ {\isasymdownharpoonright}\ b{\isadigit{2}}\ {\isacharequal}\ {\isacharparenleft}{\isasymexists}\ n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{2}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
@@ -108,7 +108,7 @@
 \isanewline
 \isacommand{locale}\isamarkupfalse%
 \ Blockchain\ {\isacharequal}\ GhostParams\ {\isacharplus}\ Protocol\ {\isacharplus}\isanewline
-\ \ \isakeyword{assumes}\ blockchain{\isacharunderscore}type\ {\isacharcolon}\ {\isachardoublequoteopen}b{\isacharprime}\ {\isasymdownharpoonright}\ b\ {\isasymand}\ b{\isacharprime}{\isacharprime}\ {\isasymdownharpoonright}\ b\ {\isasymLongrightarrow}\ {\isacharparenleft}b{\isacharprime}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacharprime}\ {\isasymor}\ b{\isacharprime}{\isacharprime}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{assumes}\ blockchain{\isacharunderscore}type\ {\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ b\ b{\isacharprime}\ b{\isacharprime}{\isacharprime}{\isachardot}\ {\isacharbraceleft}b{\isacharcomma}\ b{\isacharprime}{\isacharcomma}\ b{\isacharprime}{\isacharprime}{\isacharbraceright}\ {\isasymsubseteq}\ B\ {\isasymlongrightarrow}\ b{\isacharprime}\ {\isasymdownharpoonright}\ b\ {\isasymand}\ b{\isacharprime}{\isacharprime}\ {\isasymdownharpoonright}\ b\ {\isasymlongrightarrow}\ {\isacharparenleft}b{\isacharprime}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacharprime}\ {\isasymor}\ b{\isacharprime}{\isacharprime}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{and}\ block{\isacharunderscore}is{\isacharunderscore}consensus{\isacharunderscore}value\ {\isacharcolon}\ {\isachardoublequoteopen}B\ {\isacharequal}\ C{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
@@ -134,7 +134,7 @@
 %
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ block{\isacharunderscore}conflicting{\isacharunderscore}def\ block{\isacharunderscore}finalized{\isacharunderscore}property{\isacharunderscore}def\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}decided{\isacharunderscore}def\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ block{\isacharunderscore}finalized{\isacharunderscore}property{\isacharunderscore}def\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}decided{\isacharunderscore}def\isanewline
 \ \ \ \ \ \ \ \ \ \ naturally{\isacharunderscore}corresponding{\isacharunderscore}state{\isacharunderscore}property{\isacharunderscore}def\ \ state{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}decided{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}rule{\isacharcomma}\ rule{\isacharcomma}\ rule{\isacharcomma}\ rule{\isacharcomma}\ rule{\isacharcomma}\ rule{\isacharparenright}\ \isanewline
@@ -143,33 +143,38 @@
 \ \ \isacommand{fix}\isamarkupfalse%
 \ b{\isadigit{1}}\ b{\isadigit{2}}\ {\isasymsigma}\isanewline
 \ \ \isacommand{assume}\isamarkupfalse%
-\ {\isachardoublequoteopen}b{\isadigit{1}}\ {\isasymin}\ B\ {\isasymand}\ b{\isadigit{2}}\ {\isasymin}\ B\ {\isasymand}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardoublequoteclose}\ \isakeyword{and}\ {\isachardoublequoteopen}{\isacharparenleft}{\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{1}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{2}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{2}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}b{\isacharprime}{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isacharprime}{\isacharcomma}\ n{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+\ {\isachardoublequoteopen}b{\isadigit{1}}\ {\isasymin}\ B\ {\isasymand}\ b{\isadigit{2}}\ {\isasymin}\ B\ {\isasymand}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardoublequoteclose}\ \isakeyword{and}\ {\isachardoublequoteopen}block{\isacharunderscore}conflicting\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharparenright}{\isachardoublequoteclose}\ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}b{\isacharprime}{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ b{\isadigit{1}}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isachardoublequoteclose}\ \isanewline
 \ \ \isacommand{show}\isamarkupfalse%
-\ \ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}c{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{2}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}c{\isacharcomma}\ n{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}c{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymnot}\ b{\isadigit{2}}\ {\isasymdownharpoonright}\ c{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{proof}\isamarkupfalse%
 \ {\isacharparenleft}rule\ ccontr{\isacharparenright}\isanewline
 \ \ \ \ \isacommand{assume}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymnot}\ {\isacharparenleft}{\isasymforall}\ {\isasymsigma}\ {\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}c{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{2}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}c{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymnot}\ {\isacharparenleft}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}c{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymnot}\ b{\isadigit{2}}\ {\isasymdownharpoonright}\ c{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{hence}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}\ {\isasymsigma}\ {\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymexists}\ c\ {\isasymin}\ {\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{2}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}c{\isacharcomma}\ n{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}\ {\isasymsigma}\ {\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymexists}\ c\ {\isasymin}\ {\isasymepsilon}\ {\isasymsigma}{\isachardot}\ b{\isadigit{2}}\ {\isasymdownharpoonright}\ c{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
 \ \ \ \ \isacommand{hence}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}\ {\isasymsigma}\ {\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymexists}\ c\ {\isasymin}\ {\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isacharparenleft}{\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{2}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}c{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymexists}n{\isacharprime}{\isachardot}\ n{\isacharprime}\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}c{\isacharcomma}\ n{\isacharprime}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}\ {\isasymsigma}\ {\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymexists}\ c\ {\isasymin}\ {\isasymepsilon}\ {\isasymsigma}{\isachardot}\ b{\isadigit{2}}\ {\isasymdownharpoonright}\ c\ {\isasymand}\ b{\isadigit{1}}\ {\isasymdownharpoonright}\ c{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ {\isacartoucheopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}b{\isacharprime}{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ {\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isacharprime}{\isacharcomma}\ n{\isacharparenright}{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
+\ {\isacartoucheopen}{\isasymforall}{\isasymsigma}{\isasymin}futures\ {\isasymsigma}{\isachardot}\ {\isasymforall}b{\isacharprime}{\isasymin}{\isasymepsilon}\ {\isasymsigma}{\isachardot}\ b{\isadigit{1}}\ {\isasymdownharpoonright}\ b{\isacharprime}{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
 \ simp\isanewline
 \ \ \ \ \isacommand{hence}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ b{\isadigit{1}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{2}}{\isacharcomma}\ n{\isacharparenright}\ {\isasymor}\ b{\isadigit{2}}\ {\isacharequal}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ n{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}b{\isadigit{1}}\ {\isasymdownharpoonright}\ b{\isadigit{2}}\ {\isasymor}\ b{\isadigit{2}}\ {\isasymdownharpoonright}\ b{\isadigit{1}}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ blockchain{\isacharunderscore}type\isanewline
-\ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}metis\ GhostParams{\isachardot}blockchain{\isacharunderscore}membership{\isachardot}elims{\isacharparenleft}{\isadigit{3}}{\isacharparenright}\ blockchain{\isacharunderscore}membership{\isachardot}elims{\isacharparenleft}{\isadigit{2}}{\isacharparenright}{\isacharparenright}\isanewline
+\ blockchain{\isacharunderscore}type\ \isanewline
+\ \ \ \ \ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp{\isacharparenright}\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ {\isasymSigma}t{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}{\isasymSigma}\ {\isacartoucheopen}b{\isadigit{1}}\ {\isasymin}\ B\ {\isasymand}\ b{\isadigit{2}}\ {\isasymin}\ B\ {\isasymand}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacartoucheclose}\ block{\isacharunderscore}is{\isacharunderscore}consensus{\isacharunderscore}value\ estimates{\isacharunderscore}are{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}C\ futures{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
+\ blast\isanewline
 \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ False\isanewline
+\ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
+\ {\isacartoucheopen}block{\isacharunderscore}conflicting\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharparenright}{\isacartoucheclose}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ {\isacartoucheopen}{\isacharparenleft}{\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{1}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{2}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymlongrightarrow}\ b{\isadigit{2}}\ {\isasymnoteq}\ n{\isacharunderscore}cestor\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ n{\isacharparenright}{\isacharparenright}{\isacartoucheclose}{\isacharparenright}\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ block{\isacharunderscore}conflicting{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 \isanewline
 \isacommand{qed}\isamarkupfalse%
@@ -208,7 +213,7 @@
 \ \ \ \isacommand{hence}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymnot}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}is{\isacharunderscore}decided\ {\isacharparenleft}consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}not\ {\isacharparenleft}block{\isacharunderscore}finalized{\isacharunderscore}property\ b{\isadigit{1}}{\isacharparenright}{\isacharcomma}\ {\isasymsigma}{\isacharprime}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ n{\isacharunderscore}party{\isacharunderscore}safety\ {\isacartoucheopen}{\isasymsigma}{\isacharunderscore}set\ {\isasymsubseteq}\ {\isasymSigma}t{\isacartoucheclose}\ {\isacartoucheopen}finite\ {\isasymsigma}{\isacharunderscore}set{\isacartoucheclose}\ {\isacartoucheopen}is{\isacharunderscore}faults{\isacharunderscore}lt{\isacharunderscore}threshold\ {\isacharparenleft}{\isasymUnion}{\isasymsigma}{\isacharunderscore}set{\isacharparenright}{\isacartoucheclose}\ \isacommand{apply}\isamarkupfalse%
+\ negation{\isacharunderscore}is{\isacharunderscore}not{\isacharunderscore}decided{\isacharunderscore}by{\isacharunderscore}other{\isacharunderscore}validator\ {\isacartoucheopen}{\isasymsigma}{\isacharunderscore}set\ {\isasymsubseteq}\ {\isasymSigma}t{\isacartoucheclose}\ {\isacartoucheopen}finite\ {\isasymsigma}{\isacharunderscore}set{\isacartoucheclose}\ {\isacartoucheopen}is{\isacharunderscore}faults{\isacharunderscore}lt{\isacharunderscore}threshold\ {\isacharparenleft}{\isasymUnion}{\isasymsigma}{\isacharunderscore}set{\isacharparenright}{\isacartoucheclose}\ \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}simp\ add{\isacharcolon}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions{\isacharunderscore}def{\isacharparenright}\ \isanewline
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ {\isacartoucheopen}{\isacharbraceleft}{\isasymsigma}{\isacharcomma}\ {\isasymsigma}{\isacharprime}{\isacharbraceright}\ {\isasymsubseteq}\ {\isasymsigma}{\isacharunderscore}set\ {\isasymand}\ {\isacharbraceleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ B\ {\isasymand}\ block{\isacharunderscore}conflicting\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharparenright}\ {\isasymand}\ block{\isacharunderscore}finalized{\isacharunderscore}property\ b{\isadigit{1}}\ {\isasymin}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions\ {\isasymsigma}{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
@@ -225,7 +230,7 @@
 \ \ \ \ \ \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}simp\ add{\isacharcolon}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}metis\ {\isacartoucheopen}{\isasymsigma}{\isacharunderscore}set\ {\isasymsubseteq}\ {\isasymSigma}t{\isacartoucheclose}\ {\isacartoucheopen}finite\ {\isasymsigma}{\isacharunderscore}set{\isacartoucheclose}\ {\isacartoucheopen}is{\isacharunderscore}faults{\isacharunderscore}lt{\isacharunderscore}threshold\ {\isacharparenleft}{\isasymUnion}{\isasymsigma}{\isacharunderscore}set{\isacharparenright}{\isacartoucheclose}\ {\isacartoucheopen}{\isacharbraceleft}{\isasymsigma}{\isacharcomma}\ {\isasymsigma}{\isacharprime}{\isacharbraceright}\ {\isasymsubseteq}\ {\isasymsigma}{\isacharunderscore}set\ {\isasymand}\ {\isacharbraceleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ B\ {\isasymand}\ block{\isacharunderscore}conflicting\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharparenright}\ {\isasymand}\ block{\isacharunderscore}finalized{\isacharunderscore}property\ b{\isadigit{1}}\ {\isasymin}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions\ {\isasymsigma}{\isacartoucheclose}\ conflicting{\isacharunderscore}blocks{\isacharunderscore}imps{\isacharunderscore}conflicting{\isacharunderscore}decision\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions{\isacharunderscore}def\ insert{\isacharunderscore}subset\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ n{\isacharunderscore}party{\isacharunderscore}safety{\isacharparenright}\ \isanewline
+\ {\isacharparenleft}metis\ {\isacartoucheopen}{\isasymsigma}{\isacharunderscore}set\ {\isasymsubseteq}\ {\isasymSigma}t{\isacartoucheclose}\ {\isacartoucheopen}finite\ {\isasymsigma}{\isacharunderscore}set{\isacartoucheclose}\ {\isacartoucheopen}is{\isacharunderscore}faults{\isacharunderscore}lt{\isacharunderscore}threshold\ {\isacharparenleft}{\isasymUnion}{\isasymsigma}{\isacharunderscore}set{\isacharparenright}{\isacartoucheclose}\ {\isacartoucheopen}{\isacharbraceleft}{\isasymsigma}{\isacharcomma}\ {\isasymsigma}{\isacharprime}{\isacharbraceright}\ {\isasymsubseteq}\ {\isasymsigma}{\isacharunderscore}set\ {\isasymand}\ {\isacharbraceleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharbraceright}\ {\isasymsubseteq}\ B\ {\isasymand}\ block{\isacharunderscore}conflicting\ {\isacharparenleft}b{\isadigit{1}}{\isacharcomma}\ b{\isadigit{2}}{\isacharparenright}\ {\isasymand}\ block{\isacharunderscore}finalized{\isacharunderscore}property\ b{\isadigit{1}}\ {\isasymin}\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions\ {\isasymsigma}{\isacartoucheclose}\ conflicting{\isacharunderscore}blocks{\isacharunderscore}imps{\isacharunderscore}conflicting{\isacharunderscore}decision\ consensus{\isacharunderscore}value{\isacharunderscore}property{\isacharunderscore}decisions{\isacharunderscore}def\ insert{\isacharunderscore}subset\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ negation{\isacharunderscore}is{\isacharunderscore}not{\isacharunderscore}decided{\isacharunderscore}by{\isacharunderscore}other{\isacharunderscore}validator{\isacharparenright}\ \isanewline
 \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ False\isanewline
@@ -398,7 +403,7 @@
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/work/LayerXcom/cbc-casper-proof/Isabelle/TFGCasper.thy%:%
+%:%file=~/work/blockchain/LayerXcom/cbc-casper-proof/Isabelle/TFGCasper.thy%:%
 %:%10=1%:%
 %:%11=1%:%
 %:%12=2%:%
@@ -537,34 +542,34 @@
 %:%170=100%:%
 %:%171=101%:%
 %:%172=101%:%
-%:%173=102%:%
+%:%173=101%:%
 %:%174=102%:%
-%:%175=103%:%
-%:%181=103%:%
-%:%184=104%:%
-%:%185=105%:%
+%:%175=102%:%
+%:%176=103%:%
+%:%177=103%:%
+%:%178=104%:%
+%:%179=104%:%
+%:%180=105%:%
 %:%186=105%:%
-%:%187=106%:%
-%:%191=110%:%
-%:%194=111%:%
-%:%198=111%:%
-%:%199=111%:%
-%:%200=112%:%
-%:%201=112%:%
-%:%202=113%:%
+%:%189=106%:%
+%:%190=107%:%
+%:%191=107%:%
+%:%192=108%:%
+%:%196=112%:%
+%:%199=113%:%
 %:%203=113%:%
-%:%204=114%:%
+%:%204=113%:%
 %:%205=114%:%
-%:%206=115%:%
-%:%207=116%:%
-%:%208=117%:%
-%:%209=117%:%
-%:%210=118%:%
-%:%211=118%:%
+%:%206=114%:%
+%:%207=115%:%
+%:%208=115%:%
+%:%209=116%:%
+%:%210=116%:%
+%:%211=117%:%
 %:%212=118%:%
 %:%213=119%:%
 %:%214=119%:%
-%:%215=119%:%
+%:%215=120%:%
 %:%216=120%:%
 %:%217=120%:%
 %:%218=121%:%
@@ -574,85 +579,90 @@
 %:%222=122%:%
 %:%223=123%:%
 %:%224=123%:%
-%:%225=124%:%
+%:%225=123%:%
 %:%226=124%:%
-%:%227=125%:%
+%:%227=124%:%
 %:%228=125%:%
-%:%229=126%:%
+%:%229=125%:%
 %:%230=126%:%
 %:%231=126%:%
 %:%232=127%:%
 %:%233=127%:%
-%:%234=127%:%
+%:%234=128%:%
 %:%235=128%:%
-%:%241=128%:%
-%:%244=129%:%
-%:%245=130%:%
-%:%246=131%:%
-%:%247=131%:%
-%:%248=132%:%
-%:%249=133%:%
-%:%250=134%:%
-%:%251=135%:%
-%:%252=136%:%
-%:%253=137%:%
-%:%254=137%:%
-%:%255=138%:%
+%:%236=128%:%
+%:%237=129%:%
+%:%238=129%:%
+%:%239=129%:%
+%:%240=130%:%
+%:%246=130%:%
+%:%249=131%:%
+%:%250=132%:%
+%:%251=133%:%
+%:%252=133%:%
+%:%253=134%:%
+%:%254=135%:%
+%:%255=136%:%
+%:%256=137%:%
+%:%257=138%:%
 %:%258=139%:%
-%:%262=139%:%
-%:%263=139%:%
-%:%264=140%:%
-%:%265=140%:%
-%:%266=140%:%
-%:%271=140%:%
-%:%274=141%:%
-%:%275=142%:%
+%:%259=139%:%
+%:%260=140%:%
+%:%263=141%:%
+%:%267=141%:%
+%:%268=141%:%
+%:%269=142%:%
+%:%270=142%:%
+%:%271=142%:%
 %:%276=142%:%
-%:%277=143%:%
+%:%279=143%:%
 %:%280=144%:%
-%:%284=144%:%
-%:%285=144%:%
-%:%286=145%:%
-%:%287=145%:%
-%:%288=146%:%
-%:%294=146%:%
-%:%297=147%:%
-%:%298=148%:%
+%:%281=144%:%
+%:%282=145%:%
+%:%285=146%:%
+%:%289=146%:%
+%:%290=146%:%
+%:%291=147%:%
+%:%292=147%:%
+%:%293=148%:%
 %:%299=148%:%
-%:%300=149%:%
+%:%302=149%:%
 %:%303=150%:%
-%:%307=150%:%
-%:%313=150%:%
-%:%316=151%:%
-%:%317=152%:%
+%:%304=150%:%
+%:%305=151%:%
+%:%308=152%:%
+%:%312=152%:%
 %:%318=152%:%
-%:%319=153%:%
-%:%320=154%:%
-%:%323=155%:%
-%:%327=155%:%
-%:%328=155%:%
-%:%329=156%:%
-%:%335=156%:%
-%:%338=157%:%
-%:%339=158%:%
+%:%321=153%:%
+%:%322=154%:%
+%:%323=154%:%
+%:%324=155%:%
+%:%325=156%:%
+%:%328=157%:%
+%:%332=157%:%
+%:%333=157%:%
+%:%334=158%:%
 %:%340=158%:%
-%:%341=159%:%
+%:%343=159%:%
 %:%344=160%:%
-%:%348=160%:%
-%:%349=160%:%
-%:%350=161%:%
-%:%351=162%:%
-%:%357=162%:%
-%:%360=163%:%
-%:%361=164%:%
+%:%345=160%:%
+%:%346=161%:%
+%:%349=162%:%
+%:%353=162%:%
+%:%354=162%:%
+%:%355=163%:%
+%:%356=164%:%
 %:%362=164%:%
-%:%363=165%:%
+%:%365=165%:%
 %:%366=166%:%
-%:%370=166%:%
-%:%371=166%:%
-%:%372=167%:%
-%:%373=168%:%
-%:%374=169%:%
-%:%380=169%:%
-%:%385=170%:%
-%:%390=171%:%
+%:%367=166%:%
+%:%368=167%:%
+%:%371=168%:%
+%:%375=168%:%
+%:%376=168%:%
+%:%377=169%:%
+%:%378=170%:%
+%:%379=171%:%
+%:%385=171%:%
+%:%390=172%:%
+%:%395=173%:%

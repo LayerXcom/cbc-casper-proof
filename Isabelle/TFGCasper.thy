@@ -22,7 +22,7 @@ fun (in GhostParams) n_cestor :: "block * nat \<Rightarrow> block"
   | "n_cestor (b, n) = n_cestor (prev b, n-1)"
 
 (* Definition 4.26: Blockchain membership *)
-fun (in GhostParams) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
+definition (in GhostParams) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
   where
     "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> b1 = n_cestor (b2, n))"
 
@@ -65,7 +65,7 @@ abbreviation (in GhostParams) P :: "consensus_value_property set"
 
 (* Locale for proofs *)
 locale Blockchain = GhostParams + Protocol +
-  assumes blockchain_type : "b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<Longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
+  assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> B \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "B = C"
 
 definition (in GhostParams) block_finalized_property :: "block \<Rightarrow> consensus_value_property"
@@ -81,24 +81,26 @@ lemma (in Blockchain) conflicting_blocks_imps_conflicting_decision :
     \<longrightarrow> block_conflicting (b1, b2) 
     \<longrightarrow> consensus_value_property_is_decided (block_finalized_property b1, \<sigma>) 
     \<longrightarrow> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b2), \<sigma>)"
-  apply (simp add: block_conflicting_def block_finalized_property_def consensus_value_property_is_decided_def
+  apply (simp add: block_finalized_property_def consensus_value_property_is_decided_def
           naturally_corresponding_state_property_def  state_property_is_decided_def)
   apply (rule, rule, rule, rule, rule, rule) 
 proof -
   fix b1 b2 \<sigma>
-  assume "b1 \<in> B \<and> b2 \<in> B \<and> \<sigma> \<in> \<Sigma>" and "(\<forall>n. n \<in> \<nat> \<longrightarrow> b1 \<noteq> n_cestor (b2, n)) \<and> (\<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (b1, n))" and "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b1 = n_cestor (b', n)" 
-  show  "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (c, n)"
+  assume "b1 \<in> B \<and> b2 \<in> B \<and> \<sigma> \<in> \<Sigma>" and "block_conflicting (b1, b2)" and "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. b1 \<downharpoonright> b'" 
+  show  "\<forall>\<sigma>\<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<not> b2 \<downharpoonright> c"
   proof (rule ccontr)
-    assume "\<not> (\<forall> \<sigma> \<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (c, n))"
-    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b2 = n_cestor (c, n)"
+    assume "\<not> (\<forall>\<sigma>\<in>futures \<sigma>. \<forall>c\<in>\<epsilon> \<sigma>. \<not> b2 \<downharpoonright> c)"
+    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. b2 \<downharpoonright> c"
       by blast
-    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. (\<exists>n. n \<in> \<nat> \<and> b2 = n_cestor (c, n)) \<and> (\<exists>n'. n' \<in> \<nat> \<and> b1 = n_cestor (c, n'))"
-      using \<open>\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. \<exists>n. n \<in> \<nat> \<and> b1 = n_cestor (b', n)\<close> by simp
-    hence "\<exists> n \<in> \<nat>. b1 = n_cestor (b2, n) \<or> b2 = n_cestor (b1, n)"
-      using blockchain_type
-      by (metis GhostParams.blockchain_membership.elims(3) blockchain_membership.elims(2))
+    hence "\<exists> \<sigma> \<in>futures \<sigma>. \<exists> c \<in> \<epsilon> \<sigma>. b2 \<downharpoonright> c \<and> b1 \<downharpoonright> c"
+      using \<open>\<forall>\<sigma>\<in>futures \<sigma>. \<forall>b'\<in>\<epsilon> \<sigma>. b1 \<downharpoonright> b'\<close> by simp
+    hence "b1 \<downharpoonright> b2 \<or> b2 \<downharpoonright> b1"
+      using blockchain_type 
+      apply (simp)
+      using \<Sigma>t_is_subset_of_\<Sigma> \<open>b1 \<in> B \<and> b2 \<in> B \<and> \<sigma> \<in> \<Sigma>\<close> block_is_consensus_value estimates_are_subset_of_C futures_def by blast
     then show False
-      by (simp add: \<open>(\<forall>n. n \<in> \<nat> \<longrightarrow> b1 \<noteq> n_cestor (b2, n)) \<and> (\<forall>n. n \<in> \<nat> \<longrightarrow> b2 \<noteq> n_cestor (b1, n))\<close>)
+      using \<open>block_conflicting (b1, b2)\<close>
+      by (simp add: block_conflicting_def)
   qed
 qed
 
