@@ -68,9 +68,9 @@ locale Blockchain = GhostParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> B \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "B = C"
 
-definition (in GhostParams) block_finalized_property :: "block \<Rightarrow> consensus_value_property"
+definition (in GhostParams) block_membership_property :: "block \<Rightarrow> consensus_value_property"
   where
-    "block_finalized_property b = (\<lambda>b'. b \<downharpoonright> b')"
+    "block_membership_property b = (\<lambda>b'. b \<downharpoonright> b')"
 
 definition (in GhostParams) block_conflicting :: "(block * block) \<Rightarrow> bool"
   where
@@ -79,9 +79,9 @@ definition (in GhostParams) block_conflicting :: "(block * block) \<Rightarrow> 
 lemma (in Blockchain) conflicting_blocks_imps_conflicting_decision :
   "\<forall> b1 b2 \<sigma>. {b1, b2} \<subseteq> B \<and> \<sigma> \<in> \<Sigma> 
     \<longrightarrow> block_conflicting (b1, b2) 
-    \<longrightarrow> consensus_value_property_is_decided (block_finalized_property b1, \<sigma>) 
-    \<longrightarrow> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b2), \<sigma>)"
-  apply (simp add: block_finalized_property_def consensus_value_property_is_decided_def
+    \<longrightarrow> consensus_value_property_is_decided (block_membership_property b1, \<sigma>) 
+    \<longrightarrow> consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b2), \<sigma>)"
+  apply (simp add: block_membership_property_def consensus_value_property_is_decided_def
           naturally_corresponding_state_property_def  state_property_is_decided_def)
   apply (rule, rule, rule, rule, rule, rule) 
 proof -
@@ -108,26 +108,56 @@ theorem (in Blockchain) blockchain_safety :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
   \<longrightarrow> finite \<sigma>_set
   \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
-  \<longrightarrow> (\<forall> \<sigma> \<sigma>' b1 b2. {\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma> 
-      \<longrightarrow> block_finalized_property b2 \<notin> consensus_value_property_decisions \<sigma>')"
+  \<longrightarrow> (\<forall> \<sigma> \<sigma>' b1 b2. {\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma> 
+      \<longrightarrow> block_membership_property b2 \<notin> consensus_value_property_decisions \<sigma>')"
   apply (rule, rule, rule, rule, rule, rule, rule, rule, rule, rule)
 proof -
   fix \<sigma>_set \<sigma> \<sigma>' b1 b2
    assume "\<sigma>_set \<subseteq> \<Sigma>t" and "finite \<sigma>_set" and "is_faults_lt_threshold (\<Union>\<sigma>_set)" 
-   and "{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>" 
-   and "block_finalized_property b2 \<in> consensus_value_property_decisions \<sigma>'" 
-   hence "\<not> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')"
+   and "{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>" 
+   and "block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>'" 
+   hence "\<not> consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>')"
       using negation_is_not_decided_by_other_validator \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> apply (simp add: consensus_value_property_decisions_def) 
-      using \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
+      using \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
    have "{b1, b2} \<subseteq> B \<and> \<sigma> \<in> \<Sigma> \<and> block_conflicting (b1, b2)"
-     using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
-   hence "consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')"
-     using \<open>block_finalized_property b2 \<in> consensus_value_property_decisions \<sigma>'\<close> conflicting_blocks_imps_conflicting_decision
+     using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> by auto
+   hence "consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>')"
+     using \<open>block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>'\<close> conflicting_blocks_imps_conflicting_decision
      apply (simp add: consensus_value_property_decisions_def)
-     by (metis \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_finalized_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> conflicting_blocks_imps_conflicting_decision consensus_value_property_decisions_def insert_subset mem_Collect_eq negation_is_not_decided_by_other_validator) 
+     by (metis \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>finite \<sigma>_set\<close> \<open>is_faults_lt_threshold (\<Union>\<sigma>_set)\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> {b1, b2} \<subseteq> B \<and> block_conflicting (b1, b2) \<and> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>\<close> conflicting_blocks_imps_conflicting_decision consensus_value_property_decisions_def insert_subset mem_Collect_eq negation_is_not_decided_by_other_validator) 
    then show False
-     using \<open>\<not> consensus_value_property_is_decided (consensus_value_property_not (block_finalized_property b1), \<sigma>')\<close> by blast
+     using \<open>\<not> consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>')\<close> by blast
  qed
+
+(* Two-party blockchain safety *)
+theorem (in Blockchain) no_decision_on_conflicting_blocks :
+  "\<forall> \<sigma>1 \<sigma>2. {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma>t
+  \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
+  \<longrightarrow> (\<forall> b1 b2. {b1, b2} \<subseteq> C \<and> block_conflicting (b1, b2) 
+      \<longrightarrow> block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>1 
+      \<longrightarrow> block_membership_property b2 \<notin> consensus_value_property_decisions \<sigma>2)"
+  apply (rule, rule, rule, rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma>1 \<sigma>2 b1 b2
+  assume "{\<sigma>1, \<sigma>2} \<subseteq> \<Sigma>t" and "is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)" and "{b1, b2} \<subseteq> C \<and> block_conflicting (b1, b2)" 
+  and "block_membership_property b1 \<in> consensus_value_property_decisions \<sigma>1" 
+  and "block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>2" 
+  hence "consensus_value_property_is_decided (block_membership_property b1, \<sigma>1)"
+    by (simp add: consensus_value_property_decisions_def)
+  hence "\<not> consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>2)"      
+    using two_party_consensus_safety_for_consensus_value_property \<open>is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)\<close> \<open>{\<sigma>1, \<sigma>2} \<subseteq> \<Sigma>t\<close> by blast
+  have "block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>2"
+    using \<open>block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>2\<close> 
+    by (simp add: consensus_value_property_decisions_def)
+  have "\<sigma>2 \<in> \<Sigma>t \<and> {b2, b1} \<subseteq> B \<and> block_conflicting (b2, b1)"
+    using block_is_consensus_value \<open>{\<sigma>1, \<sigma>2} \<subseteq> \<Sigma>t\<close> \<open>{b1, b2} \<subseteq> C \<and> block_conflicting (b1, b2)\<close> by (simp add: block_conflicting_def)
+  hence "consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>2)"
+    using  conflicting_blocks_imps_conflicting_decision \<open>block_membership_property b2 \<in> consensus_value_property_decisions \<sigma>2\<close> 
+    using \<Sigma>t_is_subset_of_\<Sigma> consensus_value_property_decisions_def by auto      
+  then show False
+     using \<open>\<not> consensus_value_property_is_decided (consensus_value_property_not (block_membership_property b1), \<sigma>2)\<close> by blast
+ qed
+
 
 (* Locale for proofs *)
 locale Ghost = GhostParams + Protocol +

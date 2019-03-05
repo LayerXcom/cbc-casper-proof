@@ -76,7 +76,7 @@ lemma (in Protocol) backword_consistency :
   by auto
   
 (* Theorem 3 *)
-theorem (in Protocol) two_party_consensus_safety :
+theorem (in Protocol) two_party_consensus_safety_for_state_property :
   "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
   \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
   \<longrightarrow> \<not>(state_property_is_decided (p, \<sigma>1) \<and> state_property_is_decided (state_property_not p, \<sigma>2))"
@@ -239,7 +239,8 @@ lemma (in Protocol) negation_is_not_decided_by_other_validator :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
   \<longrightarrow> finite \<sigma>_set
   \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
-  \<longrightarrow> (\<forall> \<sigma> \<sigma>' p. {\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> p \<in> consensus_value_property_decisions \<sigma> \<longrightarrow> consensus_value_property_not p \<notin> consensus_value_property_decisions \<sigma>')"
+  \<longrightarrow> (\<forall> \<sigma> \<sigma>' p. {\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> p \<in> consensus_value_property_decisions \<sigma> 
+            \<longrightarrow> consensus_value_property_not p \<notin> consensus_value_property_decisions \<sigma>')"
   apply (rule, rule, rule, rule, rule, rule, rule, rule)
 proof -
   fix \<sigma>_set \<sigma> \<sigma>' p
@@ -261,6 +262,27 @@ proof -
     apply (simp add: consensus_value_property_decisions_def consensus_value_property_is_decided_def naturally_corresponding_state_property_def state_property_is_decided_def)
     using \<Sigma>t_def estimates_are_non_empty futures_def by fastforce   
 qed
+
+lemma (in Protocol) two_party_consensus_safety_for_consensus_value_property :
+  "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
+  \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
+  \<longrightarrow> consensus_value_property_is_decided (p, \<sigma>1) 
+  \<longrightarrow> \<not> consensus_value_property_is_decided (consensus_value_property_not p, \<sigma>2)"
+  apply (rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma>1 \<sigma>2
+  have two_party: "\<forall> \<sigma>1 \<sigma>2. {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma>t
+        \<longrightarrow> is_faults_lt_threshold (\<Union> {\<sigma>1, \<sigma>2})
+        \<longrightarrow> p \<in> consensus_value_property_decisions \<sigma>1 
+            \<longrightarrow> consensus_value_property_not p \<notin> consensus_value_property_decisions \<sigma>2"
+    using negation_is_not_decided_by_other_validator
+    by (meson finite.emptyI finite.insertI order_refl)
+  assume "\<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t" and "is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)" and "consensus_value_property_is_decided (p, \<sigma>1)"
+  then show "\<not> consensus_value_property_is_decided (consensus_value_property_not p, \<sigma>2)"  
+    using two_party
+    apply (simp add: consensus_value_property_decisions_def)
+    by blast
+qed    
 
 (* n-party consensus safety for power set of decisions *)
 lemma (in Protocol) n_party_consensus_safety :
