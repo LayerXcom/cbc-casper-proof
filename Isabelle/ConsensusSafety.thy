@@ -263,6 +263,34 @@ proof -
     using \<Sigma>t_def estimates_are_non_empty futures_def by fastforce   
 qed
 
+(* FIXME: Combine this with negation_is_not_decided_by_other_validator (skipped this because it is used in other places.) *)
+lemma (in Protocol) n_party_consensus_safety :
+  "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
+  \<longrightarrow> finite \<sigma>_set
+  \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
+  \<longrightarrow> (\<forall> p \<in> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}. 
+           (\<lambda>c. (\<not> p c)) \<notin> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set})"
+  apply (rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma>_set p
+  assume "\<sigma>_set \<subseteq> \<Sigma>t" and "finite \<sigma>_set" and "is_faults_lt_threshold (\<Union>\<sigma>_set)" and "p \<in> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}"
+  and "(\<lambda>c. (\<not> p c)) \<in> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}"
+  hence "\<exists> \<sigma>. \<sigma> \<in> \<Sigma>t \<and> \<sigma> \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}"
+    using n_party_common_futures_exists by meson
+  then obtain \<sigma>'' where "\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}" by auto
+  hence "state_property_is_decided (naturally_corresponding_state_property p, \<sigma>'')" 
+    using \<open>p \<in> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}\<close> consensus_value_property_decisions_def consensus_value_property_is_decided_def 
+    using \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> forward_consistency by fastforce
+  have "state_property_is_decided (naturally_corresponding_state_property (\<lambda>c. (\<not> p c)), \<sigma>'')" 
+    using \<open>(\<lambda>c. (\<not> p c)) \<in> \<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}\<close> consensus_value_property_decisions_def consensus_value_property_is_decided_def 
+    using \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> forward_consistency \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> by fastforce
+  then show False
+    using \<open>state_property_is_decided (naturally_corresponding_state_property p, \<sigma>'')\<close>
+    apply (simp add: state_property_is_decided_def naturally_corresponding_state_property_def)
+    by (meson \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> estimates_are_non_empty monotonic_futures order_refl subsetCE)
+qed
+
+
 lemma (in Protocol) two_party_consensus_safety_for_consensus_value_property :
   "\<forall> \<sigma>1 \<sigma>2. \<sigma>1 \<in> \<Sigma>t \<and> \<sigma>2 \<in> \<Sigma>t
   \<longrightarrow> is_faults_lt_threshold (\<sigma>1 \<union> \<sigma>2)
@@ -284,8 +312,7 @@ proof -
     by blast
 qed    
 
-(* n-party consensus safety for power set of decisions *)
-lemma (in Protocol) n_party_consensus_safety :
+lemma (in Protocol) n_party_consensus_safety_for_power_set_of_decisions :
   "\<forall> \<sigma>_set. \<sigma>_set \<subseteq> \<Sigma>t
   \<longrightarrow> finite \<sigma>_set
   \<longrightarrow> is_faults_lt_threshold (\<Union> \<sigma>_set)
