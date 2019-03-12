@@ -171,10 +171,16 @@ lemma (in Ghost) children_type :
   apply (simp add: children_def)
   using Ghost_axioms Ghost_axioms_def Ghost_def by auto
 
+lemma argmax_type :
+  "S \<subseteq> A \<Longrightarrow> arg_max_on f S \<in> A" 
+  apply (simp add: arg_max_on_def arg_max_def is_arg_max_def)
+  oops
+
 lemma (in Ghost) best_children_type :
   "\<forall> b \<sigma>. b \<in> B \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  best_children (b, \<sigma>) \<subseteq> B"
   apply (simp add: best_children_def arg_max_on_def arg_max_def is_arg_max_def)
-  apply auto 
+  using children_type 
+  apply auto
   oops
 
 lemma (in Ghost) GHSOT_type :
