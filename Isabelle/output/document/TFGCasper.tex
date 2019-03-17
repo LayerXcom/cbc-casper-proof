@@ -346,6 +346,27 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
+\ argmax{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}S\ {\isasymsubseteq}\ A\ {\isasymLongrightarrow}\ arg{\isacharunderscore}max{\isacharunderscore}on\ f\ S\ {\isasymin}\ A{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ arg{\isacharunderscore}max{\isacharunderscore}on{\isacharunderscore}def\ arg{\isacharunderscore}max{\isacharunderscore}def\ is{\isacharunderscore}arg{\isacharunderscore}max{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{oops}\isamarkupfalse%
+%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Ghost{\isacharparenright}\ best{\isacharunderscore}children{\isacharunderscore}type\ {\isacharcolon}\isanewline
 \ \ {\isachardoublequoteopen}{\isasymforall}\ b\ {\isasymsigma}{\isachardot}\ b\ {\isasymin}\ B\ {\isasymand}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymlongrightarrow}\ \ best{\isacharunderscore}children\ {\isacharparenleft}b{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isasymsubseteq}\ B{\isachardoublequoteclose}\isanewline
 %
@@ -356,8 +377,10 @@
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}simp\ add{\isacharcolon}\ best{\isacharunderscore}children{\isacharunderscore}def\ arg{\isacharunderscore}max{\isacharunderscore}on{\isacharunderscore}def\ arg{\isacharunderscore}max{\isacharunderscore}def\ is{\isacharunderscore}arg{\isacharunderscore}max{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ children{\isacharunderscore}type\ \isanewline
 \ \ \isacommand{apply}\isamarkupfalse%
-\ auto\ \isanewline
+\ auto\isanewline
 \ \ \isacommand{oops}\isamarkupfalse%
 %
 \endisatagproof
@@ -471,7 +494,7 @@
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/work/LayerXcom/cbc-casper-proof/Isabelle/TFGCasper.thy%:%
+%:%file=~/work/blockchain/LayerXcom/cbc-casper-proof/Isabelle/TFGCasper.thy%:%
 %:%10=1%:%
 %:%11=1%:%
 %:%12=2%:%
@@ -744,46 +767,57 @@
 %:%357=176%:%
 %:%358=176%:%
 %:%359=177%:%
-%:%360=177%:%
-%:%361=178%:%
-%:%367=178%:%
+%:%365=177%:%
+%:%368=178%:%
+%:%369=179%:%
 %:%370=179%:%
 %:%371=180%:%
-%:%372=180%:%
-%:%373=181%:%
-%:%376=182%:%
+%:%374=181%:%
+%:%378=181%:%
+%:%379=181%:%
 %:%380=182%:%
-%:%386=182%:%
-%:%389=183%:%
+%:%381=182%:%
+%:%382=183%:%
+%:%383=183%:%
+%:%384=184%:%
 %:%390=184%:%
-%:%391=184%:%
-%:%392=185%:%
-%:%393=186%:%
+%:%393=185%:%
+%:%394=186%:%
+%:%395=186%:%
 %:%396=187%:%
-%:%400=187%:%
-%:%401=187%:%
-%:%402=188%:%
-%:%408=188%:%
-%:%411=189%:%
-%:%412=190%:%
+%:%399=188%:%
+%:%403=188%:%
+%:%409=188%:%
+%:%412=189%:%
 %:%413=190%:%
-%:%414=191%:%
-%:%417=192%:%
-%:%421=192%:%
-%:%422=192%:%
+%:%414=190%:%
+%:%415=191%:%
+%:%416=192%:%
+%:%419=193%:%
 %:%423=193%:%
-%:%424=194%:%
-%:%430=194%:%
-%:%433=195%:%
-%:%434=196%:%
+%:%424=193%:%
+%:%425=194%:%
+%:%431=194%:%
+%:%434=195%:%
 %:%435=196%:%
-%:%436=197%:%
-%:%439=198%:%
-%:%443=198%:%
+%:%436=196%:%
+%:%437=197%:%
+%:%440=198%:%
 %:%444=198%:%
-%:%445=199%:%
-%:%446=200%:%
-%:%447=201%:%
-%:%453=201%:%
+%:%445=198%:%
+%:%446=199%:%
+%:%447=200%:%
+%:%453=200%:%
+%:%456=201%:%
+%:%457=202%:%
 %:%458=202%:%
-%:%463=203%:%
+%:%459=203%:%
+%:%462=204%:%
+%:%466=204%:%
+%:%467=204%:%
+%:%468=205%:%
+%:%469=206%:%
+%:%470=207%:%
+%:%476=207%:%
+%:%481=208%:%
+%:%486=209%:%

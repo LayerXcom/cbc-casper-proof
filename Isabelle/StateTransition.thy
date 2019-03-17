@@ -1,6 +1,6 @@
 theory StateTransition
 
-imports Main CBCCasper
+imports Main CBCCasper MessageJustification
 
 begin
 

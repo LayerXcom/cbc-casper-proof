@@ -2,7 +2,7 @@ section \<open>Safety Proof\<close>
 
 theory ConsensusSafety
 
-imports Main CBCCasper StateTransition "Libraries/LaTeXsugar"
+imports Main CBCCasper MessageJustification StateTransition "Libraries/LaTeXsugar"
 
 begin
 
