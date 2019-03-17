@@ -1,9 +1,10 @@
 session "all" = HOL +
   theories [document = false]
     CBCCasper
-    ConsensusSafety
+    MessageJustification
     LatestMessage
     StateTransition
+    ConsensusSafety
     SafetyOracle
     TFGCasper
 
@@ -15,6 +16,7 @@ session "Documentation" = HOL +
     "Libraries/LaTeXsugar"    
  theories
     CBCCasper
+    MessageJustification
     LatestMessage
     StateTransition
     ConsensusSafety
