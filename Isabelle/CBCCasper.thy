@@ -1,4 +1,4 @@
-section \<open>Description of CBC Casper\<close>
+section \<open>CBC Casper\<close>
 
 theory CBCCasper
 
@@ -7,9 +7,10 @@ imports Main HOL.Real "Libraries/Strict_Order" "Libraries/Restricted_Predicates"
 begin
 
 (* ###################################################### *)
-(* Section 2: Description of CBC Casper *)
+(* Parameters and protocol definitions *)
 (* ###################################################### *)
 
+(* Section 2: Description of CBC Casper *)
 (* Section 2.1: CBC Casper "Parameters" *)
 
 notation Set.empty ("\<emptyset>")

@@ -4,11 +4,15 @@ imports Main HOL.Real CBCCasper LatestMessage SafetyOracle ConsensusSafety
 
 begin
 
+(* ###################################################### *)
+(* Blockchain *)
+(* ###################################################### *)
+
 (* Section 4.4: Casper the Friendly GHOST *)
 (* Definition 4.23: Blocks *)
 type_synonym block = consensus_value
 
-locale GhostParams = Params +
+locale BlockchainParams = Params +
   (* Definition 4.23: Previous block resolver *)
   fixes B :: "block set"
   fixes genesis :: block
@@ -16,13 +20,13 @@ locale GhostParams = Params +
   and prev :: "block \<Rightarrow> block"
 
 (* Definition 4.25: n'th generation ancestor block *)
-fun (in GhostParams) n_cestor :: "block * nat \<Rightarrow> block"
+fun (in BlockchainParams) n_cestor :: "block * nat \<Rightarrow> block"
   where
     "n_cestor (b, 0) = b"
   | "n_cestor (b, n) = n_cestor (prev b, n-1)"
 
 (* Definition 4.26: Blockchain membership *)
-definition (in GhostParams) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
+definition (in BlockchainParams) blockchain_membership :: "block \<Rightarrow> block \<Rightarrow> bool" (infixl "\<downharpoonright>" 70)
   where
     "b1 \<downharpoonright> b2 = (\<exists> n. n \<in> \<nat> \<and> b1 = n_cestor (b2, n))"
 
@@ -30,23 +34,23 @@ notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
 
 (* Definition 4.27: Score of a block *)
-definition (in GhostParams) score :: "state \<Rightarrow> block \<Rightarrow> real"
+definition (in BlockchainParams) score :: "state \<Rightarrow> block \<Rightarrow> real"
   where
     "score \<sigma> b = sum W {v \<in> observed \<sigma>. \<exists> b' \<in> B. b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
-definition (in GhostParams) children :: "block * state \<Rightarrow> block set"
+definition (in BlockchainParams) children :: "block * state \<Rightarrow> block set"
   where
     "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
 
 (* Definition 4.29: Best Children *)
-definition (in GhostParams) best_children :: "block * state \<Rightarrow>  block set"
+definition (in BlockchainParams) best_children :: "block * state \<Rightarrow>  block set"
   where
     "best_children = (\<lambda> (b, \<sigma>). {arg_max_on (score \<sigma>) (children (b, \<sigma>))})"
 
 (* Definition 4.30: GHOST *)
 (* NOTE: well-sortedness error occurs in code generation *)
-function (in GhostParams) GHOST :: "(block set * state) => block set"
+function (in BlockchainParams) GHOST :: "(block set * state) => block set"
   where
     "GHOST (b_set, \<sigma>) =
       (\<Union> b \<in> {b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset>}. GHOST (best_children (b, \<sigma>), \<sigma>))
@@ -54,25 +58,25 @@ function (in GhostParams) GHOST :: "(block set * state) => block set"
   by auto
 
 (* Definition 4.31: Casper the Friendly Ghost *)
-definition (in GhostParams) GHOST_estimator :: "state \<Rightarrow> block set"
+definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> block set"
   where
     "GHOST_estimator \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
 (* Definition 4.32: Example non-trivial properties of consensus values *)
-abbreviation (in GhostParams) P :: "consensus_value_property set"
+abbreviation (in BlockchainParams) P :: "consensus_value_property set"
   where
     "P \<equiv> {p. \<exists>!b \<in> B. \<forall>b' \<in> B. (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False)}"
 
 (* Locale for proofs *)
-locale Blockchain = GhostParams + Protocol +
+locale Blockchain = BlockchainParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> B \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "B = C"
 
-definition (in GhostParams) block_membership_property :: "block \<Rightarrow> consensus_value_property"
+definition (in BlockchainParams) block_membership_property :: "block \<Rightarrow> consensus_value_property"
   where
     "block_membership_property b = (\<lambda>b'. b \<downharpoonright> b')"
 
-definition (in GhostParams) block_conflicting :: "(block * block) \<Rightarrow> bool"
+definition (in BlockchainParams) block_conflicting :: "(block * block) \<Rightarrow> bool"
   where
     "block_conflicting = (\<lambda>(b1, b2). \<not> (b1 \<downharpoonright> b2 \<or> b2 \<downharpoonright> b1))"
 
@@ -160,7 +164,7 @@ proof -
 
 
 (* Locale for proofs *)
-locale Ghost = GhostParams + Protocol +
+locale Ghost = BlockchainParams + Protocol +
   assumes block_type : "\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B"
   and block_is_consensus_value : "B = C"
   and ghost_is_estimator : "\<epsilon> = GHOST_estimator"
@@ -187,10 +191,10 @@ lemma (in Ghost) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> B \<longrightarrow>  GHOST(b_set, \<sigma>) \<subseteq> B"
   oops
 
-lemma (in GhostParams) GHOST_is_valid_estimator : 
+lemma (in BlockchainParams) GHOST_is_valid_estimator : 
   "(\<forall> b. b \<in> B \<longleftrightarrow> prev b \<in> B) \<and> B = C \<and> genesis \<in> C 
   \<Longrightarrow> is_valid_estimator GHOST_estimator"
-  apply (simp add: is_valid_estimator_def GhostParams.GHOST_estimator_def)
+  apply (simp add: is_valid_estimator_def BlockchainParams.GHOST_estimator_def)
   oops
 
 lemma (in Ghost) block_membership_property_is_majority_driven :

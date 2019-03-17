@@ -7,7 +7,7 @@ imports Main CBCCasper "Libraries/LaTeXsugar"
 begin
 
 (* ###################################################### *)
-(* Message justification and lemmas *)
+(* Message justification *)
 (* ###################################################### *)
 
 definition (in Params) message_justification :: "message rel"

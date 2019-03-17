@@ -4,6 +4,10 @@ imports Main CBCCasper LatestMessage StateTransition
 
 begin
 
+(* ###################################################### *)
+(* Safety oracle *)
+(* ###################################################### *)
+
 (* Section 7: Safety Oracles *)
 (* Section 7.1 Preliminary Definitions *)
 

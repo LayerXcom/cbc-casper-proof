@@ -4,6 +4,10 @@ imports Main CBCCasper MessageJustification
 
 begin
 
+(* ###################################################### *)
+(* State transition *)
+(* ###################################################### *)
+
 definition (in Params) state_transition :: "state rel"
   where 
     "state_transition = {(\<sigma>1, \<sigma>2). {\<sigma>1, \<sigma>2} \<subseteq> \<Sigma> \<and> is_future_state(\<sigma>1, \<sigma>2)}" 

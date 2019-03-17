@@ -58,3 +58,6 @@ lemma (in Protocol) observed_type :
   "∀ σ ∈ Σ. observed σ ⊆ V"
   using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 ```
+
+## Locale for proofs
+To be added.

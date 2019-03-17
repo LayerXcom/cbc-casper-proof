@@ -7,9 +7,10 @@ imports Main CBCCasper MessageJustification "Libraries/LaTeXsugar"
 begin
 
 (* ###################################################### *)
-(* Section 4: Example Protocols *)
+(* Latest messages *)
 (* ###################################################### *)
 
+(* Section 4: Example Protocols *)
 (* Section 4.1:  Preliminary Definitions *)
 
 (* Definition 4.2 *)
