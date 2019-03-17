@@ -43,18 +43,18 @@ definition immediately_next_message where
   "immediately_next_message = (\<lambda>(\<sigma>,m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
 
 lemma (in Protocol) state_transition_by_immediately_next_message_of_same_depth_non_zero: 
-  "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+  "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>i (V,C,\<epsilon>) n. \<forall>m\<in>Mi (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>i (V,C,\<epsilon>) (n+1)"
   apply (rule, rule, rule, rule, rule)
 proof-
   fix n \<sigma> m
-  assume "1 \<le> n" "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n" "m \<in> M_i (V, C, \<epsilon>) n" "immediately_next_message (\<sigma>, m)"
+  assume "1 \<le> n" "\<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n" "m \<in> Mi (V, C, \<epsilon>) n" "immediately_next_message (\<sigma>, m)"
 
   have "\<exists>n'. n = Suc n'"
     using \<open>1 \<le> n\<close> old.nat.exhaust by auto
-  hence si: "\<Sigma>_i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
+  hence si: "\<Sigma>i (V,C,\<epsilon>) n = {\<sigma> \<in> Pow (Mi (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
     by force
 
-  hence "\<Sigma>_i (V,C,\<epsilon>) (n+1) = {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
+  hence "\<Sigma>i (V,C,\<epsilon>) (n+1) = {\<sigma> \<in> Pow (Mi (V,C,\<epsilon>) n). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
     by force
 
   have "justification m \<subseteq> \<sigma>"
@@ -63,65 +63,65 @@ proof-
   hence "justification m \<subseteq> \<sigma> \<union> {m}"
     by blast
   moreover have "\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma>"
-    using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by blast
+    using \<open>\<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n\<close> si by blast
   hence"\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}"
     by auto
   ultimately have "\<And>m'. m' \<in> \<sigma> \<union> {m} \<Longrightarrow> justification m \<subseteq> \<sigma>"
     using \<open>justification m \<subseteq> \<sigma>\<close> by blast
 
-  have "{m} \<in> Pow (M_i (V,C,\<epsilon>) n)"
-    using \<open>m \<in> M_i (V, C, \<epsilon>) n\<close> by auto
-  moreover have "\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n-1))"
-    using \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by auto
-  hence "\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) n)"
+  have "{m} \<in> Pow (Mi (V,C,\<epsilon>) n)"
+    using \<open>m \<in> Mi (V, C, \<epsilon>) n\<close> by auto
+  moreover have "\<sigma> \<in> Pow (Mi (V,C,\<epsilon>) (n-1))"
+    using \<open>\<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n\<close> si by auto
+  hence "\<sigma> \<in> Pow (Mi (V,C,\<epsilon>) n)"
     using Mi_monotonic
     by (metis (full_types) PowD PowI Suc_eq_plus1 \<open>\<exists>n'. n = Suc n'\<close> diff_Suc_1 subset_iff)
-  ultimately have "\<sigma> \<union> {m} \<in> Pow (M_i (V,C,\<epsilon>) n)"
+  ultimately have "\<sigma> \<union> {m} \<in> Pow (Mi (V,C,\<epsilon>) n)"
     by blast
 
-  show "\<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)"
-    using \<open>\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (M_i (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> 
-    \<open>\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> si by auto
+  show "\<sigma> \<union> {m} \<in> \<Sigma>i (V, C, \<epsilon>) (n + 1)"
+    using \<open>\<And>m'. finite \<sigma> \<and> m' \<in> \<sigma> \<Longrightarrow> justification m' \<subseteq> \<sigma> \<union> {m}\<close> \<open>\<sigma> \<union> {m} \<in> Pow (Mi (V, C, \<epsilon>) n)\<close> \<open>justification m \<subseteq> \<sigma> \<union> {m}\<close> 
+    \<open>\<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n\<close> si by auto
 qed
 
 lemma (in Protocol) state_transition_by_immediately_next_message_of_same_depth: 
-  "\<forall>\<sigma>\<in>\<Sigma>_i (V,C,\<epsilon>) n. \<forall>m\<in>M_i (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n+1)"
+  "\<forall>\<sigma>\<in>\<Sigma>i (V,C,\<epsilon>) n. \<forall>m\<in>Mi (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>i (V,C,\<epsilon>) (n+1)"
   apply (cases n)
   apply auto[1]
   using state_transition_by_immediately_next_message_of_same_depth_non_zero
   by (metis le_add1 plus_1_eq_Suc)
 
 lemma (in Params) past_state_exists_in_same_depth :
-  "\<forall> \<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>_i (V,C,\<epsilon>) n \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<longrightarrow> \<sigma> \<in> \<Sigma> \<longrightarrow> \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n"
+  "\<forall> \<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>i (V,C,\<epsilon>) n \<longrightarrow> \<sigma> \<subseteq> \<sigma>' \<longrightarrow> \<sigma> \<in> \<Sigma> \<longrightarrow> \<sigma> \<in> \<Sigma>i (V,C,\<epsilon>) n"
   apply (rule, rule, rule, rule, rule) 
 proof (cases n)
   case 0
-  show "\<And>\<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = 0 \<Longrightarrow> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  show "\<And>\<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = 0 \<Longrightarrow> \<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n"
     by auto
 next
   case (Suc nat)
-  show "\<And>\<sigma> \<sigma>' nat. \<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = Suc nat \<Longrightarrow> \<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  show "\<And>\<sigma> \<sigma>' nat. \<sigma>' \<in> \<Sigma>i (V, C, \<epsilon>) n \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> n = Suc nat \<Longrightarrow> \<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n"
   proof -
   fix \<sigma> \<sigma>'
-  assume "\<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  assume "\<sigma>' \<in> \<Sigma>i (V, C, \<epsilon>) n"
   and "\<sigma> \<subseteq> \<sigma>'" 
   and "\<sigma> \<in> \<Sigma>"
   have "n > 0"
     by (simp add: Suc)
   have "finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)"
-    using \<open>\<sigma> \<in> \<Sigma>\<close> state_is_finite state_is_in_pow_M_i by blast
-  moreover have "\<sigma> \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))"
+    using \<open>\<sigma> \<in> \<Sigma>\<close> state_is_finite state_is_in_pow_Mi by blast
+  moreover have "\<sigma> \<in> Pow (Mi (V, C, \<epsilon>) (n - 1))"
     using \<open>\<sigma> \<subseteq> \<sigma>'\<close>
-    by (smt Pow_iff Suc_eq_plus1 \<Sigma>i_monotonic \<Sigma>i_subset_Mi \<open>\<sigma>' \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> add_diff_cancel_left' add_eq_if diff_is_0_eq diff_le_self plus_1_eq_Suc subset_iff)
-  ultimately have  "\<sigma> \<in> {\<sigma> \<in> Pow (M_i (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
+    by (smt Pow_iff Suc_eq_plus1 \<Sigma>i_monotonic \<Sigma>i_subset_Mi \<open>\<sigma>' \<in> \<Sigma>i (V, C, \<epsilon>) n\<close> add_diff_cancel_left' add_eq_if diff_is_0_eq diff_le_self plus_1_eq_Suc subset_iff)
+  ultimately have  "\<sigma> \<in> {\<sigma> \<in> Pow (Mi (V,C,\<epsilon>) (n - 1)). finite \<sigma> \<and> (\<forall> m. m \<in> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>)}"
     by blast
-  then show "\<sigma> \<in> \<Sigma>_i (V, C, \<epsilon>) n"
+  then show "\<sigma> \<in> \<Sigma>i (V, C, \<epsilon>) n"
     by (simp add: Suc)
   qed
 qed
 
 lemma (in Protocol) immediately_next_message_exists_in_same_depth: 
-  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> M. immediately_next_message (\<sigma>,m) \<longrightarrow> (\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n \<and> m \<in> M_i (V,C,\<epsilon>) n)"
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> M. immediately_next_message (\<sigma>,m) \<longrightarrow> (\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>i (V,C,\<epsilon>) n \<and> m \<in> Mi (V,C,\<epsilon>) n)"
   apply (simp add: immediately_next_message_def M_def \<Sigma>_def)
   using past_state_exists_in_same_depth
   using \<Sigma>i_is_subset_of_\<Sigma> by blast
@@ -134,22 +134,22 @@ proof -
   assume "\<sigma> \<in> \<Sigma>" 
   and "m \<in> M" 
   and "immediately_next_message (\<sigma>, m)" 
-  then have "(\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>_i (V,C,\<epsilon>) n \<and> m \<in> M_i (V,C,\<epsilon>) n)"
+  then have "(\<exists> n \<in> \<nat>. \<sigma> \<in> \<Sigma>i (V,C,\<epsilon>) n \<and> m \<in> Mi (V,C,\<epsilon>) n)"
     using immediately_next_message_exists_in_same_depth \<open>\<sigma> \<in> \<Sigma>\<close> \<open>m \<in> M\<close>
     by blast
-  then have "\<exists> n \<in> \<nat>. \<sigma> \<union> {m} \<in> \<Sigma>_i (V,C,\<epsilon>) (n + 1)"
+  then have "\<exists> n \<in> \<nat>. \<sigma> \<union> {m} \<in> \<Sigma>i (V,C,\<epsilon>) (n + 1)"
     using state_transition_by_immediately_next_message_of_same_depth
     using \<open>immediately_next_message (\<sigma>, m)\<close> by blast
   show "\<sigma> \<union> {m} \<in> \<Sigma>"
     apply (simp add: \<Sigma>_def)
-    by (metis Nats_1 Nats_add Un_insert_right \<open>\<exists>n\<in>\<nat>. \<sigma> \<union> {m} \<in> \<Sigma>_i (V, C, \<epsilon>) (n + 1)\<close> sup_bot.right_neutral)
+    by (metis Nats_1 Nats_add Un_insert_right \<open>\<exists>n\<in>\<nat>. \<sigma> \<union> {m} \<in> \<Sigma>i (V, C, \<epsilon>) (n + 1)\<close> sup_bot.right_neutral)
 qed
 
 lemma (in Protocol) state_transition_imps_immediately_next_message: 
   "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longrightarrow> immediately_next_message (\<sigma>,m)"
 proof - 
   have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<longrightarrow> (\<forall> m' \<in> \<sigma> \<union> {m}. justification m' \<subseteq> \<sigma> \<union> {m})"
-    using state_is_in_pow_M_i by blast
+    using state_is_in_pow_Mi by blast
   then have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<longrightarrow> justification m \<subseteq> \<sigma> \<union> {m}"
     by auto
   then have "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longrightarrow> justification m \<subseteq> \<sigma>"
@@ -168,7 +168,7 @@ lemma (in Protocol) state_transition_is_immediately_next_message:
   "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma>  \<longleftrightarrow> justification m \<subseteq> \<sigma>"
   using state_transition_only_made_by_immediately_next_message 
   apply (simp add: immediately_next_message_def) 
-  using insert_Diff state_is_in_pow_M_i by fastforce
+  using insert_Diff state_is_in_pow_Mi by fastforce
 
 lemma (in Protocol) strict_subset_of_state_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'. \<sigma>' \<subset> \<sigma> \<longrightarrow> (\<exists> m \<in> \<sigma> - \<sigma>'. immediately_next_message (\<sigma>', m))"
@@ -182,7 +182,7 @@ proof -
   proof (rule ccontr)
     assume "\<not> (\<exists> m \<in> \<sigma> - \<sigma>'. justification m \<subseteq> \<sigma>')"
     then have "\<forall> m \<in> \<sigma> - \<sigma>'. \<exists> m' \<in> justification m. m' \<in> \<sigma> - \<sigma>'"
-      using \<open>\<not> (\<exists>m\<in>\<sigma> - \<sigma>'. justification m \<subseteq> \<sigma>')\<close> state_is_in_pow_M_i \<open>\<sigma>' \<subset> \<sigma>\<close>
+      using \<open>\<not> (\<exists>m\<in>\<sigma> - \<sigma>'. justification m \<subseteq> \<sigma>')\<close> state_is_in_pow_Mi \<open>\<sigma>' \<subset> \<sigma>\<close>
       by (metis Diff_iff \<open>\<sigma> \<in> \<Sigma>\<close> subset_eq)
     then have "\<forall> m \<in> \<sigma> - \<sigma>'. \<exists> m'. justified m' m \<and> m' \<in> \<sigma> - \<sigma>'"
       using justified_def by auto 

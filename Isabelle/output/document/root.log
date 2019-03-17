@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.28)  17 MAR 2019 23:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.12.28)  17 MAR 2019 23:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -319,13 +319,7 @@ ubset[]to[]$\OT1/cmr/m/n/10 ^^F$\OT1/cmr/m/it/10 i Suc[]eq[]plus1 $\OT1/cmr/m/n
 /10 commute add[]2[]eq[]Suc$\OT1/cmr/m/n/10 )$[] 
  []
 
-[5]
-Overfull \hbox (0.34634pt too wide) in paragraph at lines 335--348
-[][]    \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 smt Mi[]monoton
-ic Suc[]diff[]Suc add[]leE diff[]add diff[]le[]self message[]is[]in[]M[]i
- []
-
-[6] [7] [8] [9]
+[5] [6] [7] [8] [9]
 Overfull \hbox (10.08217pt too wide) in paragraph at lines 935--949
 [][]  \OT1/cmr/bx/n/10 us-ing \OT1/cmr/m/it/10 Params$\OML/cmm/m/it/10 :$\OT1/c
 mr/m/it/10 M[]type Protocol[]axioms observed[]def state[]is[]subset[]of[]M \OT1
@@ -340,11 +334,11 @@ f equivocating[]validators[]def
  []
 
 ) (./MessageJustification.tex [11]
-Overfull \hbox (25.35025pt too wide) in paragraph at lines 60--67
+Overfull \hbox (21.7725pt too wide) in paragraph at lines 60--67
 [][]  \OT1/cmr/bx/n/10 by $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 meson Params$\OML
 /cmm/m/it/10 :$\OT1/cmr/m/it/10 M[]type Params$\OML/cmm/m/it/10 :$\OT1/cmr/m/it
-/10 state[]is[]in[]pow[]M[]i Protocol[]axioms contra[]subsetD$\OT1/cmr/m/n/10 )
-$[] 
+/10 state[]is[]in[]pow[]Mi Protocol[]axioms contra[]subsetD$\OT1/cmr/m/n/10 )$[
+] 
  []
 
 [12]
@@ -528,18 +522,7 @@ Overfull \hbox (38.53969pt too wide) in paragraph at lines 141--143
 iately[]next[]message[]of[]same[]depth[]non[]zero$\OT1/cmr/m/n/10 :$
  []
 
-[20]
-Overfull \hbox (3.24753pt too wide) in paragraph at lines 156--158
-[][]  \OT1/cmr/bx/n/10 as-sume \OT1/cmr/m/it/10 1 $\OMS/cmsy/m/n/10 ^^T$ \OT1/c
-mr/m/it/10 n $\OML/cmm/m/it/10 ^^[$ $\OMS/cmsy/m/n/10 2$ $\OT1/cmr/m/n/10 ^^F$[
-]\OT1/cmr/m/it/10 i $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/10 V$\OML/cmm/m/it/10 ;$ \
-OT1/cmr/m/it/10 C$\OML/cmm/m/it/10 ;$ $"$$\OT1/cmr/m/n/10 )$ \OT1/cmr/m/it/10 n
- m $\OMS/cmsy/m/n/10 2$ \OT1/cmr/m/it/10 M[]i $\OT1/cmr/m/n/10 ($\OT1/cmr/m/it/
-10 V$\OML/cmm/m/it/10 ;$ \OT1/cmr/m/it/10 C$\OML/cmm/m/it/10 ;$ $"$$\OT1/cmr/m/
-n/10 )$ \OT1/cmr/m/it/10 n immediately[]next[]message
- []
-
-[21] [22]
+[20] [21] [22]
 Overfull \hbox (78.28864pt too wide) in paragraph at lines 455--463
 [][]  \OT1/cmr/bx/n/10 us-ing \OT1/cmr/m/it/10 state[]transition[]imps[]immedia
 tely[]next[]message state[]transition[]by[]immediately[]next[]message[] 
@@ -1085,7 +1068,7 @@ al/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local
 exlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/te
 xlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/loca
 l/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on root.pdf (46 pages, 235989 bytes).
+Output written on root.pdf (46 pages, 235954 bytes).
 PDF statistics:
  290 PDF objects out of 1000 (max. 8388607)
  226 compressed objects within 3 object streams

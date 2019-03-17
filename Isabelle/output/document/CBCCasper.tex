@@ -82,12 +82,12 @@
 \isanewline
 \isacommand{fun}\isamarkupfalse%
 \isanewline
-\ \ {\isasymSigma}{\isacharunderscore}i\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}validator\ set\ {\isasymtimes}\ consensus{\isacharunderscore}value\ set\ {\isasymtimes}\ {\isacharparenleft}message\ set\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isacharparenright}{\isacharparenright}\ {\isasymRightarrow}\ nat\ {\isasymRightarrow}\ state\ set{\isachardoublequoteclose}\ \isakeyword{and}\isanewline
-\ \ M{\isacharunderscore}i\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}validator\ set\ {\isasymtimes}\ consensus{\isacharunderscore}value\ set\ {\isasymtimes}\ {\isacharparenleft}message\ set\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isacharparenright}{\isacharparenright}\ {\isasymRightarrow}\ nat\ {\isasymRightarrow}\ message\ set{\isachardoublequoteclose}\isanewline
+\ \ {\isasymSigma}i\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}validator\ set\ {\isasymtimes}\ consensus{\isacharunderscore}value\ set\ {\isasymtimes}\ {\isacharparenleft}message\ set\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isacharparenright}{\isacharparenright}\ {\isasymRightarrow}\ nat\ {\isasymRightarrow}\ state\ set{\isachardoublequoteclose}\ \isakeyword{and}\isanewline
+\ \ Mi\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}validator\ set\ {\isasymtimes}\ consensus{\isacharunderscore}value\ set\ {\isasymtimes}\ {\isacharparenleft}message\ set\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isacharparenright}{\isacharparenright}\ {\isasymRightarrow}\ nat\ {\isasymRightarrow}\ message\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\ \isanewline
-\ \ \ \ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isacharequal}\ {\isacharbraceleft}{\isasymemptyset}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
-\ \ {\isacharbar}\ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isacharequal}\ {\isacharbraceleft}{\isasymsigma}\ {\isasymin}\ Pow\ {\isacharparenleft}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isacharparenright}{\isachardot}\ finite\ {\isasymsigma}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ m{\isachardot}\ m\ {\isasymin}\ {\isasymsigma}\ {\isasymlongrightarrow}\ justification\ m\ {\isasymsubseteq}\ {\isasymsigma}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
-\ \ {\isacharbar}\ {\isachardoublequoteopen}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isacharequal}\ {\isacharbraceleft}m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isacharparenleft}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isacharparenright}\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\ \isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isacharequal}\ {\isacharbraceleft}{\isasymemptyset}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ {\isacharbar}\ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isacharequal}\ {\isacharbraceleft}{\isasymsigma}\ {\isasymin}\ Pow\ {\isacharparenleft}Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isacharparenright}{\isachardot}\ finite\ {\isasymsigma}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ m{\isachardot}\ m\ {\isasymin}\ {\isasymsigma}\ {\isasymlongrightarrow}\ justification\ m\ {\isasymsubseteq}\ {\isasymsigma}{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ {\isacharbar}\ {\isachardoublequoteopen}Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isacharequal}\ {\isacharbraceleft}m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isacharparenleft}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isacharparenright}\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\ \isanewline
 \isanewline
 \isacommand{locale}\isamarkupfalse%
 \ Params\ {\isacharequal}\isanewline
@@ -99,9 +99,9 @@
 \isanewline
 \isakeyword{begin}\isanewline
 \ \ \isacommand{definition}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymSigma}\ {\isacharequal}\ {\isacharparenleft}{\isasymUnion}i{\isasymin}{\isasymnat}{\isachardot}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ i{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymSigma}\ {\isacharequal}\ {\isacharparenleft}{\isasymUnion}i{\isasymin}{\isasymnat}{\isachardot}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ i{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{definition}\isamarkupfalse%
-\ {\isachardoublequoteopen}M\ {\isacharequal}\ {\isacharparenleft}{\isasymUnion}i{\isasymin}{\isasymnat}{\isachardot}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ i{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}M\ {\isacharequal}\ {\isacharparenleft}{\isasymUnion}i{\isasymin}{\isasymnat}{\isachardot}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ i{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{definition}\isamarkupfalse%
 \ is{\isacharunderscore}valid{\isacharunderscore}estimator\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}{\isacharparenleft}state\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isacharparenright}\ {\isasymRightarrow}\ bool{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isakeyword{where}\isanewline
@@ -109,7 +109,7 @@
 \isanewline
 \ \ \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ {\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}Mi{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharplus}\ {\isadigit{1}}{\isacharparenright}\ {\isasymsubseteq}\ Pow\ {\isacharparenleft}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}Mi{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharplus}\ {\isadigit{1}}{\isacharparenright}\ {\isasymsubseteq}\ Pow\ {\isacharparenleft}Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -127,7 +127,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ {\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}to{\isacharunderscore}Mi{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymLongrightarrow}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}to{\isacharunderscore}Mi{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymLongrightarrow}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -145,7 +145,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ Mi{\isacharunderscore}subset{\isacharunderscore}to{\isacharunderscore}{\isasymSigma}i{\isacharcolon}\ {\isachardoublequoteopen}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymLongrightarrow}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymsubseteq}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{2}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ Mi{\isacharunderscore}subset{\isacharunderscore}to{\isacharunderscore}{\isasymSigma}i{\isacharcolon}\ {\isachardoublequoteopen}Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymLongrightarrow}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}\ {\isasymsubseteq}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{2}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -163,7 +163,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ {\isasymSigma}i{\isacharunderscore}monotonic{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isasymSigma}i{\isacharunderscore}monotonic{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -187,7 +187,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ Mi{\isacharunderscore}monotonic{\isacharcolon}\ {\isachardoublequoteopen}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ Mi{\isacharunderscore}monotonic{\isacharcolon}\ {\isachardoublequoteopen}Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n{\isacharplus}{\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -214,7 +214,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ {\isasymSigma}i{\isacharunderscore}monotonicity{\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymle}\ n\ {\isasymlongrightarrow}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ m\ {\isasymsubseteq}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
+\ {\isasymSigma}i{\isacharunderscore}monotonicity{\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymle}\ n\ {\isasymlongrightarrow}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ m\ {\isasymsubseteq}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -234,7 +234,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ Mi{\isacharunderscore}monotonicity{\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymle}\ n\ {\isasymlongrightarrow}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ m\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
+\ Mi{\isacharunderscore}monotonicity{\isacharcolon}\ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymle}\ n\ {\isasymlongrightarrow}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ m\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}C{\isacharcomma}{\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -254,8 +254,8 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}i\ {\isacharcolon}\isanewline
-\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ M{\isachardot}\ {\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}Mi\ {\isacharcolon}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ M{\isachardot}\ {\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -263,7 +263,7 @@
 %
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ M{\isacharunderscore}def\ {\isasymSigma}{\isacharunderscore}i{\isachardot}elims{\isacharparenright}\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ M{\isacharunderscore}def\ {\isasymSigma}i{\isachardot}elims{\isacharparenright}\isanewline
 \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}metis\ Nats{\isacharunderscore}{\isadigit{1}}\ Nats{\isacharunderscore}add\ One{\isacharunderscore}nat{\isacharunderscore}def\ diff{\isacharunderscore}Suc{\isacharunderscore}{\isadigit{1}}\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc{\isacharparenright}%
 \endisatagproof
@@ -275,8 +275,8 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}M{\isacharunderscore}i\ {\isacharcolon}\isanewline
-\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isacharparenleft}{\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymsigma}\ {\isasymin}\ Pow\ {\isacharparenleft}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ m\ {\isasymin}\ {\isasymsigma}{\isachardot}\ justification\ m\ {\isasymsubseteq}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+\ state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}Mi\ {\isacharcolon}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isacharparenleft}{\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymsigma}\ {\isasymin}\ Pow\ {\isacharparenleft}Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isacharparenright}\ {\isasymand}\ {\isacharparenleft}{\isasymforall}\ m\ {\isasymin}\ {\isasymsigma}{\isachardot}\ justification\ m\ {\isasymsubseteq}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -294,29 +294,29 @@
 \ \ \ \ \ \ \isacommand{fix}\isamarkupfalse%
 \ y\ {\isacharcolon}{\isacharcolon}\ nat\ \isakeyword{and}\ {\isasymsigma}\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}message\ set{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{assume}\isamarkupfalse%
-\ a{\isadigit{1}}{\isacharcolon}\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y{\isachardoublequoteclose}\isanewline
+\ a{\isadigit{1}}{\isacharcolon}\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{assume}\isamarkupfalse%
 \ a{\isadigit{2}}{\isacharcolon}\ {\isachardoublequoteopen}y\ {\isasymin}\ {\isasymnat}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ a{\isadigit{1}}\ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}meson\ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}monotonic\ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}Mi\ Pow{\isacharunderscore}iff\ contra{\isacharunderscore}subsetD{\isacharparenright}\isanewline
 \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ {\isasymsigma}\ {\isasymsubseteq}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}n{\isachardot}\ n\ {\isasymin}\ {\isasymnat}\ {\isasymand}\ {\isasymsigma}\ {\isasymsubseteq}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ {\isadigit{1}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ a{\isadigit{2}}\ \isacommand{by}\isamarkupfalse%
 \ {\isacharparenleft}metis\ {\isacharparenleft}no{\isacharunderscore}types{\isacharparenright}\ Nats{\isacharunderscore}{\isadigit{1}}\ Nats{\isacharunderscore}add\ diff{\isacharunderscore}Suc{\isacharunderscore}{\isadigit{1}}\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc{\isacharparenright}\isanewline
 \ \ \ \ \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}n{\isasymin}{\isasymnat}{\isachardot}\ {\isasymsigma}\ {\isasymsubseteq}\ {\isacharbraceleft}m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}n{\isasymin}{\isasymnat}{\isachardot}\ {\isasymsigma}\ {\isasymsubseteq}\ {\isacharbraceleft}m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}n\ {\isacharminus}\ Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \ \ \isacommand{next}\isamarkupfalse%
 \ \isanewline
 \ \ \ \ \ \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymAnd}y\ {\isasymsigma}\ m\ x{\isachardot}\ y\ {\isasymin}\ {\isasymnat}\ {\isasymLongrightarrow}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y\ {\isasymLongrightarrow}\ m\ {\isasymin}\ {\isasymsigma}\ {\isasymLongrightarrow}\ x\ {\isasymin}\ justification\ m\ {\isasymLongrightarrow}\ x\ {\isasymin}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymAnd}y\ {\isasymsigma}\ m\ x{\isachardot}\ y\ {\isasymin}\ {\isasymnat}\ {\isasymLongrightarrow}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ y\ {\isasymLongrightarrow}\ m\ {\isasymin}\ {\isasymsigma}\ {\isasymLongrightarrow}\ x\ {\isasymin}\ justification\ m\ {\isasymLongrightarrow}\ x\ {\isasymin}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}monotonic\ \isacommand{by}\isamarkupfalse%
 \ fastforce\isanewline
@@ -331,8 +331,8 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}i{\isacharunderscore}n\ {\isacharcolon}\isanewline
-\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ M{\isachardot}\ {\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
+\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}Mi{\isacharunderscore}n\ {\isacharcolon}\isanewline
+\ \ \ \ {\isachardoublequoteopen}{\isasymforall}\ m\ {\isasymin}\ M{\isachardot}\ {\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -340,7 +340,7 @@
 %
 \isatagproof
 \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}smt\ Mi{\isacharunderscore}monotonic\ Suc{\isacharunderscore}diff{\isacharunderscore}Suc\ add{\isacharunderscore}leE\ diff{\isacharunderscore}add\ diff{\isacharunderscore}le{\isacharunderscore}self\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}i\ neq{\isadigit{0}}{\isacharunderscore}conv\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc\ subsetCE\ zero{\isacharunderscore}less{\isacharunderscore}diff{\isacharparenright}%
+\ {\isacharparenleft}smt\ Mi{\isacharunderscore}monotonic\ Suc{\isacharunderscore}diff{\isacharunderscore}Suc\ add{\isacharunderscore}leE\ diff{\isacharunderscore}add\ diff{\isacharunderscore}le{\isacharunderscore}self\ message{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}Mi\ neq{\isadigit{0}}{\isacharunderscore}conv\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc\ subsetCE\ zero{\isacharunderscore}less{\isacharunderscore}diff{\isacharparenright}%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -368,7 +368,7 @@
 \ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ m\ {\isasymin}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{have}\isamarkupfalse%
 \isanewline
-\ \ \ \ \ \ {\isachardoublequoteopen}{\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\isanewline
+\ \ \ \ \ \ {\isachardoublequoteopen}{\isasymexists}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\isanewline
 \ \ \ \ \ \ {\isasymLongrightarrow}\ m\ {\isasymin}\ M{\isachardoublequoteclose}\isanewline
 \ \ \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ M{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
@@ -380,7 +380,7 @@
 \ \ \ \ \ \ \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}simp\ add{\isacharcolon}\ M{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \ \ \ \ \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}smt\ M{\isacharunderscore}i{\isachardot}simps\ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}monotonic\ PowD\ Suc{\isacharunderscore}diff{\isacharunderscore}Suc\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ m\ {\isasymin}\ {\isasymsigma}{\isacartoucheclose}\ add{\isacharunderscore}leE\ diff{\isacharunderscore}add\ diff{\isacharunderscore}le{\isacharunderscore}self\ gr{\isadigit{0}}I\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc\ state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}M{\isacharunderscore}i\ subsetCE\ zero{\isacharunderscore}less{\isacharunderscore}diff{\isacharparenright}\isanewline
+\ {\isacharparenleft}smt\ Mi{\isachardot}simps\ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}monotonic\ PowD\ Suc{\isacharunderscore}diff{\isacharunderscore}Suc\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ m\ {\isasymin}\ {\isasymsigma}{\isacartoucheclose}\ add{\isacharunderscore}leE\ diff{\isacharunderscore}add\ diff{\isacharunderscore}le{\isacharunderscore}self\ gr{\isadigit{0}}I\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ plus{\isacharunderscore}{\isadigit{1}}{\isacharunderscore}eq{\isacharunderscore}Suc\ state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}Mi\ subsetCE\ zero{\isacharunderscore}less{\isacharunderscore}diff{\isacharparenright}\isanewline
 \ \ \isacommand{qed}\isamarkupfalse%
 %
 \endisatagproof
@@ -453,7 +453,7 @@
 \endisadelimproof
 \isanewline
 \ \ \isacommand{lemma}\isamarkupfalse%
-\ {\isasymSigma}{\isacharunderscore}is{\isacharunderscore}subseteq{\isacharunderscore}of{\isacharunderscore}pow{\isacharunderscore}M{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}\ {\isasymsubseteq}\ Pow\ M{\isachardoublequoteclose}\isanewline
+\ {\isasymSigma}is{\isacharunderscore}subseteq{\isacharunderscore}of{\isacharunderscore}pow{\isacharunderscore}M{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}\ {\isasymsubseteq}\ Pow\ M{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ \ \ %
@@ -541,7 +541,7 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ empty{\isacharunderscore}set{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}{\isasymSigma}{\isacharunderscore}{\isadigit{0}}{\isacharcolon}\ {\isachardoublequoteopen}{\isasymemptyset}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ empty{\isacharunderscore}set{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}{\isasymSigma}{\isacharunderscore}{\isadigit{0}}{\isacharcolon}\ {\isachardoublequoteopen}{\isasymemptyset}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -569,7 +569,7 @@
 \isacommand{apply}\isamarkupfalse%
 \ {\isacharparenleft}simp\ add{\isacharcolon}\ \ {\isasymSigma}{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{using}\isamarkupfalse%
-\ Nats{\isacharunderscore}{\isadigit{0}}\ {\isasymSigma}{\isacharunderscore}i{\isachardot}simps{\isacharparenleft}{\isadigit{1}}{\isacharparenright}\ \isacommand{by}\isamarkupfalse%
+\ Nats{\isacharunderscore}{\isadigit{0}}\ {\isasymSigma}i{\isachardot}simps{\isacharparenleft}{\isadigit{1}}{\isacharparenright}\ \isacommand{by}\isamarkupfalse%
 \ blast%
 \endisatagproof
 {\isafoldproof}%
@@ -580,7 +580,7 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ {\isasymSigma}{\isacharunderscore}i{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ {\isasymSigma}i{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -601,7 +601,7 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ {\isasymSigma}{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ {\isasymSigma}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}{\isasymSigma}\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -640,7 +640,7 @@
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ non{\isacharunderscore}justifying{\isacharunderscore}message{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}{\isadigit{0}}{\isacharcolon}\ \isanewline
-\ \ {\isachardoublequoteopen}{\isasymexists}\ m{\isachardot}\ m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymexists}\ m{\isachardot}\ m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\ \isanewline
 %
 \isadelimproof
 \ \ %
@@ -672,7 +672,7 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ M{\isacharunderscore}i{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ Mi{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -696,7 +696,7 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ M{\isacharunderscore}is{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}M\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ Mis{\isacharunderscore}non{\isacharunderscore}empty{\isacharcolon}\ {\isachardoublequoteopen}M\ {\isasymnoteq}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -735,7 +735,7 @@
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Params{\isacharparenright}\ {\isasymSigma}i{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}{\isasymSigma}\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymsubseteq}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -754,7 +754,7 @@
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ message{\isacharunderscore}justifying{\isacharunderscore}state{\isacharunderscore}in{\isacharunderscore}{\isasymSigma}{\isacharunderscore}n{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}n\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isacharparenleft}{\isasymforall}\ {\isasymsigma}{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ m{\isachardot}\ m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ n\ {\isasymin}\ {\isasymnat}{\isachardot}\ {\isacharparenleft}{\isasymforall}\ {\isasymsigma}{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymexists}\ m{\isachardot}\ m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -769,7 +769,7 @@
 \ n\ {\isasymsigma}\isanewline
 \ \ \isacommand{assume}\isamarkupfalse%
 \ {\isachardoublequoteopen}n\ {\isasymin}\ {\isasymnat}{\isachardoublequoteclose}\isanewline
-\ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{and}\ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isachardoublequoteclose}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
@@ -797,15 +797,15 @@
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isasymepsilon}\ {\isasymsigma}\ {\isasymsubseteq}\ C{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ estimates{\isacharunderscore}are{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}C\ {\isasymSigma}i{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}{\isasymSigma}\ {\isacartoucheopen}n\ {\isasymin}\ {\isasymnat}{\isacartoucheclose}\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
+\ estimates{\isacharunderscore}are{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}C\ {\isasymSigma}i{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}{\isasymSigma}\ {\isacartoucheopen}n\ {\isasymin}\ {\isasymnat}{\isacartoucheclose}\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
 \ \ \isacommand{ultimately}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}\ m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}\ m{\isachardot}\ est\ m\ {\isasymin}\ C\ {\isasymand}\ sender\ m\ {\isasymin}\ V\ {\isasymand}\ justification\ m\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n\ {\isasymand}\ est\ m\ {\isasymin}\ {\isasymepsilon}\ {\isacharparenleft}justification\ m{\isacharparenright}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ Nats{\isacharunderscore}{\isadigit{1}}\ One{\isacharunderscore}nat{\isacharunderscore}def\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
+\ {\isacartoucheopen}{\isasymsigma}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ n{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
 \ blast\isanewline
 \isacommand{qed}\isamarkupfalse%
 %
@@ -828,25 +828,25 @@
 \isacommand{proof}\isamarkupfalse%
 \ {\isacharminus}\isanewline
 \ \ \isacommand{obtain}\isamarkupfalse%
-\ m\ \isakeyword{where}\ {\isachardoublequoteopen}m\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ m\ \isakeyword{where}\ {\isachardoublequoteopen}m\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isadigit{0}}\ {\isasymand}\ justification\ m\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ non{\isacharunderscore}justifying{\isacharunderscore}message{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}{\isadigit{0}}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isacharbraceleft}m{\isacharbraceright}\ {\isasymin}\ {\isasymSigma}{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isacharbraceleft}m{\isacharbraceright}\ {\isasymin}\ {\isasymSigma}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ Params{\isachardot}{\isasymSigma}i{\isacharunderscore}subset{\isacharunderscore}Mi\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymexists}\ m{\isacharprime}{\isachardot}\ m{\isacharprime}\ {\isasymin}\ \ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ {\isachardoublequoteopen}{\isasymexists}\ m{\isacharprime}{\isachardot}\ m{\isacharprime}\ {\isasymin}\ \ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ message{\isacharunderscore}justifying{\isacharunderscore}state{\isacharunderscore}in{\isacharunderscore}{\isasymSigma}{\isacharunderscore}n{\isacharunderscore}exists{\isacharunderscore}in{\isacharunderscore}M{\isacharunderscore}n\ Nats{\isacharunderscore}{\isadigit{1}}\ One{\isacharunderscore}nat{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
 \ metis\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{obtain}\isamarkupfalse%
-\ m{\isacharprime}\ \isakeyword{where}\ {\isachardoublequoteopen}m{\isacharprime}\ {\isasymin}\ \ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
+\ m{\isacharprime}\ \isakeyword{where}\ {\isachardoublequoteopen}m{\isacharprime}\ {\isasymin}\ \ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isachardoublequoteclose}\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{have}\isamarkupfalse%
@@ -859,13 +859,13 @@
 \ \isacommand{have}\isamarkupfalse%
 \ {\isachardoublequoteopen}{\isacharbraceleft}m{\isacharprime}{\isacharbraceright}\ {\isasymnotin}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ Params{\isachardot}state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}M{\isacharunderscore}i\ Protocol{\isacharunderscore}axioms\ {\isacartoucheopen}m{\isacharprime}\ {\isasymin}\ M{\isacharunderscore}i\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
+\ Params{\isachardot}state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}Mi\ Protocol{\isacharunderscore}axioms\ {\isacartoucheopen}m{\isacharprime}\ {\isasymin}\ Mi\ {\isacharparenleft}V{\isacharcomma}\ C{\isacharcomma}\ {\isasymepsilon}{\isacharparenright}\ {\isacharparenleft}Suc\ {\isadigit{0}}{\isacharparenright}\ {\isasymand}\ justification\ m{\isacharprime}\ {\isacharequal}\ {\isacharbraceleft}m{\isacharbraceright}{\isacartoucheclose}\ \isacommand{by}\isamarkupfalse%
 \ fastforce\isanewline
 \ \ \isacommand{ultimately}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
 \ {\isacharquery}thesis\isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
-\ {\isasymSigma}{\isacharunderscore}is{\isacharunderscore}subseteq{\isacharunderscore}of{\isacharunderscore}pow{\isacharunderscore}M\ \isacommand{by}\isamarkupfalse%
+\ {\isasymSigma}is{\isacharunderscore}subseteq{\isacharunderscore}of{\isacharunderscore}pow{\isacharunderscore}M\ \isacommand{by}\isamarkupfalse%
 \ auto\isanewline
 \isacommand{qed}\isamarkupfalse%
 %

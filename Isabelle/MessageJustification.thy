@@ -17,7 +17,7 @@ definition (in Params) message_justification :: "message rel"
 lemma (in Protocol) transitivity_of_justifications :
   "trans message_justification"
   apply (simp add: trans_def message_justification_def justified_def)
-  by (meson Params.M_type Params.state_is_in_pow_M_i Protocol_axioms contra_subsetD)
+  by (meson Params.M_type Params.state_is_in_pow_Mi Protocol_axioms contra_subsetD)
 
 lemma (in Protocol) irreflexivity_of_justifications :
   "irrefl message_justification"
@@ -28,17 +28,17 @@ proof -
   fix n m
   assume "est m \<in> C" 
   assume "sender m \<in> V"
-  assume "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n" 
+  assume "justification m \<in> \<Sigma>i (V, C, \<epsilon>) n" 
   assume "est m \<in> \<epsilon> (justification m)" 
   assume "m \<in> justification m"
-  have  "m \<in> M_i (V, C, \<epsilon>) (n - 1)"
-    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>est m \<in> C\<close> \<open>est m \<in> \<epsilon> (justification m)\<close> \<open>justification m \<in> \<Sigma>_i (V, C, \<epsilon>) n\<close> \<open>m \<in> justification m\<close> \<open>sender m \<in> V\<close> add.right_neutral add_Suc_right diff_is_0_eq' diff_le_self diff_zero mem_Collect_eq not_gr0 subsetCE)
-  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) (n - 1)"
-    using M_i.simps by blast
-  then have  "justification m \<in> \<Sigma>_i (V, C, \<epsilon>) 0"
+  have  "m \<in> Mi (V, C, \<epsilon>) (n - 1)"
+    by (smt Mi.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>est m \<in> C\<close> \<open>est m \<in> \<epsilon> (justification m)\<close> \<open>justification m \<in> \<Sigma>i (V, C, \<epsilon>) n\<close> \<open>m \<in> justification m\<close> \<open>sender m \<in> V\<close> add.right_neutral add_Suc_right diff_is_0_eq' diff_le_self diff_zero mem_Collect_eq not_gr0 subsetCE)
+  then have  "justification m \<in> \<Sigma>i (V, C, \<epsilon>) (n - 1)"
+    using Mi.simps by blast
+  then have  "justification m \<in> \<Sigma>i (V, C, \<epsilon>) 0"
     apply (induction n)
     apply simp
-    by (smt M_i.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>m \<in> justification m\<close> add.right_neutral add_Suc_right diff_Suc_1 mem_Collect_eq not_gr0 subsetCE subsetCE)
+    by (smt Mi.simps One_nat_def Params.\<Sigma>i_subset_Mi Pow_iff Suc_pred \<open>m \<in> justification m\<close> add.right_neutral add_Suc_right diff_Suc_1 mem_Collect_eq not_gr0 subsetCE subsetCE)
   then have "justification m \<in> {\<emptyset>}"
     by simp
   then show False
@@ -62,7 +62,7 @@ lemma (in Protocol) justification_is_strict_partial_order_on_M :
 lemma (in Protocol) monotonicity_of_justifications :
   "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subseteq> justification m"
   apply simp
-  by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_M_i)
+  by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_Mi)
 
 lemma (in Protocol) strict_monotonicity_of_justifications :
   "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subset> justification m"
@@ -77,28 +77,28 @@ lemma (in Protocol) only_valid_message_is_justified :
   apply (simp add: justified_def)
   using Params.M_type message_in_state_is_valid by blast
 
-lemma (in Protocol) justified_message_exists_in_M_i_n_minus_1 :
+lemma (in Protocol) justified_message_exists_in_Mi_n_minus_1 :
   "\<forall> n m m'. n \<in> \<nat> 
   \<longrightarrow> justified m' m
-  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
-  \<longrightarrow>  m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+  \<longrightarrow> m \<in> Mi (V, C, \<epsilon>) n  
+  \<longrightarrow>  m' \<in> Mi (V, C, \<epsilon>) (n - 1)"
 proof -
   have "\<forall> n m m'. justified m' m
-  \<longrightarrow> m \<in> M_i (V, C, \<epsilon>) n  
+  \<longrightarrow> m \<in> Mi (V, C, \<epsilon>) n  
   \<longrightarrow> m \<in> M \<and> m' \<in> M
-  \<longrightarrow> m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
+  \<longrightarrow> m' \<in> Mi (V, C, \<epsilon>) (n - 1)"
     apply (rule, rule, rule, rule, rule, rule)
   proof -
     fix n m m'
     assume "justified m' m" 
-    assume "m \<in> M_i (V, C, \<epsilon>) n"
+    assume "m \<in> Mi (V, C, \<epsilon>) n"
     assume "m \<in> M \<and> m' \<in> M"
-    then have "justification m \<in> \<Sigma>_i (V,C,\<epsilon>) n"
-      using M_i.simps \<open>m \<in> M_i (V, C, \<epsilon>) n\<close> by blast
-    then have "justification m \<in>  Pow (M_i (V,C,\<epsilon>) (n - 1))"
-      by (metis (no_types, lifting) Suc_diff_Suc \<Sigma>_i.simps(1) \<Sigma>i_subset_Mi \<open>justified m' m\<close> add_leE diff_add diff_le_self empty_iff justified_def neq0_conv plus_1_eq_Suc singletonD subsetCE)
-    show "m' \<in> M_i (V, C, \<epsilon>) (n - 1)"
-      using \<open>justification m \<in> Pow (M_i (V, C, \<epsilon>) (n - 1))\<close> \<open>justified m' m\<close> justified_def by auto
+    then have "justification m \<in> \<Sigma>i (V,C,\<epsilon>) n"
+      using Mi.simps \<open>m \<in> Mi (V, C, \<epsilon>) n\<close> by blast
+    then have "justification m \<in>  Pow (Mi (V,C,\<epsilon>) (n - 1))"
+      by (metis (no_types, lifting) Suc_diff_Suc \<Sigma>i.simps(1) \<Sigma>i_subset_Mi \<open>justified m' m\<close> add_leE diff_add diff_le_self empty_iff justified_def neq0_conv plus_1_eq_Suc singletonD subsetCE)
+    show "m' \<in> Mi (V, C, \<epsilon>) (n - 1)"
+      using \<open>justification m \<in> Pow (Mi (V, C, \<epsilon>) (n - 1))\<close> \<open>justified m' m\<close> justified_def by auto
   qed
   then show ?thesis
     by (metis (no_types, lifting) M_def UN_I only_valid_message_is_justified)
