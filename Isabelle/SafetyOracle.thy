@@ -105,7 +105,7 @@ lemma (in Protocol) validator_in_clique_see_L_H_M_of_others_is_singleton :
   "\<forall> v_set p \<sigma>. v_set \<subseteq> V \<and> \<sigma> \<in> \<Sigma> 
   \<longrightarrow> is_clique (v_set, p, \<sigma>) 
   \<longrightarrow> (\<forall> v v'. {v, v'} \<subseteq> v_set \<longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
-  oops
+  sorry
 
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 
@@ -405,13 +405,11 @@ lemma (in Protocol) clique_imps_everyone_agreeing :
 proof-
   fix \<sigma> v_set p assume "\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V"  and "is_clique (v_set, p, \<sigma>)" 
   then have clique: "\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
-           \<and> is_singleton (L_H_M 
-                              (the_elem (L_H_J \<sigma> v)) v)
            \<and> later_disagreeing_messages (p,
                                          the_elem (L_H_M 
                                             (the_elem (L_H_J \<sigma> v)) v)
                                         , v, \<sigma>) = \<emptyset>"
-    by (simp add: is_clique_def)
+    by (simp add: is_clique_def) 
   then have p_on_est : "\<forall> v \<in> v_set. (\<forall> m \<in> {m' \<in> \<sigma>. sender m' = v 
                                        \<and> justified (the_elem (L_H_M 
                                                           (the_elem (L_H_J \<sigma> v)) v))
@@ -427,7 +425,8 @@ proof-
   then have justified_ok: "\<forall> v \<in> v_set. justified (the_elem (L_H_M 
                                                           (the_elem (L_H_J \<sigma> v)) v))
                                     (the_elem (L_H_M \<sigma> v))"
-    by (smt \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> clique empty_iff is_singleton_the_elem justified_def L_H_J_type L_H_M_def L_M_is_subset_of_the_state L_H_J_of_observed_non_equivocating_validator_is_singleton singletonI subsetCE)
+    using validator_in_clique_see_L_H_M_of_others_is_singleton
+    by (smt Diff_iff L_H_M_def L_H_M_is_in_the_state L_M_from_non_observed_validator_is_empty M_type \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_clique (v_set, p, \<sigma>)\<close> empty_subsetI insert_subset is_singleton_the_elem justified_def observed_non_equivocating_validators_def state_is_subset_of_M subsetCE)
   have sender_ok: "\<forall> v \<in> v_set. sender (the_elem (L_H_M \<sigma> v)) = v" 
     using \<open>\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M
     using \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> by blast
