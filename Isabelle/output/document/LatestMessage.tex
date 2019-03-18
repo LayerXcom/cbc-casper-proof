@@ -27,7 +27,7 @@
 \isacommand{theory}\isamarkupfalse%
 \ LatestMessage\isanewline
 \isanewline
-\isakeyword{imports}\ Main\ CBCCasper\ {\isachardoublequoteopen}Libraries{\isacharslash}LaTeXsugar{\isachardoublequoteclose}\isanewline
+\isakeyword{imports}\ Main\ CBCCasper\ MessageJustification\ {\isachardoublequoteopen}Libraries{\isacharslash}LaTeXsugar{\isachardoublequoteclose}\isanewline
 \isanewline
 \isakeyword{begin}%
 \endisatagtheory
@@ -37,6 +37,7 @@
 \isanewline
 %
 \endisadelimtheory
+\isanewline
 \isanewline
 \isanewline
 \isanewline
@@ -350,6 +351,27 @@
 %
 \endisadelimproof
 \isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ V{\isachardot}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isasymsubseteq}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def{\isacharparenright}\ \isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
 \ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ set{\isachardoublequoteclose}\isanewline
@@ -559,6 +581,7 @@
 \isanewline
 \isanewline
 \isanewline
+\isanewline
 \isacommand{definition}\isamarkupfalse%
 \ latest{\isacharunderscore}estimates\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
@@ -611,7 +634,7 @@
 \isacommand{definition}\isamarkupfalse%
 \ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ message\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharparenleft}if\ is{\isacharunderscore}equivocating\ {\isasymsigma}\ v\ then\ {\isasymemptyset}\ else\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharparenleft}if\ v\ {\isasymin}\ equivocating{\isacharunderscore}validators\ {\isasymsigma}\ then\ {\isasymemptyset}\ else\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ {\isacharcolon}\isanewline
@@ -633,13 +656,82 @@
 \endisadelimproof
 \isanewline
 \isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\isanewline
+\ \ \ \ \ \ is{\isacharunderscore}singleton\ {\isacharparenleft}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}have{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\ \isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ sender{\isacharunderscore}of{\isacharunderscore}latest{\isacharunderscore}message{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ sender\ {\isacharparenleft}the{\isacharunderscore}elem\ {\isacharparenleft}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}{\isacharparenright}\ {\isacharequal}\ v{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ \ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\ \isanewline
+\ \ \ \ \ \ \ \ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}smt\ Diff{\isacharunderscore}iff\ is{\isacharunderscore}singleton{\isacharunderscore}the{\isacharunderscore}elem\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ prod{\isachardot}simps{\isacharparenleft}{\isadigit{2}}{\isacharparenright}\ singletonI{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}message{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}the{\isacharunderscore}state{\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ the{\isacharunderscore}elem\ {\isacharparenleft}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}\ {\isasymin}\ {\isasymsigma}{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ \ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\ \isanewline
+\ \ \ \ \ \ \ \ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ Diff{\isacharunderscore}iff\ contra{\isacharunderscore}subsetD\ insert{\isacharunderscore}subset\ is{\isacharunderscore}singleton{\isacharunderscore}the{\isacharunderscore}elem\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ observed{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\ \ \isanewline
+\isanewline
 \isanewline
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
 \ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}est\ m\ {\isacharbar}\ m{\isachardot}\ m\ {\isasymin}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ \isanewline
+\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ est\ {\isacharbackquote}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ {\isacharcolon}\isanewline
@@ -651,8 +743,10 @@
 %
 \isatagproof
 \isacommand{using}\isamarkupfalse%
-\ Protocol{\isachardot}latest{\isacharunderscore}estimates{\isacharunderscore}type\ Protocol{\isacharunderscore}axioms\ latest{\isacharunderscore}estimates{\isacharunderscore}def\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
-\ auto%
+\ Protocol{\isachardot}latest{\isacharunderscore}estimates{\isacharunderscore}type\ Protocol{\isacharunderscore}axioms\ latest{\isacharunderscore}estimates{\isacharunderscore}def\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ \isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ M{\isacharunderscore}type\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ \isacommand{by}\isamarkupfalse%
+\ fastforce%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -680,7 +774,134 @@
 %
 \endisadelimproof
 \isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}is{\isacharunderscore}singleton\ A\ {\isasymLongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharparenleft}f\ {\isacharbackquote}A{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ is{\isacharunderscore}singleton{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
 \isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}estimate\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\isanewline
+\ \ \ \ \ \ is{\isacharunderscore}singleton\ {\isacharparenleft}latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\isanewline
+\ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ state\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ justification\ {\isacharbackquote}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isachardoublequoteclose}\isanewline
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isasymsubseteq}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ M{\isacharunderscore}type\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ \isanewline
+\ \ \ \ \ \ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
+\ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}justification\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\isanewline
+\ \ \ \ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharparenleft}latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}has{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\isanewline
+\ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}justification{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymforall}\ {\isasymsigma}{\isacharprime}\ {\isasymin}\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}{\isacharprime}\ {\isasymsubset}\ {\isasymsigma}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}justifications{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\isanewline
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ latest{\isacharunderscore}messages{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \ \ \ \ message{\isacharunderscore}in{\isacharunderscore}state{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
 \isanewline
 %
 \isadelimtheory
@@ -700,7 +921,7 @@
 %
 \end{isabellebody}%
 \endinput
-%:%file=~/work/LayerXcom/cbc-casper-proof/Isabelle/LatestMessage.thy%:%
+%:%file=~/work/blockchain/LayerXcom/cbc-casper-proof/Isabelle/LatestMessage.thy%:%
 %:%11=1%:%
 %:%27=3%:%
 %:%28=3%:%
@@ -718,363 +939,485 @@
 %:%46=14%:%
 %:%47=15%:%
 %:%48=16%:%
-%:%49=16%:%
+%:%49=17%:%
 %:%50=17%:%
 %:%51=18%:%
 %:%52=19%:%
 %:%53=20%:%
-%:%54=20%:%
+%:%54=21%:%
 %:%55=21%:%
-%:%58=22%:%
-%:%62=22%:%
-%:%63=22%:%
+%:%56=22%:%
+%:%59=23%:%
+%:%63=23%:%
 %:%64=23%:%
-%:%65=23%:%
-%:%70=23%:%
-%:%73=24%:%
+%:%65=24%:%
+%:%66=24%:%
+%:%71=24%:%
 %:%74=25%:%
-%:%75=25%:%
+%:%75=26%:%
 %:%76=26%:%
-%:%79=27%:%
-%:%83=27%:%
-%:%84=27%:%
+%:%77=27%:%
+%:%80=28%:%
+%:%84=28%:%
 %:%85=28%:%
-%:%86=28%:%
-%:%87=28%:%
-%:%92=28%:%
-%:%95=29%:%
+%:%86=29%:%
+%:%87=29%:%
+%:%88=29%:%
+%:%93=29%:%
 %:%96=30%:%
 %:%97=31%:%
-%:%98=31%:%
+%:%98=32%:%
 %:%99=32%:%
 %:%100=33%:%
 %:%101=34%:%
 %:%102=35%:%
-%:%103=35%:%
+%:%103=36%:%
 %:%104=36%:%
-%:%107=37%:%
-%:%111=37%:%
-%:%112=37%:%
+%:%105=37%:%
+%:%108=38%:%
+%:%112=38%:%
 %:%113=38%:%
-%:%114=38%:%
-%:%119=38%:%
-%:%122=39%:%
+%:%114=39%:%
+%:%115=39%:%
+%:%120=39%:%
 %:%123=40%:%
-%:%124=40%:%
+%:%124=41%:%
 %:%125=41%:%
-%:%128=42%:%
-%:%132=42%:%
-%:%133=42%:%
+%:%126=42%:%
+%:%129=43%:%
+%:%133=43%:%
 %:%134=43%:%
-%:%135=43%:%
-%:%136=43%:%
-%:%141=43%:%
-%:%144=44%:%
+%:%135=44%:%
+%:%136=44%:%
+%:%137=44%:%
+%:%142=44%:%
 %:%145=45%:%
-%:%146=45%:%
+%:%146=46%:%
 %:%147=46%:%
-%:%150=47%:%
-%:%154=47%:%
-%:%155=47%:%
+%:%148=47%:%
+%:%151=48%:%
+%:%155=48%:%
 %:%156=48%:%
-%:%157=48%:%
-%:%162=48%:%
-%:%165=49%:%
+%:%157=49%:%
+%:%158=49%:%
+%:%163=49%:%
 %:%166=50%:%
-%:%167=50%:%
+%:%167=51%:%
 %:%168=51%:%
-%:%171=52%:%
-%:%175=52%:%
-%:%176=52%:%
-%:%181=52%:%
-%:%184=53%:%
+%:%169=52%:%
+%:%172=53%:%
+%:%176=53%:%
+%:%177=53%:%
+%:%182=53%:%
 %:%185=54%:%
 %:%186=55%:%
-%:%187=55%:%
+%:%187=56%:%
 %:%188=56%:%
 %:%189=57%:%
 %:%190=58%:%
 %:%191=59%:%
-%:%192=59%:%
+%:%192=60%:%
 %:%193=60%:%
-%:%196=61%:%
-%:%200=61%:%
-%:%201=61%:%
+%:%194=61%:%
+%:%197=62%:%
+%:%201=62%:%
 %:%202=62%:%
-%:%203=62%:%
-%:%208=62%:%
-%:%211=63%:%
+%:%203=63%:%
+%:%204=63%:%
+%:%209=63%:%
 %:%212=64%:%
-%:%213=64%:%
+%:%213=65%:%
 %:%214=65%:%
-%:%217=66%:%
-%:%221=66%:%
-%:%222=66%:%
+%:%215=66%:%
+%:%218=67%:%
+%:%222=67%:%
 %:%223=67%:%
-%:%224=67%:%
-%:%225=67%:%
-%:%230=67%:%
-%:%233=68%:%
+%:%224=68%:%
+%:%225=68%:%
+%:%226=68%:%
+%:%231=68%:%
 %:%234=69%:%
 %:%235=70%:%
-%:%236=70%:%
+%:%236=71%:%
 %:%237=71%:%
 %:%238=72%:%
 %:%239=73%:%
 %:%240=74%:%
-%:%241=74%:%
+%:%241=75%:%
 %:%242=75%:%
-%:%245=76%:%
-%:%249=76%:%
-%:%250=76%:%
+%:%243=76%:%
+%:%246=77%:%
+%:%250=77%:%
 %:%251=77%:%
-%:%252=77%:%
-%:%253=77%:%
-%:%258=77%:%
-%:%261=78%:%
+%:%252=78%:%
+%:%253=78%:%
+%:%254=78%:%
+%:%259=78%:%
 %:%262=79%:%
-%:%263=79%:%
+%:%263=80%:%
 %:%264=80%:%
-%:%267=81%:%
-%:%271=81%:%
-%:%272=81%:%
+%:%265=81%:%
+%:%268=82%:%
+%:%272=82%:%
 %:%273=82%:%
-%:%274=82%:%
-%:%275=82%:%
-%:%280=82%:%
-%:%283=83%:%
+%:%274=83%:%
+%:%275=83%:%
+%:%276=83%:%
+%:%281=83%:%
 %:%284=84%:%
 %:%285=85%:%
-%:%286=85%:%
+%:%286=86%:%
 %:%287=86%:%
 %:%288=87%:%
 %:%289=88%:%
 %:%290=89%:%
-%:%291=89%:%
+%:%291=90%:%
 %:%292=90%:%
-%:%295=91%:%
-%:%299=91%:%
-%:%300=91%:%
+%:%293=91%:%
+%:%296=92%:%
+%:%300=92%:%
 %:%301=92%:%
-%:%302=92%:%
-%:%303=92%:%
-%:%308=92%:%
-%:%311=93%:%
+%:%302=93%:%
+%:%303=93%:%
+%:%304=93%:%
+%:%309=93%:%
 %:%312=94%:%
-%:%313=94%:%
+%:%313=95%:%
 %:%314=95%:%
-%:%317=96%:%
-%:%321=96%:%
-%:%322=96%:%
+%:%315=96%:%
+%:%318=97%:%
+%:%322=97%:%
 %:%323=97%:%
-%:%324=97%:%
-%:%325=97%:%
-%:%330=97%:%
-%:%333=98%:%
+%:%324=98%:%
+%:%325=98%:%
+%:%326=98%:%
+%:%331=98%:%
 %:%334=99%:%
-%:%335=99%:%
+%:%335=100%:%
 %:%336=100%:%
-%:%339=101%:%
-%:%343=101%:%
-%:%344=101%:%
-%:%349=101%:%
-%:%352=102%:%
+%:%337=101%:%
+%:%340=102%:%
+%:%344=102%:%
+%:%345=102%:%
+%:%350=102%:%
 %:%353=103%:%
 %:%354=104%:%
 %:%355=104%:%
 %:%356=105%:%
-%:%357=106%:%
-%:%358=107%:%
-%:%359=108%:%
-%:%360=108%:%
-%:%361=109%:%
-%:%364=110%:%
-%:%368=110%:%
-%:%369=110%:%
-%:%370=111%:%
-%:%371=111%:%
-%:%372=111%:%
-%:%377=111%:%
-%:%380=112%:%
-%:%381=113%:%
-%:%382=113%:%
-%:%383=114%:%
-%:%386=115%:%
-%:%390=115%:%
-%:%391=115%:%
-%:%392=115%:%
-%:%397=115%:%
-%:%400=116%:%
-%:%401=117%:%
-%:%402=117%:%
-%:%403=118%:%
-%:%410=119%:%
-%:%411=119%:%
-%:%412=120%:%
-%:%413=120%:%
+%:%359=106%:%
+%:%363=106%:%
+%:%364=106%:%
+%:%365=107%:%
+%:%366=107%:%
+%:%371=107%:%
+%:%374=108%:%
+%:%375=109%:%
+%:%376=110%:%
+%:%377=110%:%
+%:%378=111%:%
+%:%379=112%:%
+%:%380=113%:%
+%:%381=114%:%
+%:%382=114%:%
+%:%383=115%:%
+%:%386=116%:%
+%:%390=116%:%
+%:%391=116%:%
+%:%392=117%:%
+%:%393=117%:%
+%:%394=117%:%
+%:%399=117%:%
+%:%402=118%:%
+%:%403=119%:%
+%:%404=119%:%
+%:%405=120%:%
+%:%408=121%:%
+%:%412=121%:%
+%:%413=121%:%
 %:%414=121%:%
-%:%415=121%:%
-%:%416=122%:%
-%:%417=122%:%
-%:%418=122%:%
-%:%419=123%:%
-%:%420=124%:%
-%:%421=124%:%
-%:%422=125%:%
-%:%423=125%:%
-%:%424=126%:%
-%:%425=126%:%
-%:%426=126%:%
-%:%427=127%:%
-%:%428=127%:%
-%:%429=128%:%
-%:%430=128%:%
-%:%431=128%:%
-%:%432=129%:%
-%:%438=129%:%
-%:%441=130%:%
-%:%442=131%:%
-%:%443=131%:%
-%:%444=132%:%
-%:%447=133%:%
-%:%451=133%:%
-%:%452=133%:%
+%:%419=121%:%
+%:%422=122%:%
+%:%423=123%:%
+%:%424=123%:%
+%:%425=124%:%
+%:%432=125%:%
+%:%433=125%:%
+%:%434=126%:%
+%:%435=126%:%
+%:%436=127%:%
+%:%437=127%:%
+%:%438=128%:%
+%:%439=128%:%
+%:%440=128%:%
+%:%441=129%:%
+%:%442=130%:%
+%:%443=130%:%
+%:%444=131%:%
+%:%445=131%:%
+%:%446=132%:%
+%:%447=132%:%
+%:%448=132%:%
+%:%449=133%:%
+%:%450=133%:%
+%:%451=134%:%
+%:%452=134%:%
 %:%453=134%:%
-%:%458=134%:%
-%:%461=135%:%
-%:%462=136%:%
-%:%463=137%:%
+%:%454=135%:%
+%:%460=135%:%
+%:%463=136%:%
 %:%464=137%:%
-%:%465=138%:%
-%:%466=139%:%
-%:%469=140%:%
-%:%473=140%:%
-%:%474=140%:%
-%:%475=141%:%
-%:%476=142%:%
-%:%477=142%:%
-%:%482=142%:%
+%:%465=137%:%
+%:%466=138%:%
+%:%469=139%:%
+%:%473=139%:%
+%:%474=139%:%
+%:%475=140%:%
+%:%480=140%:%
+%:%483=141%:%
+%:%484=142%:%
 %:%485=143%:%
-%:%486=144%:%
+%:%486=143%:%
 %:%487=144%:%
 %:%488=145%:%
 %:%491=146%:%
 %:%495=146%:%
 %:%496=146%:%
 %:%497=147%:%
-%:%498=147%:%
-%:%499=147%:%
-%:%500=148%:%
-%:%501=148%:%
-%:%502=149%:%
-%:%503=149%:%
-%:%508=149%:%
-%:%511=150%:%
-%:%512=151%:%
+%:%498=148%:%
+%:%499=148%:%
+%:%504=148%:%
+%:%507=149%:%
+%:%508=150%:%
+%:%509=150%:%
+%:%510=151%:%
 %:%513=152%:%
-%:%514=152%:%
-%:%515=153%:%
-%:%518=154%:%
+%:%517=152%:%
+%:%518=152%:%
+%:%519=153%:%
+%:%520=153%:%
+%:%521=153%:%
 %:%522=154%:%
 %:%523=154%:%
 %:%524=155%:%
 %:%525=155%:%
-%:%526=156%:%
-%:%527=156%:%
-%:%528=157%:%
-%:%529=157%:%
-%:%530=158%:%
-%:%531=159%:%
-%:%532=160%:%
-%:%533=161%:%
-%:%534=162%:%
-%:%535=163%:%
-%:%536=164%:%
-%:%537=165%:%
-%:%538=165%:%
-%:%539=166%:%
-%:%540=166%:%
-%:%541=166%:%
-%:%542=167%:%
-%:%543=167%:%
-%:%544=168%:%
-%:%545=169%:%
-%:%546=169%:%
-%:%547=170%:%
-%:%553=170%:%
-%:%556=171%:%
-%:%557=172%:%
-%:%558=173%:%
-%:%559=174%:%
-%:%560=175%:%
-%:%561=176%:%
-%:%562=177%:%
-%:%563=177%:%
-%:%564=178%:%
-%:%565=179%:%
-%:%566=180%:%
-%:%567=181%:%
-%:%568=181%:%
-%:%569=182%:%
-%:%572=183%:%
-%:%576=183%:%
-%:%577=183%:%
-%:%578=183%:%
-%:%583=183%:%
+%:%530=155%:%
+%:%533=156%:%
+%:%534=157%:%
+%:%535=158%:%
+%:%536=158%:%
+%:%537=159%:%
+%:%540=160%:%
+%:%544=160%:%
+%:%545=160%:%
+%:%546=161%:%
+%:%547=161%:%
+%:%548=162%:%
+%:%549=162%:%
+%:%550=163%:%
+%:%551=163%:%
+%:%552=164%:%
+%:%553=165%:%
+%:%554=166%:%
+%:%555=167%:%
+%:%556=168%:%
+%:%557=169%:%
+%:%558=170%:%
+%:%559=171%:%
+%:%560=171%:%
+%:%561=172%:%
+%:%562=172%:%
+%:%563=172%:%
+%:%564=173%:%
+%:%565=173%:%
+%:%566=174%:%
+%:%567=175%:%
+%:%568=175%:%
+%:%569=176%:%
+%:%575=176%:%
+%:%578=177%:%
+%:%579=178%:%
+%:%580=179%:%
+%:%581=180%:%
+%:%582=181%:%
+%:%583=182%:%
+%:%584=183%:%
+%:%585=184%:%
 %:%586=184%:%
 %:%587=185%:%
-%:%588=185%:%
-%:%589=186%:%
-%:%592=187%:%
-%:%596=187%:%
-%:%597=187%:%
-%:%598=187%:%
-%:%603=187%:%
-%:%606=188%:%
-%:%607=189%:%
-%:%608=190%:%
+%:%588=186%:%
+%:%589=187%:%
+%:%590=188%:%
+%:%591=188%:%
+%:%592=189%:%
+%:%595=190%:%
+%:%599=190%:%
+%:%600=190%:%
+%:%601=190%:%
+%:%606=190%:%
 %:%609=191%:%
 %:%610=192%:%
-%:%611=193%:%
+%:%611=192%:%
 %:%612=193%:%
-%:%613=194%:%
-%:%614=195%:%
-%:%615=196%:%
-%:%616=197%:%
-%:%617=197%:%
-%:%618=198%:%
-%:%621=199%:%
-%:%625=199%:%
-%:%626=199%:%
-%:%631=199%:%
+%:%615=194%:%
+%:%619=194%:%
+%:%620=194%:%
+%:%621=194%:%
+%:%626=194%:%
+%:%629=195%:%
+%:%630=196%:%
+%:%631=197%:%
+%:%632=198%:%
+%:%633=199%:%
 %:%634=200%:%
-%:%635=201%:%
-%:%636=202%:%
-%:%637=203%:%
-%:%638=204%:%
-%:%639=205%:%
-%:%640=205%:%
-%:%641=206%:%
-%:%642=207%:%
-%:%643=208%:%
-%:%644=209%:%
-%:%645=209%:%
-%:%646=210%:%
-%:%649=211%:%
-%:%653=211%:%
-%:%654=211%:%
-%:%655=211%:%
-%:%660=211%:%
-%:%663=212%:%
-%:%664=213%:%
-%:%665=213%:%
-%:%666=214%:%
-%:%669=215%:%
-%:%673=215%:%
-%:%674=215%:%
-%:%679=215%:%
+%:%635=200%:%
+%:%636=201%:%
+%:%637=202%:%
+%:%638=203%:%
+%:%639=204%:%
+%:%640=204%:%
+%:%641=205%:%
+%:%644=206%:%
+%:%648=206%:%
+%:%649=206%:%
+%:%654=206%:%
+%:%657=207%:%
+%:%658=208%:%
+%:%659=209%:%
+%:%660=209%:%
+%:%661=210%:%
+%:%662=211%:%
+%:%665=212%:%
+%:%669=212%:%
+%:%670=212%:%
+%:%671=213%:%
+%:%672=213%:%
+%:%677=213%:%
+%:%680=214%:%
+%:%681=215%:%
 %:%682=216%:%
-%:%683=217%:%
-%:%684=218%:%
-%:%687=219%:%
-%:%692=220%:%
+%:%683=216%:%
+%:%684=217%:%
+%:%687=218%:%
+%:%691=218%:%
+%:%692=218%:%
+%:%693=219%:%
+%:%694=220%:%
+%:%695=220%:%
+%:%700=220%:%
+%:%703=221%:%
+%:%704=222%:%
+%:%705=222%:%
+%:%706=223%:%
+%:%709=224%:%
+%:%713=224%:%
+%:%714=224%:%
+%:%715=225%:%
+%:%716=226%:%
+%:%717=226%:%
+%:%722=226%:%
+%:%725=227%:%
+%:%726=228%:%
+%:%727=229%:%
+%:%728=230%:%
+%:%729=231%:%
+%:%730=232%:%
+%:%731=232%:%
+%:%732=233%:%
+%:%733=234%:%
+%:%734=235%:%
+%:%735=236%:%
+%:%736=237%:%
+%:%737=237%:%
+%:%738=238%:%
+%:%741=239%:%
+%:%745=239%:%
+%:%746=239%:%
+%:%747=240%:%
+%:%748=240%:%
+%:%749=240%:%
+%:%754=240%:%
+%:%757=241%:%
+%:%758=242%:%
+%:%759=242%:%
+%:%760=243%:%
+%:%763=244%:%
+%:%767=244%:%
+%:%768=244%:%
+%:%773=244%:%
+%:%776=245%:%
+%:%777=246%:%
+%:%778=246%:%
+%:%779=247%:%
+%:%782=248%:%
+%:%786=248%:%
+%:%787=248%:%
+%:%788=249%:%
+%:%789=249%:%
+%:%794=249%:%
+%:%797=250%:%
+%:%798=251%:%
+%:%799=251%:%
+%:%800=252%:%
+%:%801=253%:%
+%:%804=254%:%
+%:%808=254%:%
+%:%809=254%:%
+%:%810=255%:%
+%:%811=255%:%
+%:%812=256%:%
+%:%813=256%:%
+%:%814=257%:%
+%:%815=257%:%
+%:%820=257%:%
+%:%823=258%:%
+%:%824=259%:%
+%:%825=260%:%
+%:%826=261%:%
+%:%827=262%:%
+%:%828=263%:%
+%:%829=263%:%
+%:%830=264%:%
+%:%831=267%:%
+%:%832=268%:%
+%:%833=269%:%
+%:%834=270%:%
+%:%835=270%:%
+%:%836=271%:%
+%:%839=272%:%
+%:%843=272%:%
+%:%844=272%:%
+%:%845=273%:%
+%:%846=273%:%
+%:%851=273%:%
+%:%854=274%:%
+%:%855=275%:%
+%:%856=275%:%
+%:%857=276%:%
+%:%858=277%:%
+%:%861=278%:%
+%:%865=278%:%
+%:%866=278%:%
+%:%867=279%:%
+%:%868=279%:%
+%:%869=280%:%
+%:%870=280%:%
+%:%871=281%:%
+%:%872=281%:%
+%:%877=281%:%
+%:%880=282%:%
+%:%881=283%:%
+%:%882=283%:%
+%:%883=284%:%
+%:%886=285%:%
+%:%890=285%:%
+%:%891=285%:%
+%:%892=286%:%
+%:%893=287%:%
+%:%894=287%:%
+%:%895=288%:%
+%:%896=289%:%
+%:%897=289%:%
+%:%902=289%:%
+%:%905=290%:%
+%:%908=291%:%
+%:%913=292%:%

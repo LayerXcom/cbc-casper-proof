@@ -20,7 +20,7 @@ locale Protocol =
   and ε_type: "⋀s. s ∈ Σ ⟹ ε s ∈ Pow C - {∅}"
 
   assumes Σ_def: "Σ = (⋃i∈ℕ. Σ_i (V,C,ε) i)"
-  and M_def: "M = (⋃i∈ℕ. M_i (V,C,ε) i)"
+  and M_def: "M = (⋃i∈ℕ. Mi (V,C,ε) i)"
 begin
 ```
 
@@ -58,3 +58,6 @@ lemma (in Protocol) observed_type :
   "∀ σ ∈ Σ. observed σ ⊆ V"
   using Protocol.M_type Protocol_axioms observed_def state_is_subset_of_M by fastforce
 ```
+
+## Locale for proofs
+To be added.

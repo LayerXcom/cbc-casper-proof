@@ -4,6 +4,10 @@ imports Main CBCCasper LatestMessage StateTransition ConsensusSafety
 
 begin
 
+(* ###################################################### *)
+(* Safety oracle *)
+(* ###################################################### *)
+
 (* Section 7: Safety Oracles *)
 (* Section 7.1 Preliminary Definitions *)
 
@@ -479,7 +483,7 @@ proof -
   then show "p c"
     using \<open>is_majority_driven p\<close> unfolding is_majority_driven_def is_majority_def gt_threshold_def
     using \<open>c \<in> \<epsilon> \<sigma>\<close> 
-    using M_i.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
+    using Mi.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
 qed
 
 (* Lemma 39 (Cliques exist in all futures) *)

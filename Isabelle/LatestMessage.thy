@@ -2,14 +2,15 @@ section \<open>Latest Message\<close>
 
 theory LatestMessage
 
-imports Main CBCCasper "Libraries/LaTeXsugar"
+imports Main CBCCasper MessageJustification "Libraries/LaTeXsugar"
 
 begin
 
 (* ###################################################### *)
-(* Section 4: Example Protocols *)
+(* Latest messages *)
 (* ###################################################### *)
 
+(* Section 4: Example Protocols *)
 (* Section 4.1:  Preliminary Definitions *)
 
 (* Definition 4.2 *)
