@@ -36,7 +36,7 @@ notation (ASCII)
 (* Definition 4.27: Score of a block *)
 definition (in BlockchainParams) score :: "state \<Rightarrow> block \<Rightarrow> real"
   where
-    "score \<sigma> b = sum W {v \<in> observed \<sigma>. \<exists> b' \<in> B. b' \<in> (latest_estimates_from_non_equivocating_validators \<sigma> v) \<and> (b \<downharpoonright> b')}"
+    "score \<sigma> b = sum W {v \<in> observed \<sigma>. \<exists> b' \<in> B. b' \<in> (L_H_E \<sigma> v) \<and> (b \<downharpoonright> b')}"
 
 (* Definition 4.28: Children *)
 definition (in BlockchainParams) children :: "block * state \<Rightarrow> block set"
