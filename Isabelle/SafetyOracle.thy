@@ -85,19 +85,27 @@ lemma (in Protocol) later_disagreeing_messages_type :
 (* Definition 7.16: Clique with 1 layers *)
 (* NOTE: The original definition implies that validators in clique are not equivocating. 
          Here we explicitly states this. *)
-(* FIXME: We should prove that validators in clique see each other have a single latest message, 
-          by the monotonicity of equivocations. The original definition implies it.  *)
 definition is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
  where
-   "is_clique = (\<lambda>(v_set, p, \<sigma>). (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
-     \<and> (\<forall>  v' \<in> v_set. 
-             is_singleton (L_H_M 
-                              (the_elem (L_H_J \<sigma> v)) v')
-           \<and> is_agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
-           \<and> later_disagreeing_messages (p,
-                                         the_elem (L_H_M 
-                                            (the_elem (L_H_J \<sigma> v)) v')
-                                        , v', \<sigma>) = \<emptyset>)))"
+   "is_clique = (\<lambda>(v_set, p, \<sigma>). 
+      (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
+       \<and> (\<forall>  v' \<in> v_set. 
+             is_agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
+             \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>)))"
+
+(* FIXME: We should prove that validators in clique see each other have a single latest message, 
+          by the monotonicity of equivocations. The original definition implies it.  *)
+lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
+  "\<forall> \<sigma> v \<sigma>'. v \<in> V \<and> {\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> is_future_state (\<sigma>', \<sigma>)
+  \<longrightarrow> v \<notin> equivocating_validators \<sigma>
+  \<longrightarrow> v \<notin> equivocating_validators \<sigma>'"
+  oops
+
+lemma (in Protocol) validator_in_clique_see_L_H_M_of_others_is_singleton : 
+  "\<forall> v_set p \<sigma>. v_set \<subseteq> V \<and> \<sigma> \<in> \<Sigma> 
+  \<longrightarrow> is_clique (v_set, p, \<sigma>) 
+  \<longrightarrow> (\<forall> v v'. {v, v'} \<subseteq> v_set \<longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
+  oops
 
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 
