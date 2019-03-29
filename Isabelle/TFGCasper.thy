@@ -260,14 +260,14 @@ lemma (in BlockchainParams) GHOST_is_valid_estimator :
   oops
 
 lemma (in Ghost) block_membership_is_majority_driven :
-  "\<forall> p \<in> P. is_majority_driven p"
-  apply (simp add: is_majority_driven_def)
+  "\<forall> p \<in> P. majority_driven p"
+  apply (simp add: majority_driven_def)
   (* by (metis DiffE Pow_iff is_valid_estimator_def \<epsilon>_type block_is_consensus_value subsetCE) *)
   oops
 
 lemma (in Ghost) block_membership_is_max_driven :
-  "\<forall> p \<in> P. is_max_driven p"
-  apply (simp add: is_max_driven_def)
+  "\<forall> p \<in> P. max_driven p"
+  apply (simp add: max_driven_def)
   (* FIXME: Timeout *)
   (* by (metis DiffE Nats_0 ghost_is_estimator) *)
   oops

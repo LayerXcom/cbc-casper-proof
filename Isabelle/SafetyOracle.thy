@@ -80,19 +80,19 @@ lemma (in Protocol) agreeing_validators_weight_combined :
   by simp
 
 (* Definition 7.11 *)
-definition (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
+definition (in Params) majority :: "(validator set * state) \<Rightarrow> bool"
   where
-    "is_majority = (\<lambda>(v_set, \<sigma>). (weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2))"
+    "majority = (\<lambda>(v_set, \<sigma>). (weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2))"
    
 (* Definition 7.12 *)
-definition (in Protocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) majority_driven :: "consensus_value_property \<Rightarrow> bool"
   where
-    "is_majority_driven p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> is_majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
+    "majority_driven p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
 (* Definition 7.13 *)
-definition (in Protocol) is_max_driven :: "consensus_value_property \<Rightarrow> bool"
+definition (in Protocol) max_driven :: "consensus_value_property \<Rightarrow> bool"
   where
-    "is_max_driven p =
+    "max_driven p =
       (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
 
 (* Definition 7.14 *)
@@ -288,7 +288,7 @@ lemma (in Protocol) new_message_from_majority_clique_see_members_agreeing :
   "\<forall> \<sigma> \<sigma>' m' v_set. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique (v_set, p, \<sigma>) \<and> sender m' \<in> v_set \<and> sender m' \<notin> equivocating_validators \<sigma>'
-      \<and> (\<forall> v \<in> v_set. is_majority (v_set, the_elem (L_H_J \<sigma> v))) 
+      \<and> (\<forall> v \<in> v_set. majority (v_set, the_elem (L_H_J \<sigma> v))) 
   \<longrightarrow> sender m' \<in> agreeing_validators (p, justification m')"
   oops
 
@@ -346,10 +346,10 @@ lemma (in Protocol) empty_later_disagreeing_messages_in_new_message :
 (* Lemma 31 (New non-equivocating latest messages from members of majority clique don’t break the clique) *)
 lemma (in Protocol) clique_not_affected_by_minimal_transitions_outside_clique :
   "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique (v_set, p, \<sigma>) \<and> sender m' \<in> v_set \<and> sender m' \<notin> equivocating_validators \<sigma>'
-      \<and> (\<forall> v \<in> v_set. is_majority (v_set, the_elem (L_H_J \<sigma> v))) 
+      \<and> (\<forall> v \<in> v_set. majority (v_set, the_elem (L_H_J \<sigma> v))) 
   \<longrightarrow> is_clique (v_set, p, \<sigma>')"
   oops
 
@@ -366,7 +366,7 @@ definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bo
 lemma (in Protocol) gt_threshold_imps_majority_for_any_validator :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V
   \<longrightarrow> gt_threshold (v_set, \<sigma>) 
-  \<longrightarrow> (\<forall> v \<in> v_set. is_majority (v_set, the_elem (L_H_J \<sigma> v)))"
+  \<longrightarrow> (\<forall> v \<in> v_set. majority (v_set, the_elem (L_H_J \<sigma> v)))"
   oops
 
 (* Definition 7.19: Clique oracle with 1 layers *)
@@ -378,7 +378,7 @@ definition (in Params) is_clique_oracle :: "(validator set * state * consensus_v
 (* Lemma 33 (Clique oracles preserved over minimal transitions from validators not in clique). *)
 lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_validators_not_in_clique :
   "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> sender m' \<notin> v_set - equivocating_validators \<sigma>
       \<and> is_clique_oracle (v_set, \<sigma>, p) 
@@ -388,7 +388,7 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_valid
 (* Lemma 34 (Clique oracles preserved over minimal transitions from non-equivocating validators) *)
 lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_non_equivocating_validator :
   "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> sender m' \<in> v_set - equivocating_validators \<sigma> \<and> sender m' \<notin> equivocating_validators \<sigma>'
       \<and> is_clique_oracle (v_set, \<sigma>, p) 
@@ -398,7 +398,7 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_non_e
 (* Lemma 35 (Clique oracles preserved over minimal transitions from non-equivocating validators) *)
 lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_equivocating_validator :
   "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> sender m' \<in> v_set - equivocating_validators \<sigma> \<and> sender m' \<in> equivocating_validators \<sigma>'
       \<and> is_clique_oracle (v_set, \<sigma>, p) 
@@ -408,7 +408,7 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_equiv
 (* Lemma 36 (Clique oracles preserved over minimal transitions) *)
 lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
   "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
@@ -416,7 +416,7 @@ lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
 
 lemma (in Protocol) clique_oracles_preserved_over_nice_message :
   "\<forall> \<sigma> m' v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> \<sigma> \<union> {m'} \<in> \<Sigma>t
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m'}, p)"
@@ -476,7 +476,7 @@ qed
 lemma (in Protocol) threshold_sized_clique_imps_estimator_agreeing :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> finite v_set
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>) 
   \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c)"
   apply (rule, rule, rule, rule, rule, rule, rule, rule)
@@ -484,7 +484,7 @@ proof -
   fix \<sigma> v_set p c
   assume  "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V"
   and "finite v_set"
-  and "is_majority_driven p"
+  and "majority_driven p"
   and "is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>)"
   and "c \<in> \<epsilon> \<sigma>"
   then have "v_set - equivocating_validators \<sigma> \<subseteq> agreeing_validators (p, \<sigma>)" 
@@ -517,7 +517,7 @@ proof -
     using \<open>weight_measure (v_set - equivocating_validators \<sigma>) \<le> weight_measure (agreeing_validators (p, \<sigma>))\<close>
     by linarith  
   then show "p c"
-    using \<open>is_majority_driven p\<close> unfolding is_majority_driven_def is_majority_def gt_threshold_def
+    using \<open>majority_driven p\<close> unfolding majority_driven_def majority_def gt_threshold_def
     using \<open>c \<in> \<epsilon> \<sigma>\<close> 
     using Mi.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
 qed
@@ -525,13 +525,13 @@ qed
 (* Lemma 39 (Cliques exist in all futures) *)
 lemma (in Protocol) clique_oracle_for_all_futures :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. is_clique_oracle (v_set, \<sigma>', p))"
   apply (rule+)
 proof -
   fix \<sigma> v_set p \<sigma>'
-  assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "is_majority_driven p" and "is_clique_oracle (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
+  assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "is_clique_oracle (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
   show "is_clique_oracle (v_set, \<sigma>', p)"
     using clique_oracles_preserved_over_minimal_transitions
   sorry
@@ -541,7 +541,7 @@ qed
 lemma (in Protocol) clique_oracle_is_safety_oracle :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> finite v_set
-  \<longrightarrow> is_majority_driven p
+  \<longrightarrow> majority_driven p
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>')"    
   using clique_oracle_for_all_futures threshold_sized_clique_imps_estimator_agreeing
