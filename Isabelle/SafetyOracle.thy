@@ -60,6 +60,24 @@ lemma (in Protocol) disagreeing_validators_type :
   apply (simp add: disagreeing_validators_def)
   by auto
 
+lemma (in Protocol) weight_measure_agreeing_plus_equivocating :
+  "\<forall> \<sigma> \<in> \<Sigma>. weight_measure (agreeing_validators (p, \<sigma>) \<union> equivocating_validators \<sigma>) = weight_measure (agreeing_validators (p, \<sigma>)) + equivocation_fault_weight \<sigma>"
+  unfolding equivocation_fault_weight_def
+  using agreeing_validators_are_not_equivocating weight_measure_disjoint_plus agreeing_validators_finite equivocating_validators_is_finite
+  by simp
+
+lemma (in Protocol) disagreeing_validators_weight_combined :
+  "\<forall> \<sigma> \<in> \<Sigma>. weight_measure (disagreeing_validators (p, \<sigma>)) = weight_measure V - weight_measure (agreeing_validators (p, \<sigma>)) - equivocation_fault_weight \<sigma>"
+  unfolding disagreeing_validators_def
+  using weight_measure_agreeing_plus_equivocating
+  unfolding equivocation_fault_weight_def
+  using agreeing_validators_are_not_equivocating weight_measure_subset_minus agreeing_validators_finite equivocating_validators_is_finite
+  by (smt Diff_empty Diff_iff Int_iff V_type agreeing_validators_type equivocating_validators_type finite_Diff old.prod.case subset_iff)
+
+lemma (in Protocol) agreeing_validators_weight_combined :
+  "\<forall> \<sigma> \<in> \<Sigma>. weight_measure (agreeing_validators (p, \<sigma>)) = weight_measure V - weight_measure (disagreeing_validators (p, \<sigma>)) - equivocation_fault_weight \<sigma>"
+  using disagreeing_validators_weight_combined
+  by simp
 
 (* Definition 7.11 *)
 definition (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
