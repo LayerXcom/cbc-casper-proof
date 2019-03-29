@@ -80,7 +80,7 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
 (* Definition 4.27: Score of a block *)
 definition (in BlockchainParams) score :: "state \<Rightarrow> consensus_value \<Rightarrow> real"
   where
-    "score \<sigma> b = sum W {v \<in> observed \<sigma>. \<exists> b' \<in> C. b' \<in> (L_H_E \<sigma> v) \<and> (b \<downharpoonright> b')}"
+    "score \<sigma> b = sum W (agreeing_validators (block_membership b, \<sigma>))"  
 
 (* Definition 4.28: Children *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
@@ -106,12 +106,36 @@ definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> consens
   where
     "GHOST_estimator \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
-
-
 (* Locale for proofs *)
 locale Blockchain = BlockchainParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> C \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "C = C"
+
+lemma (in Blockchain) equivalence_of_score_to_paper :
+  "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (block_membership b, \<sigma>) =  {v \<in> V. \<exists> b' \<in> L_H_E \<sigma> v. b \<downharpoonright> b'}"
+proof -
+  have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
+        \<longrightarrow> (v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<in> observed \<sigma> \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x))"
+    using observed_non_equivocating_validators_have_one_latest_message
+    unfolding observed_non_equivocating_validators_def is_singleton_def
+    by (metis Diff_iff empty_iff insert_iff)
+  moreover have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
+        \<longrightarrow> (v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<in> observed \<sigma> \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x))"
+    apply (simp add: observed_def L_M_def from_sender_def)
+    by auto
+  ultimately have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
+        \<longrightarrow> (v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x))"
+    by blast
+  then have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma>
+        \<longrightarrow> (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x))"
+    by blast
+  show ?thesis
+    apply (simp add: agreeing_validators_def agreeing_def observed_non_equivocating_validators_def L_H_E_def L_H_M_def block_membership_def)
+    using \<open>\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma>
+        \<longrightarrow> (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x))\<close>
+    observed_type_for_state
+    by blast
+qed
 
 
 definition (in BlockchainParams) block_conflicting :: "(consensus_value * consensus_value) \<Rightarrow> bool"
