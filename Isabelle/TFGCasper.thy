@@ -80,8 +80,9 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
 (* Locale for proofs *)
 locale Blockchain = BlockchainParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> C \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
-  assumes prev_type : "\<forall> b. b \<in> C \<longleftrightarrow> prev b \<in> C"
-  
+  and prev_type : "\<forall> b. b \<in> C \<longleftrightarrow> prev b \<in> C"
+  and genesis_type : "genesis \<in> C"
+
 definition (in BlockchainParams) block_conflicting :: "(consensus_value * consensus_value) \<Rightarrow> bool"
   where
     "block_conflicting = (\<lambda>(b1, b2). \<not> (b1 \<downharpoonright> b2 \<or> b2 \<downharpoonright> b1))"
@@ -230,7 +231,6 @@ definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> consens
 (* Locale for proofs *)
 locale TFG = Blockchain + 
   assumes ghost_is_estimator : "\<epsilon> = GHOST_estimator"
-  and genesis_type : "genesis \<in> C"
 
 lemma (in TFG) children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> C"
