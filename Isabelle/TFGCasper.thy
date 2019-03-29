@@ -223,41 +223,40 @@ function (in BlockchainParams) GHOST :: "(consensus_value set * state) \<Rightar
        \<union> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>}"
   by auto
 
-(* Definition 4.31: Casper the Friendly TFG *)
-definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> consensus_value set"
+definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow> consensus_value set"
   where
-    "GHOST_estimator \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
+    "GHOST_heads_or_children \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
-(* Locale for proofs *)
-locale TFG = Blockchain + 
-  assumes ghost_is_estimator : "\<epsilon> = GHOST_estimator"
-
-lemma (in TFG) children_type :
+lemma (in Blockchain) children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> C"
   apply (simp add: children_def)
-  using TFG_axioms TFG_axioms_def TFG_def prev_type by auto
+  using prev_type by auto
 
 lemma argmax_type :
   "S \<subseteq> A \<Longrightarrow> arg_max_on f S \<in> A" 
   apply (simp add: arg_max_on_def arg_max_def is_arg_max_def)
   oops
 
-lemma (in TFG) best_children_type :
+lemma (in Blockchain) best_children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  best_children (b, \<sigma>) \<subseteq> C"
   apply (simp add: best_children_def arg_max_on_def arg_max_def is_arg_max_def)
   using children_type 
   apply auto
   oops
 
-lemma (in TFG) GHSOT_type :
+lemma (in Blockchain) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow>  GHOST(b_set, \<sigma>) \<subseteq> C"
   oops
 
-lemma (in BlockchainParams) GHOST_is_valid_estimator : 
-  "(\<forall> b. b \<in> C \<longleftrightarrow> prev b \<in> C) \<and> genesis \<in> C 
-  \<Longrightarrow> is_valid_estimator GHOST_estimator"
-  apply (simp add: is_valid_estimator_def BlockchainParams.GHOST_estimator_def)
+lemma (in Blockchain) GHOST_is_valid_estimator : 
+  "is_valid_estimator GHOST_heads_or_children"
+  apply (simp add: is_valid_estimator_def BlockchainParams.GHOST_heads_or_children_def)
   oops
+
+(* Locale for proofs *)
+(* Definition 4.31: Casper the Friendly GHOST *)
+locale TFG = Blockchain + 
+  assumes ghost_is_estimator : "\<epsilon> = GHOST_heads_or_children"
 
 lemma (in TFG) block_membership_is_majority_driven :
   "\<forall> b \<in> C. majority_driven (block_membership b)"
