@@ -60,10 +60,15 @@ proof -
 qed
 
 lemma (in BlockchainParams) transitivity_of_blockchain_membership :
-  "{b1, b2, b3} \<subseteq> C \<Longrightarrow> b1 \<downharpoonright> b2 \<and> b2 \<downharpoonright> b3 \<Longrightarrow> b1 \<downharpoonright> b3"
-  apply (simp add: trans_def blockchain_membership_def)
+  "b1 \<downharpoonright> b2 \<and> b2 \<downharpoonright> b3 \<Longrightarrow> b1 \<downharpoonright> b3"
+  apply (simp add: blockchain_membership_def)
   using n_cestor_transitive
   by (metis id_apply of_nat_eq_id of_nat_in_Nats subsetI)
+
+lemma (in BlockchainParams) irreflexivity_of_blockchain_membership :
+  "b \<downharpoonright> b"
+  apply (simp add: blockchain_membership_def)
+  using Nats_0 by fastforce
 
 (* Block membership property *)
 (* This is Definition 4.32: Example non-trivial properties of consensus values *)
@@ -72,8 +77,7 @@ definition (in BlockchainParams) block_membership :: "consensus_value \<Rightarr
     "block_membership b = (\<lambda>b'. b \<downharpoonright> b')"
 
 lemma (in BlockchainParams) also_agreeing_on_ancestors :
-  "\<forall> b b'. {b, b'} \<subseteq> C \<and> b \<downharpoonright> b'
-  \<longrightarrow> agreeing (block_membership b', \<sigma>, v) \<longrightarrow> agreeing (block_membership b, \<sigma>, v)"
+  "b' \<downharpoonright> b \<Longrightarrow> agreeing (block_membership b, \<sigma>, v) \<longrightarrow> agreeing (block_membership b', \<sigma>, v)"
   apply (simp add: agreeing_def block_membership_def)
   using BlockchainParams.transitivity_of_blockchain_membership by blast
 
@@ -81,7 +85,7 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
 locale Blockchain = BlockchainParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> C \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and prev_type : "\<forall> b. b \<in> C \<longleftrightarrow> prev b \<in> C"
-  and genesis_type : "genesis \<in> C"
+  and genesis_type : "genesis \<in> C" "\<forall> b \<in> C. genesis \<downharpoonright> b" "prev genesis = genesis"
 
 definition (in BlockchainParams) block_conflicting :: "(consensus_value * consensus_value) \<Rightarrow> bool"
   where
@@ -209,10 +213,20 @@ definition (in BlockchainParams) children :: "consensus_value * state \<Rightarr
   where
     "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
 
+lemma (in BlockchainParams) children_membership :
+  "\<forall> b \<in> children (b', \<sigma>).  b' \<downharpoonright> b"
+  apply (simp add: children_def) 
+  by (metis BlockchainParams.blockchain_membership_def BlockchainParams.n_cestor.simps(2) diff_Suc_1 id_apply n_cestor.simps(1) of_nat_eq_id of_nat_in_Nats)
+
 (* Definition 4.29: Best Children *)
 definition (in BlockchainParams) best_children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
     "best_children = (\<lambda> (b, \<sigma>). {arg_max_on (score \<sigma>) (children (b, \<sigma>))})"
+
+(* Best children property *)
+definition (in BlockchainParams) best_child :: "consensus_value \<Rightarrow> state_property"
+  where
+    "best_child b = (\<lambda>\<sigma>. b \<in> best_children (prev b, \<sigma>))"
 
 (* Definition 4.30: GHOST *)
 (* NOTE: well-sortedness error occurs in code generation *)
@@ -233,7 +247,7 @@ lemma (in Blockchain) children_type :
   using prev_type by auto
 
 lemma argmax_type :
-  "S \<subseteq> A \<Longrightarrow> arg_max_on f S \<in> A" 
+  "arg_max_on f S \<in> S" 
   apply (simp add: arg_max_on_def arg_max_def is_arg_max_def)
   oops
 
@@ -256,7 +270,7 @@ lemma (in Blockchain) GHOST_is_valid_estimator :
 (* Locale for proofs *)
 (* Definition 4.31: Casper the Friendly GHOST *)
 locale TFG = Blockchain + 
-  assumes ghost_is_estimator : "\<epsilon> = GHOST_heads_or_children"
+  assumes ghost_estimator : "\<epsilon> = GHOST_heads_or_children"
 
 lemma (in TFG) block_membership_is_majority_driven :
   "\<forall> b \<in> C. majority_driven (block_membership b)"
@@ -266,6 +280,55 @@ lemma (in TFG) block_membership_is_majority_driven :
 lemma (in TFG) block_membership_is_max_driven :
   "\<forall> b \<in> C. max_driven (block_membership b)"
   apply (simp add: max_driven_def)
-  oops
+proof -
+  have "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b
+        \<longrightarrow> agreeing_validators (block_membership b, \<sigma>) \<subseteq> agreeing_validators (block_membership b', \<sigma>)"
+    unfolding agreeing_validators_def
+    using also_agreeing_on_ancestors by blast
+  hence "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b 
+        \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) \<ge> weight_measure (agreeing_validators (block_membership b, \<sigma>))"
+    using weight_measure_subset_gte agreeing_validators_finite agreeing_validators_type by simp
+  hence "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b 
+        \<longrightarrow> weight_measure V - weight_measure (disagreeing_validators (block_membership b', \<sigma>)) - equivocation_fault_weight \<sigma> 
+              \<ge> weight_measure V - weight_measure (disagreeing_validators (block_membership b, \<sigma>)) - equivocation_fault_weight \<sigma>"
+    using agreeing_validators_weight_combined by simp
+  hence "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b
+        \<longrightarrow> weight_measure (disagreeing_validators (block_membership b, \<sigma>)) 
+              \<ge> weight_measure (disagreeing_validators (block_membership b', \<sigma>))"
+    by simp
+  show "\<forall>b\<in>C. \<forall>\<sigma> \<in> \<Sigma>. weight_measure (disagreeing_validators (block_membership b, \<sigma>)) < weight_measure (agreeing_validators (block_membership b, \<sigma>)) 
+            \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. block_membership b c)"
+    apply (rule, rule, rule, rule)
+  proof - 
+    fix b \<sigma> c
+    assume "b \<in> C" 
+    and  "\<sigma> \<in> \<Sigma>"
+    and "weight_measure (disagreeing_validators (block_membership b, \<sigma>)) < weight_measure (agreeing_validators (block_membership b, \<sigma>))"
+    and "c \<in> \<epsilon> \<sigma>"
+    hence "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b, \<sigma>))"
+      using \<open>\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b 
+        \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) \<ge> weight_measure (agreeing_validators (block_membership b, \<sigma>))\<close>
+      by fastforce
+    hence "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b', \<sigma>))"
+      using \<open>\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b
+        \<longrightarrow> weight_measure (disagreeing_validators (block_membership b, \<sigma>)) \<ge> weight_measure (disagreeing_validators (block_membership b', \<sigma>))\<close>
+          \<open>b \<in> C\<close> \<open>\<sigma> \<in> \<Sigma>\<close>
+      by force
+    hence "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)"
+      sorry
+    have "c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))" 
+      using ghost_estimator \<open>c \<in> \<epsilon> \<sigma>\<close>
+      unfolding GHOST_heads_or_children_def
+      by blast
+    then have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b''"
+      using \<open>\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)\<close>
+      sorry
+   then show "block_membership b c"
+     unfolding block_membership_def
+     using \<open>c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))\<close>  
+           transitivity_of_blockchain_membership children_membership
+     by blast
+ qed
+qed
 
 end

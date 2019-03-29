@@ -87,13 +87,13 @@ definition (in Params) majority :: "(validator set * state) \<Rightarrow> bool"
 (* Definition 7.12 *)
 definition (in Protocol) majority_driven :: "consensus_value_property \<Rightarrow> bool"
   where
-    "majority_driven p = (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
+    "majority_driven p = (\<forall> \<sigma> \<in> \<Sigma>. majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
 (* Definition 7.13 *)
 definition (in Protocol) max_driven :: "consensus_value_property \<Rightarrow> bool"
   where
     "max_driven p =
-      (\<forall> \<sigma> c. \<sigma> \<in> \<Sigma> \<and> c \<in> C \<and> weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> c \<in> \<epsilon> \<sigma> \<and> p c)"
+      (\<forall> \<sigma> \<in> \<Sigma>. weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
 (* Definition 7.14 *)
 definition later_disagreeing_messages :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
