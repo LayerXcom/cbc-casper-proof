@@ -21,14 +21,14 @@ begin
 
 
 (* Definition 7.8 *)
-definition is_agreeing :: "(consensus_value_property * state * validator) \<Rightarrow> bool"
+definition agreeing :: "(consensus_value_property * state * validator) \<Rightarrow> bool"
   where
-    "is_agreeing  = (\<lambda>(p, \<sigma>, v). \<forall> c \<in> L_H_E \<sigma> v. p c)"
+    "agreeing  = (\<lambda>(p, \<sigma>, v). \<forall> c \<in> L_H_E \<sigma> v. p c)"
 
 (* NOTE: Modified from the original draft with observed_non_equivocating_validators *)
 definition agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "agreeing_validators  = (\<lambda>(p, \<sigma>).{v \<in> observed_non_equivocating_validators \<sigma>. is_agreeing  (p, \<sigma>, v)})"
+    "agreeing_validators  = (\<lambda>(p, \<sigma>).{v \<in> observed_non_equivocating_validators \<sigma>. agreeing  (p, \<sigma>, v)})"
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
@@ -89,7 +89,7 @@ definition is_clique :: "(validator set * consensus_value_property * state) \<Ri
    "is_clique = (\<lambda>(v_set, p, \<sigma>). 
       (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
        \<and> (\<forall>  v' \<in> v_set. 
-             is_agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
+             agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
              \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>)))"
 
 (* FIXME: We should prove that validators in clique see each other have a single latest message, 
@@ -439,7 +439,7 @@ proof-
     apply (simp add: L_H_E_def)
     by (metis (no_types, lifting) \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> empty_iff is_singleton_the_elem L_H_M_of_observed_non_equivocating_validator_is_singleton singletonD singletonI the_elem_image_unique)  
   then show "v_set \<subseteq> agreeing_validators (p, \<sigma>)"
-    unfolding agreeing_validators_def is_agreeing_def
+    unfolding agreeing_validators_def agreeing_def
     by (smt \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> is_singleton_the_elem mem_Collect_eq L_H_E_of_observed_non_equivocating_validator_is_singleton old.prod.case singletonD subsetI)
 qed
 
