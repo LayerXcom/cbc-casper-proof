@@ -39,15 +39,26 @@ lemma (in Protocol) agreeing_validators_finite :
   "\<forall> \<sigma> \<in> \<Sigma>. finite (agreeing_validators (p, \<sigma>))"
   by (meson V_type agreeing_validators_type rev_finite_subset)
 
+lemma (in Protocol) agreeing_validators_are_observed_non_equivocating_validators :
+  "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> observed_non_equivocating_validators \<sigma>"
+  apply (simp add: agreeing_validators_def)
+  by blast
+
+lemma (in Protocol) agreeing_validators_are_not_equivocating :
+  "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<inter> equivocating_validators \<sigma> = \<emptyset>"
+  using agreeing_validators_are_observed_non_equivocating_validators
+        observed_non_equivocating_validators_are_not_equivocating 
+  by blast
+
 (* Definition 7.9 *)
-definition disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
+definition (in Params) disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "disagreeing_validators = (\<lambda>(p, \<sigma>). {v \<in> observed_non_equivocating_validators \<sigma>. \<exists> c \<in> L_H_E \<sigma> v. \<not> p c})"
+    "disagreeing_validators = (\<lambda>(p, \<sigma>). V - agreeing_validators (p, \<sigma>) - equivocating_validators \<sigma>)"
 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
-  apply (simp add: observed_non_equivocating_validators_def disagreeing_validators_def)
-  using observed_type_for_state by auto
+  apply (simp add: disagreeing_validators_def)
+  by auto
 
 
 (* Definition 7.11 *)

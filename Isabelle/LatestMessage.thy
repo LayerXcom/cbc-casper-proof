@@ -116,6 +116,11 @@ lemma (in Protocol) observed_non_equivocating_validators_type :
   apply (simp add: observed_non_equivocating_validators_def)
   using observed_type_for_state equivocating_validators_type by auto
 
+lemma (in Protocol) observed_non_equivocating_validators_are_not_equivocating :
+  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<inter> equivocating_validators \<sigma> = \<emptyset>"
+  unfolding observed_non_equivocating_validators_def
+  by blast
+
 lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
   using justification_is_well_founded_on_M from_sender_type_for_state wfp_on_subset by blast 
