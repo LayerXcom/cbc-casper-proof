@@ -347,6 +347,18 @@ definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
     (* "weight_measure v_set = sum W v_set" *)
     "weight_measure v_set = Sum (W `v_set)"
 
+lemma (in Protocol) weight_measure_subset_minus :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> B
+    \<Longrightarrow>  weight_measure B - weight_measure A = weight_measure (B - A)"
+  apply (simp add:  weight_measure_def)
+  oops
+
+lemma (in Protocol) weight_measure_disjoint_plus :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<inter> B = \<emptyset>
+    \<Longrightarrow>  weight_measure A + weight_measure B = weight_measure (A \<union> B)"
+  apply (simp add:  weight_measure_def)
+  oops
+
 lemma (in Protocol) weight_measure_comparison_strict_subset_gte :
   "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> A \<Longrightarrow> weight_measure A \<ge> weight_measure B"
   apply (simp add:  weight_measure_def)
