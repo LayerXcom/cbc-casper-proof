@@ -28,6 +28,59 @@ definition (in BlockchainParams) blockchain_membership :: "consensus_value \<Rig
 notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
 
+definition (in BlockchainParams) blockchain_membership_rel :: "consensus_value rel"
+  where 
+    "blockchain_membership_rel = {(b1, b2). {b1, b2} \<subseteq> C \<and> b1 \<downharpoonright> b2}" 
+
+lemma (in BlockchainParams) n_cestor_transitive :
+  "\<forall> n1 n2 x y z. {n1, n2} \<subseteq> \<nat> 
+    \<longrightarrow> x = n_cestor (y, n1) 
+    \<longrightarrow> y = n_cestor (z, n2)
+    \<longrightarrow> x = n_cestor (z, n1 + n2)"
+  apply (rule, rule)
+proof -
+  fix n1 n2
+  show "\<forall>x y z. {n1, n2} \<subseteq> \<nat> \<longrightarrow> x = n_cestor (y, n1) \<longrightarrow> y = n_cestor (z, n2) \<longrightarrow> x = n_cestor (z, n1 + n2)"
+    apply (induction n2)
+    apply simp
+    apply (rule, rule, rule, rule, rule, rule)
+  proof -
+    fix n2 x y z
+    assume "\<forall>x y z. {n1, n2} \<subseteq> \<nat> \<longrightarrow> x = n_cestor (y, n1) \<longrightarrow> y = n_cestor (z, n2) \<longrightarrow> x = n_cestor (z, n1 + n2)" 
+    assume "{n1, Suc n2} \<subseteq> \<nat>"
+    assume "x = n_cestor (y, n1)"
+    assume "y = n_cestor (z, Suc n2)"
+    then have "y = n_cestor (prev z, n2)"
+      by simp
+    have "{n1, n2} \<subseteq> \<nat>"
+      by (simp add: Nats_def)
+    then have "x = n_cestor (prev z, n1 + n2)"
+      using \<open>x = n_cestor (y, n1)\<close> \<open>y = n_cestor (prev z, n2)\<close>
+            \<open>\<forall>x y z. {n1, n2} \<subseteq> \<nat> \<longrightarrow> x = n_cestor (y, n1) \<longrightarrow> y = n_cestor (z, n2) \<longrightarrow> x = n_cestor (z, n1 + n2)\<close>
+      by simp
+    then show "x = n_cestor (z, n1 + Suc n2)"
+      by simp
+  qed
+qed
+
+lemma (in BlockchainParams) transitivity_of_blockchain_membership :
+  "trans blockchain_membership_rel"
+  apply (simp add: trans_def blockchain_membership_rel_def blockchain_membership_def)
+  using n_cestor_transitive
+  by (metis id_apply of_nat_eq_id of_nat_in_Nats subsetI)
+
+(* Block membership property *)
+(* This is Definition 4.32: Example non-trivial properties of consensus values *)
+definition (in BlockchainParams) block_membership :: "consensus_value \<Rightarrow> consensus_value_property"
+  where
+    "block_membership b = (\<lambda>b'. b \<downharpoonright> b')"
+
+lemma (in BlockchainParams) also_agreeing_on_ancestors :
+  "\<forall> b b'. {b, b'} \<subseteq> C \<and> b \<downharpoonright> b'
+  \<longrightarrow> agreeing (block_membership b', \<sigma>, v) \<longrightarrow> agreeing (block_membership b, \<sigma>, v)"
+  apply (simp add: agreeing_def block_membership_def)
+  oops
+
 (* Definition 4.27: Score of a block *)
 definition (in BlockchainParams) score :: "state \<Rightarrow> consensus_value \<Rightarrow> real"
   where
@@ -57,19 +110,13 @@ definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> consens
   where
     "GHOST_estimator \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
-(* Definition 4.32: Example non-trivial properties of consensus values *)
-abbreviation (in BlockchainParams) P :: "consensus_value_property set"
-  where
-    "P \<equiv> {p. \<exists>!b \<in> C. \<forall>b' \<in> C. (b \<downharpoonright> b' \<longrightarrow> p b' = True) \<and> \<not> (b \<downharpoonright> b' \<longrightarrow> p b' = False)}"
+
 
 (* Locale for proofs *)
 locale Blockchain = BlockchainParams + Protocol +
   assumes blockchain_type : "\<forall> b b' b''. {b, b', b''} \<subseteq> C \<longrightarrow> b' \<downharpoonright> b \<and> b'' \<downharpoonright> b \<longrightarrow> (b' \<downharpoonright> b'' \<or> b'' \<downharpoonright> b')"
   and block_is_consensus_value : "C = C"
 
-definition (in BlockchainParams) block_membership :: "consensus_value \<Rightarrow> consensus_value_property"
-  where
-    "block_membership b = (\<lambda>b'. b \<downharpoonright> b')"
 
 definition (in BlockchainParams) block_conflicting :: "(consensus_value * consensus_value) \<Rightarrow> bool"
   where
