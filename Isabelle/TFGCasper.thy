@@ -28,10 +28,6 @@ definition (in BlockchainParams) blockchain_membership :: "consensus_value \<Rig
 notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
 
-definition (in BlockchainParams) blockchain_membership_rel :: "consensus_value rel"
-  where 
-    "blockchain_membership_rel = {(b1, b2). {b1, b2} \<subseteq> C \<and> b1 \<downharpoonright> b2}" 
-
 lemma (in BlockchainParams) n_cestor_transitive :
   "\<forall> n1 n2 x y z. {n1, n2} \<subseteq> \<nat> 
     \<longrightarrow> x = n_cestor (y, n1) 
@@ -64,8 +60,8 @@ proof -
 qed
 
 lemma (in BlockchainParams) transitivity_of_blockchain_membership :
-  "trans blockchain_membership_rel"
-  apply (simp add: trans_def blockchain_membership_rel_def blockchain_membership_def)
+  "{b1, b2, b3} \<subseteq> C \<Longrightarrow> b1 \<downharpoonright> b2 \<and> b2 \<downharpoonright> b3 \<Longrightarrow> b1 \<downharpoonright> b3"
+  apply (simp add: trans_def blockchain_membership_def)
   using n_cestor_transitive
   by (metis id_apply of_nat_eq_id of_nat_in_Nats subsetI)
 
@@ -79,7 +75,7 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
   "\<forall> b b'. {b, b'} \<subseteq> C \<and> b \<downharpoonright> b'
   \<longrightarrow> agreeing (block_membership b', \<sigma>, v) \<longrightarrow> agreeing (block_membership b, \<sigma>, v)"
   apply (simp add: agreeing_def block_membership_def)
-  oops
+  using BlockchainParams.transitivity_of_blockchain_membership by blast
 
 (* Definition 4.27: Score of a block *)
 definition (in BlockchainParams) score :: "state \<Rightarrow> consensus_value \<Rightarrow> real"
