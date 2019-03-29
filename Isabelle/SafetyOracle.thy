@@ -23,12 +23,12 @@ begin
 (* Definition 7.8 *)
 definition agreeing :: "(consensus_value_property * state * validator) \<Rightarrow> bool"
   where
-    "agreeing  = (\<lambda>(p, \<sigma>, v). \<forall> c \<in> L_H_E \<sigma> v. p c)"
+    "agreeing = (\<lambda>(p, \<sigma>, v). \<forall> c \<in> L_H_E \<sigma> v. p c)"
 
 (* NOTE: Modified from the original draft with observed_non_equivocating_validators *)
 definition agreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "agreeing_validators  = (\<lambda>(p, \<sigma>).{v \<in> observed_non_equivocating_validators \<sigma>. agreeing  (p, \<sigma>, v)})"
+    "agreeing_validators = (\<lambda>(p, \<sigma>).{v \<in> observed_non_equivocating_validators \<sigma>. agreeing  (p, \<sigma>, v)})"
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
@@ -42,7 +42,7 @@ lemma (in Protocol) agreeing_validators_finite :
 (* Definition 7.9 *)
 definition disagreeing_validators :: "(consensus_value_property * state) \<Rightarrow> validator set"
   where
-    "disagreeing_validators  = (\<lambda>(p, \<sigma>). {v \<in> observed_non_equivocating_validators \<sigma>. \<exists> c \<in> L_H_E \<sigma> v. \<not> p c})"
+    "disagreeing_validators = (\<lambda>(p, \<sigma>). {v \<in> observed_non_equivocating_validators \<sigma>. \<exists> c \<in> L_H_E \<sigma> v. \<not> p c})"
 
 lemma (in Protocol) disagreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) \<subseteq> V"
@@ -53,7 +53,7 @@ lemma (in Protocol) disagreeing_validators_type :
 (* Definition 7.11 *)
 definition (in Params) is_majority :: "(validator set * state) \<Rightarrow> bool"
   where
-    "is_majority  = (\<lambda>(v_set, \<sigma>). (weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2))"
+    "is_majority = (\<lambda>(v_set, \<sigma>). (weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2))"
    
 (* Definition 7.12 *)
 definition (in Protocol) is_majority_driven :: "consensus_value_property \<Rightarrow> bool"
