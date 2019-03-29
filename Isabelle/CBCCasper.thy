@@ -164,8 +164,8 @@ end
 (* Locale for proofs *)
 locale Protocol = Params +
   assumes V_type: "V \<noteq> \<emptyset> \<and> finite V"
-  and W_type: "\<And>w. w \<in> range W \<Longrightarrow> w > 0"
-  and t_type: "0 \<le> t" "t < Sum (W ` V)"
+  and W_type: "\<forall> v \<in> V. W v > 0"
+  and t_type: "0 \<le> t" "t < sum W V"
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
@@ -338,42 +338,62 @@ lemma (in Protocol) equivocation_is_monotonic :
   using observed_def by fastforce
 
 (* ###################################################### *)
-(* Weight *)
+(* Weight measure *)
 (* ###################################################### *)
 
 (* Definition 7.10 *)
 definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
   where
     (* "weight_measure v_set = sum W v_set" *)
-    "weight_measure v_set = Sum (W `v_set)"
+    "weight_measure v_set = sum W v_set"
 
-lemma (in Protocol) weight_measure_subset_minus :
+lemma (in Params) weight_measure_subset_minus :
   "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> B
     \<Longrightarrow>  weight_measure B - weight_measure A = weight_measure (B - A)"
   apply (simp add:  weight_measure_def)
-  oops
+  by (simp add: sum_diff)
 
-lemma (in Protocol) weight_measure_disjoint_plus :
+lemma (in Params) weight_measure_disjoint_plus :
   "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<inter> B = \<emptyset>
     \<Longrightarrow>  weight_measure A + weight_measure B = weight_measure (A \<union> B)"
   apply (simp add:  weight_measure_def)
-  oops
+  by (simp add: sum.union_disjoint)
 
-lemma (in Protocol) weight_measure_comparison_strict_subset_gte :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> A \<Longrightarrow> weight_measure A \<ge> weight_measure B"
+lemma (in Protocol) weight_positive :
+  "A \<subseteq> V \<Longrightarrow> weight_measure A \<ge> 0"
   apply (simp add:  weight_measure_def)
   using W_type
-  by (smt Diff_iff finite_imageI subsetCE subset_UNIV subset_image_iff sum_mono2)
+  by (smt subsetCE sum_nonneg)
 
-lemma (in Protocol) weight_measure_comparison_stritct_subset_gt :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subset> A \<Longrightarrow> weight_measure A > weight_measure B"
+lemma (in Protocol) weight_gte_diff :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> V 
+   \<Longrightarrow> weight_measure B \<ge> weight_measure B - weight_measure A"
+  using weight_positive by auto
+
+lemma (in Protocol) weight_measure_subset_gte_diff :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> V
+  \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure (B - A)"
+  using weight_measure_subset_minus
+  using weight_gte_diff by fastforce
+
+lemma (in Protocol) weight_measure_subset_gte :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> V 
+  \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure A"
+  apply (simp add:  weight_measure_def)
+  using W_type
+  by (smt DiffE Params.weight_measure_def subset_eq sum_nonneg weight_measure_subset_minus)
+
+lemma (in Protocol) weight_measure_stritct_subset_gt :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> V 
+  \<Longrightarrow> A \<subset> B \<Longrightarrow> weight_measure B >  weight_measure A"
+  using weight_measure_subset_gte
   apply (simp add:  weight_measure_def)
   using W_type
   oops
 
-lemma (in Protocol) weight_measure_gt_set_difference :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<noteq> \<emptyset> \<Longrightarrow> weight_measure A > weight_measure (A - B)"
-  oops
+(* ###################################################### *)
+(* Equivocation fault weight *)
+(* ###################################################### *)
 
 (* Definition 2.11 *)
 definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
@@ -384,7 +404,7 @@ definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
 lemma (in Protocol) equivocation_fault_weight_is_monotonic :
   "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
   \<longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
-  using equivocation_is_monotonic weight_measure_comparison_strict_subset_gte 
+  using equivocation_is_monotonic weight_measure_subset_gte 
   by (smt equivocating_validators_is_finite equivocating_validators_type equivocation_fault_weight_def subset_iff)
 
 (* Definition 2.12 *)

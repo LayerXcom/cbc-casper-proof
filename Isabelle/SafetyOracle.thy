@@ -462,8 +462,9 @@ proof -
     using clique_imps_everyone_agreeing
     by (meson Diff_subset \<Sigma>t_is_subset_of_\<Sigma> subsetCE subset_trans)
   then have "weight_measure (v_set - equivocating_validators \<sigma>) \<le> weight_measure (agreeing_validators (p, \<sigma>))"
-    using agreeing_validators_finite equivocating_validators_def weight_measure_comparison_strict_subset_gte
-          \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>finite v_set\<close> by auto
+    using agreeing_validators_finite equivocating_validators_def weight_measure_subset_gte
+          \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>finite v_set\<close>
+    by (simp add: \<Sigma>t_def agreeing_validators_type)
   have "weight_measure (v_set - equivocating_validators \<sigma>) > (weight_measure V) div 2 + t  - weight_measure (equivocating_validators \<sigma>)"
     using \<open>is_clique (v_set - equivocating_validators \<sigma>, p, \<sigma>) \<and> gt_threshold (v_set - equivocating_validators \<sigma>, \<sigma>)\<close>
     unfolding gt_threshold_def by simp
@@ -478,7 +479,7 @@ proof -
     moreover have "V - equivocating_validators \<sigma> \<subseteq> V"
       by (simp add: Diff_subset)
     ultimately have "(weight_measure V) div 2 \<ge> (weight_measure (V - equivocating_validators \<sigma>)) div 2" 
-      using weight_measure_comparison_strict_subset_gte
+      using weight_measure_subset_gte
       by (simp add: V_type)  
     then show ?thesis
       using \<open>weight_measure V / 2 < weight_measure (v_set - equivocating_validators \<sigma>)\<close> by linarith
