@@ -222,34 +222,34 @@ function (in BlockchainParams) GHOST :: "(consensus_value set * state) \<Rightar
        \<union> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>}"
   by auto
 
-(* Definition 4.31: Casper the Friendly Ghost *)
+(* Definition 4.31: Casper the Friendly TFG *)
 definition (in BlockchainParams) GHOST_estimator :: "state \<Rightarrow> consensus_value set"
   where
     "GHOST_estimator \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
 (* Locale for proofs *)
-locale Ghost = Blockchain + 
+locale TFG = Blockchain + 
   assumes ghost_is_estimator : "\<epsilon> = GHOST_estimator"
   and genesis_type : "genesis \<in> C"
 
-lemma (in Ghost) children_type :
+lemma (in TFG) children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> C"
   apply (simp add: children_def)
-  using Ghost_axioms Ghost_axioms_def Ghost_def prev_type by auto
+  using TFG_axioms TFG_axioms_def TFG_def prev_type by auto
 
 lemma argmax_type :
   "S \<subseteq> A \<Longrightarrow> arg_max_on f S \<in> A" 
   apply (simp add: arg_max_on_def arg_max_def is_arg_max_def)
   oops
 
-lemma (in Ghost) best_children_type :
+lemma (in TFG) best_children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  best_children (b, \<sigma>) \<subseteq> C"
   apply (simp add: best_children_def arg_max_on_def arg_max_def is_arg_max_def)
   using children_type 
   apply auto
   oops
 
-lemma (in Ghost) GHSOT_type :
+lemma (in TFG) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow>  GHOST(b_set, \<sigma>) \<subseteq> C"
   oops
 
@@ -259,17 +259,14 @@ lemma (in BlockchainParams) GHOST_is_valid_estimator :
   apply (simp add: is_valid_estimator_def BlockchainParams.GHOST_estimator_def)
   oops
 
-lemma (in Ghost) block_membership_is_majority_driven :
-  "\<forall> p \<in> P. majority_driven p"
+lemma (in TFG) block_membership_is_majority_driven :
+  "\<forall> b \<in> C. majority_driven (block_membership b)"
   apply (simp add: majority_driven_def)
-  (* by (metis DiffE Pow_iff is_valid_estimator_def \<epsilon>_type block_is_consensus_value subsetCE) *)
   oops
 
-lemma (in Ghost) block_membership_is_max_driven :
-  "\<forall> p \<in> P. max_driven p"
+lemma (in TFG) block_membership_is_max_driven :
+  "\<forall> b \<in> C. max_driven (block_membership b)"
   apply (simp add: max_driven_def)
-  (* FIXME: Timeout *)
-  (* by (metis DiffE Nats_0 ghost_is_estimator) *)
   oops
 
 end
