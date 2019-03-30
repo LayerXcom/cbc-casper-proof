@@ -291,7 +291,22 @@ lemma (in Blockchain) best_children_finite :
   apply (simp add: best_children_def is_arg_max_def)
   using children_finite
   by auto
-  
+ 
+lemma (in Blockchain) best_children_existence :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> \<longrightarrow> best_children (b, \<sigma>) \<in> Pow C - {\<emptyset>}"    
+proof -
+  have "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> 
+    \<longrightarrow> (\<exists> b'. maximum_on_non_strict (children (b, \<sigma>)) (score_magnitude_children \<sigma> b) b')"  
+    using totality_of_score_magnitude_children score_magnitude_children_is_preorder
+        children_finite children_type connex_preorder_on_finite_non_empty_set_has_maximum
+    by blast
+  then show ?thesis
+    apply (simp add: score_magnitude_children_def best_children_def is_arg_max_def)
+    apply (simp add: maximum_on_non_strict_def upper_bound_on_non_strict_def)
+    apply auto
+    by (smt children_type ex_in_conv subsetCE)
+qed
+
 (* Best children property *)
 definition (in BlockchainParams) best_child :: "consensus_value \<Rightarrow> state_property"
   where
@@ -309,22 +324,6 @@ function (in BlockchainParams) GHOST :: "(consensus_value set * state) \<Rightar
 definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow> consensus_value set"
   where
     "GHOST_heads_or_children \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
-
-
-lemma (in Blockchain) best_children_existence :
-  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> \<longrightarrow> best_children (b, \<sigma>) \<in> Pow C - {\<emptyset>}"    
-proof -
-  have "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> 
-    \<longrightarrow> (\<exists> b'. maximum_on_non_strict (children (b, \<sigma>)) (score_magnitude_children \<sigma> b) b')"  
-    using totality_of_score_magnitude_children score_magnitude_children_is_preorder
-        children_finite children_type connex_preorder_on_finite_non_empty_set_has_maximum
-    by blast
-  then show ?thesis
-    apply (simp add: score_magnitude_children_def best_children_def is_arg_max_def)
-    apply (simp add: maximum_on_non_strict_def upper_bound_on_non_strict_def)
-    apply auto
-    by (smt children_type ex_in_conv subsetCE)
-qed
 
 lemma (in Blockchain) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C"
