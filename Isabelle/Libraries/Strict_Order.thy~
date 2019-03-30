@@ -120,7 +120,7 @@ definition upper_bound_on_non_strict :: "'a set \<Rightarrow> 'a rel \<Rightarro
 
 definition maximum_on_non_strict :: "'a set \<Rightarrow> 'a rel \<Rightarrow> 'a \<Rightarrow> bool"
   where 
-    "maximum_on_non_strict A r x = (x \<in> A \<and> upper_bound_on_non_strict A r x)" 
+    "maximum_on_non_strict A r x = (x \<in> A \<and> upper_bound_on A r x)" 
 
 definition maximal_on_non_strict :: "'a set \<Rightarrow> 'a rel \<Rightarrow> 'a \<Rightarrow> bool"
   where 
@@ -130,40 +130,15 @@ lemma preorder_on_finite_non_empty_set_has_maximal :
   "preorder_on A r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on_non_strict A r x)"
 proof - 
   have "\<And>n. preorder_on A r \<Longrightarrow> (\<forall> A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on_non_strict A r x))"
-  (* Similar proof strategy to strict_partial_order_on_finite_non_empty_set_has_maximal *)
-  proof -
+  proof - 
     fix n
     assume "preorder_on A r"
-    show "\<forall> A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on_non_strict A r x)"
+    show "\<forall> A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximal_on A r x)"
       apply (induction n)
-      unfolding maximal_on_non_strict_def
-       apply (metis card_eq_SucD singletonD singletonI)
-      (* Error occurs in assumption when using pure logic *)
-      (* apply (rule, rule, rule, rule) *)
-    proof -      
-      fix n
-      assume "\<forall>A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> A \<and> (\<forall>y. y \<in> A \<longrightarrow> (y, x) \<in> r \<or> (x, y) \<notin> r))"
-      have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> \<longrightarrow> (\<exists> A' b. B = A' \<union> {b} \<and> card A' = Suc n \<and> b \<notin> A')"
-        by (metis Un_commute add_diff_cancel_left' card_gt_0_iff card_insert_disjoint card_le_Suc_iff insert_is_Un not_le not_less_eq_eq plus_1_eq_Suc)
-      then have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> 
-          \<longrightarrow> (\<exists> A' b. B = A' \<union> {b} \<and> card A' = Suc n \<and> finite A' \<and> A' \<noteq> \<emptyset> \<and> b \<notin> A')"
-        by (metis card_gt_0_iff zero_less_Suc)
-      then have "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset>
-          \<longrightarrow> (\<exists> A' b x. B = A' \<union> {b} \<and> b \<notin> A' \<and> x \<in> A' \<and> (\<forall>y. y \<in> A' \<longrightarrow> (y, x) \<in> r \<or> (x, y) \<notin> r))"
-        using \<open>\<forall>A. Suc n = card A \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> A \<and> (\<forall>y. y \<in> A \<longrightarrow> (y, x) \<in> r \<or> (x, y) \<notin> r))\<close> 
-        by metis
-      then show "\<forall>B. Suc (Suc n) = card B \<longrightarrow> finite B \<longrightarrow> B \<noteq> \<emptyset> \<longrightarrow> (\<exists>x. x \<in> B \<and> (\<forall>y. y \<in> B \<longrightarrow> (y, x) \<in> r \<or> (x, y) \<notin> r))"
-        by (metis (no_types, lifting) Un_insert_right \<open>preorder_on A r\<close> insertE insert_iff preorder_on_def sup_bot.right_neutral transE)
+      unfolding maximal_on_def
+      sorry
     qed
+    then show ?thesis
+      sorry
   qed
-  then show ?thesis
-    by (metis card.insert_remove finite.cases)
-qed
-
-
-lemma connex_preorder_on_finite_non_empty_set_has_maximum :
-  "preorder_on A r \<and> total_on A r \<longrightarrow> finite A \<longrightarrow> A \<noteq> \<emptyset> \<longrightarrow> (\<exists> x. maximum_on_non_strict A r x)" 
-  apply (simp add: total_on_def maximum_on_non_strict_def upper_bound_on_non_strict_def maximal_on_non_strict_def)
-  by (metis maximal_on_non_strict_def order_on_defs(1) preorder_on_finite_non_empty_set_has_maximal refl_onD)  
-
 end

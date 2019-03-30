@@ -208,10 +208,68 @@ proof -
     by blast
 qed
 
+definition (in BlockchainParams) score_magnitude :: "state \<Rightarrow> consensus_value rel"
+  where 
+    "score_magnitude \<sigma> = {(b1, b2). {b1, b2} \<subseteq> C \<and> score \<sigma> b1 \<le> score \<sigma> b2}" 
+
+lemma (in Blockchain) transitivity_of_score_magnitude :
+  "\<forall> \<sigma> \<in> \<Sigma>. trans (score_magnitude \<sigma>)"
+  by (simp add: trans_def score_magnitude_def)
+  
+lemma (in Blockchain) reflexivity_of_score_magnitude :
+  "\<forall> \<sigma> \<in> \<Sigma>. refl_on C (score_magnitude \<sigma>)"
+  apply (simp add: refl_on_def score_magnitude_def)
+  by auto
+  
+lemma (in Blockchain) score_magnitude_is_preorder :
+  "\<forall> \<sigma> \<in> \<Sigma>. preorder_on C (score_magnitude \<sigma>)"
+  unfolding preorder_on_def 
+  using reflexivity_of_score_magnitude transitivity_of_score_magnitude by simp
+
+lemma (in Blockchain) totality_of_score_magnitude :
+  "\<forall> \<sigma> \<in> \<Sigma>. Relation.total_on C (score_magnitude \<sigma>)"
+  apply (simp add: Relation.total_on_def score_magnitude_def)
+  by auto
+
 (* Definition 4.28: Children *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
     "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
+
+lemma (in Blockchain) children_type :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> C"
+  apply (simp add: children_def)
+  using prev_type by auto
+
+lemma (in Blockchain) children_finite :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  finite (children (b, \<sigma>))"
+  apply (simp add: children_def)
+  using state_is_finite
+  by (metis Collect_mem_eq finite_Collect_conjI finite_imageI) 
+
+(* Subset of preorder is subset? *)
+definition (in BlockchainParams) score_magnitude_children :: "state \<Rightarrow> consensus_value \<Rightarrow> consensus_value rel"
+  where 
+    "score_magnitude_children \<sigma> b = {(b1, b2). {b1, b2} \<subseteq> children (b, \<sigma>) \<and> score \<sigma> b1 \<le> score \<sigma> b2}" 
+
+lemma (in Blockchain) transitivity_of_score_magnitude_children :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. trans (score_magnitude_children \<sigma> b)"
+  by (simp add: trans_def score_magnitude_children_def)
+  
+lemma (in Blockchain) reflexivity_of_score_magnitude_children :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. refl_on (children (b, \<sigma>)) (score_magnitude_children \<sigma> b)"
+  apply (simp add: refl_on_def score_magnitude_children_def)
+  by blast 
+
+lemma (in Blockchain) score_magnitude_children_is_preorder :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. preorder_on (children (b, \<sigma>)) (score_magnitude_children \<sigma> b)"
+  unfolding preorder_on_def 
+  using reflexivity_of_score_magnitude_children transitivity_of_score_magnitude_children by simp
+
+lemma (in Blockchain) totality_of_score_magnitude_children :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. Relation.total_on (children (b, \<sigma>)) (score_magnitude_children \<sigma> b)"
+  apply (simp add: Relation.total_on_def score_magnitude_children_def)
+  by auto
 
 lemma (in BlockchainParams) children_membership :
   "\<forall> b \<in> children (b', \<sigma>).  b' \<downharpoonright> b"
@@ -223,6 +281,17 @@ definition (in BlockchainParams) best_children :: "consensus_value * state \<Rig
   where
     "best_children = (\<lambda> (b, \<sigma>). {b' \<in> C. is_arg_max (score \<sigma>) (\<lambda>b'. b' \<in> children (b, \<sigma>)) b'})"
 
+lemma (in Blockchain) best_children_type :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> best_children (b, \<sigma>) \<subseteq> C"
+  apply (simp add: is_arg_max_def best_children_def)
+  by (metis (mono_tags, lifting) mem_Collect_eq subsetI)
+
+lemma (in Blockchain) best_children_finite :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> finite (best_children (b, \<sigma>))"
+  apply (simp add: best_children_def is_arg_max_def)
+  using children_finite
+  by auto
+  
 (* Best children property *)
 definition (in BlockchainParams) best_child :: "consensus_value \<Rightarrow> state_property"
   where
@@ -234,30 +303,38 @@ function (in BlockchainParams) GHOST :: "(consensus_value set * state) \<Rightar
   where
     "GHOST (b_set, \<sigma>) =
       (\<Union> b \<in> {b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset>}. GHOST (best_children (b, \<sigma>), \<sigma>))
-       \<union> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>}"
+         \<union> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>}"
   by auto
 
 definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow> consensus_value set"
   where
     "GHOST_heads_or_children \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
-lemma (in Blockchain) children_type :
-  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  children (b, \<sigma>) \<subseteq> C"
-  apply (simp add: children_def)
-  using prev_type by auto
 
-lemma (in Blockchain) best_children_type :
-  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> best_children (b, \<sigma>) \<subseteq> C"
-  apply (simp add: is_arg_max_def best_children_def)
-  by (metis (mono_tags, lifting) mem_Collect_eq subsetI)
+lemma (in Blockchain) best_children_existence :
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> \<longrightarrow> best_children (b, \<sigma>) \<in> Pow C - {\<emptyset>}"    
+proof -
+  have "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> children (b, \<sigma>) \<noteq> \<emptyset> 
+    \<longrightarrow> (\<exists> b'. maximum_on_non_strict (children (b, \<sigma>)) (score_magnitude_children \<sigma> b) b')"  
+    using totality_of_score_magnitude_children score_magnitude_children_is_preorder
+        children_finite children_type connex_preorder_on_finite_non_empty_set_has_maximum
+    by blast
+  then show ?thesis
+    apply (simp add: score_magnitude_children_def best_children_def is_arg_max_def)
+    apply (simp add: maximum_on_non_strict_def upper_bound_on_non_strict_def)
+    apply auto
+    by (smt children_type ex_in_conv subsetCE)
+qed
 
 lemma (in Blockchain) GHSOT_type :
-  "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow>  GHOST(b_set, \<sigma>) \<subseteq> C"
+  "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C"
+  using best_children_type
   oops
 
 lemma (in Blockchain) GHOST_is_valid_estimator : 
   "is_valid_estimator GHOST_heads_or_children"
-  apply (simp add: is_valid_estimator_def BlockchainParams.GHOST_heads_or_children_def)
+  unfolding is_valid_estimator_def
+  apply (simp add:  BlockchainParams.GHOST_heads_or_children_def)
   oops
 
 (* Locale for proofs *)
