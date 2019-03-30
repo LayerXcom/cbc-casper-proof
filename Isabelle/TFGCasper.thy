@@ -247,7 +247,7 @@ lemma (in Blockchain) children_finite :
   using state_is_finite
   by (metis Collect_mem_eq finite_Collect_conjI finite_imageI) 
 
-(* Subset of preorder is subset? *)
+(* FIXME: Reuse score_magnitude, Subset of preordered & connex set is preordered & connex? #109 *)
 definition (in BlockchainParams) score_magnitude_children :: "state \<Rightarrow> consensus_value \<Rightarrow> consensus_value rel"
   where 
     "score_magnitude_children \<sigma> b = {(b1, b2). {b1, b2} \<subseteq> children (b, \<sigma>) \<and> score \<sigma> b1 \<le> score \<sigma> b2}" 
@@ -312,7 +312,7 @@ definition (in BlockchainParams) best_child :: "consensus_value \<Rightarrow> st
   where
     "best_child b = (\<lambda>\<sigma>. b \<in> best_children (prev b, \<sigma>))"
 
-(* Definition 4.30: GHOST *)
+(* Definition 4.30: LMD GHOST *)
 (* NOTE: well-sortedness error occurs in code generation *)
 function (in BlockchainParams) GHOST :: "(consensus_value set * state) \<Rightarrow> consensus_value set"
   where
@@ -327,6 +327,7 @@ definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow>
 
 lemma (in Blockchain) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C"
+  apply auto
   using best_children_type
   oops
 
@@ -334,6 +335,8 @@ lemma (in Blockchain) GHOST_is_valid_estimator :
   "is_valid_estimator GHOST_heads_or_children"
   unfolding is_valid_estimator_def
   apply (simp add:  BlockchainParams.GHOST_heads_or_children_def)
+  apply auto
+  using best_children_type 
   oops
 
 (* Locale for proofs *)
