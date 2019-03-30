@@ -221,7 +221,7 @@ lemma (in BlockchainParams) children_membership :
 (* Definition 4.29: Best Children *)
 definition (in BlockchainParams) best_children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
-    "best_children = (\<lambda> (b, \<sigma>). {arg_max_on (score \<sigma>) (children (b, \<sigma>))})"
+    "best_children = (\<lambda> (b, \<sigma>). {b' \<in> C. is_arg_max (score \<sigma>) (\<lambda>b'. b' \<in> children (b, \<sigma>)) b'})"
 
 (* Best children property *)
 definition (in BlockchainParams) best_child :: "consensus_value \<Rightarrow> state_property"
@@ -246,17 +246,10 @@ lemma (in Blockchain) children_type :
   apply (simp add: children_def)
   using prev_type by auto
 
-lemma argmax_type :
-  "arg_max_on f S \<in> S" 
-  apply (simp add: arg_max_on_def arg_max_def is_arg_max_def)
-  oops
-
 lemma (in Blockchain) best_children_type :
-  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  best_children (b, \<sigma>) \<subseteq> C"
-  apply (simp add: best_children_def arg_max_on_def arg_max_def is_arg_max_def)
-  using children_type 
-  apply auto
-  oops
+  "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> best_children (b, \<sigma>) \<subseteq> C"
+  apply (simp add: is_arg_max_def best_children_def)
+  by (metis (mono_tags, lifting) mem_Collect_eq subsetI)
 
 lemma (in Blockchain) GHSOT_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow>  GHOST(b_set, \<sigma>) \<subseteq> C"
