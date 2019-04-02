@@ -60,6 +60,15 @@ lemma (in Protocol) disagreeing_validators_type :
   apply (simp add: disagreeing_validators_def)
   by auto
 
+lemma (in Protocol) disagreeing_validators_are_non_observed_or_not_agreeing :
+  "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) = {v \<in> V - equivocating_validators \<sigma>. v \<notin> observed \<sigma> \<or> (\<exists> c \<in> L_H_E \<sigma> v. \<not> p c)}"
+  apply (simp add: disagreeing_validators_def agreeing_validators_def observed_non_equivocating_validators_def agreeing_def)
+  by blast
+
+lemma (in Protocol) disagreeing_validators_include_not_agreeing_validators :
+  "\<forall> \<sigma> \<in> \<Sigma>. {v \<in> V - equivocating_validators \<sigma>. \<exists> c \<in> L_H_E \<sigma> v. \<not> p c} \<subseteq> disagreeing_validators (p, \<sigma>)"
+  using disagreeing_validators_are_non_observed_or_not_agreeing by blast
+
 lemma (in Protocol) weight_measure_agreeing_plus_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. weight_measure (agreeing_validators (p, \<sigma>) \<union> equivocating_validators \<sigma>) = weight_measure (agreeing_validators (p, \<sigma>)) + equivocation_fault_weight \<sigma>"
   unfolding equivocation_fault_weight_def
