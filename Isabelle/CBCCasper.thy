@@ -350,6 +350,12 @@ definition (in Params) weight_measure :: "validator set \<Rightarrow> real"
 lemma (in Params) weight_measure_subset_minus :
   "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> B
     \<Longrightarrow>  weight_measure B - weight_measure A = weight_measure (B - A)"
+  apply (simp add: weight_measure_def)
+  by (simp add: sum_diff)
+
+lemma (in Params) weight_measure_strict_subset_minus :
+  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subset> B
+    \<Longrightarrow>  weight_measure B - weight_measure A = weight_measure (B - A)"
   apply (simp add:  weight_measure_def)
   by (simp add: sum_diff)
 
@@ -366,30 +372,44 @@ lemma (in Protocol) weight_positive :
   by (smt subsetCE sum_nonneg)
 
 lemma (in Protocol) weight_gte_diff :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> V 
-   \<Longrightarrow> weight_measure B \<ge> weight_measure B - weight_measure A"
+  "A \<subseteq> V \<Longrightarrow> weight_measure B \<ge> weight_measure B - weight_measure A"
   using weight_positive by auto
 
 lemma (in Protocol) weight_measure_subset_gte_diff :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> A \<subseteq> V
-  \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure (B - A)"
-  using weight_measure_subset_minus
-  using weight_gte_diff by fastforce
+  "A \<subseteq> V \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure (B - A)"
+  using weight_measure_subset_minus V_type weight_gte_diff
+  by (smt finite_Diff2 finite_subset sum.infinite weight_measure_def)
 
 lemma (in Protocol) weight_measure_subset_gte :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> V 
-  \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure A"
+  "B \<subseteq> V \<Longrightarrow> A \<subseteq> B \<Longrightarrow> weight_measure B \<ge> weight_measure A"
+  using W_type V_type
   apply (simp add:  weight_measure_def)
-  using W_type
-  by (smt DiffE Params.weight_measure_def subset_eq sum_nonneg weight_measure_subset_minus)
-
+  by (smt DiffD1 Params.weight_measure_def finite_subset subsetCE sum_nonneg weight_measure_subset_minus)
+ 
 lemma (in Protocol) weight_measure_stritct_subset_gt :
-  "finite A \<Longrightarrow> finite B \<Longrightarrow> B \<subseteq> V 
-  \<Longrightarrow> A \<subset> B \<Longrightarrow> weight_measure B >  weight_measure A"
-  using weight_measure_subset_gte
-  apply (simp add:  weight_measure_def)
-  using W_type
-  oops
+  "B \<subseteq> V \<Longrightarrow> A \<subset> B \<Longrightarrow> weight_measure B > weight_measure A" 
+proof -
+  fix A B
+  assume "B \<subseteq> V" 
+  and "A \<subset> B" 
+  then have "A \<subset> V"
+    by auto
+  have "finite A \<and> finite B"
+    using V_type finite_subset \<open>B \<subseteq> V\<close> \<open>A \<subset> B\<close> by auto
+  have "B - A \<noteq> \<emptyset> \<and> B - A \<subseteq> V"
+    using \<open>A \<subset> B\<close> \<open>B \<subseteq> V\<close>
+    by blast 
+  then have "weight_measure (B - A) > 0"
+    using W_type
+    apply (simp add: weight_measure_def)
+    by (meson Diff_eq_empty_iff V_type rev_finite_subset subset_eq sum_pos)    
+  have "weight_measure B = weight_measure (B - A) + weight_measure A"
+    using weight_measure_strict_subset_minus \<open>B \<subseteq> V\<close> \<open>A \<subset> B\<close> \<open>finite A \<and> finite B\<close>
+    by fastforce    
+  then show "weight_measure B > weight_measure A"
+    using \<open>weight_measure (B - A) > 0\<close>
+    by linarith
+qed
 
 (* ###################################################### *)
 (* Equivocation fault weight *)
