@@ -325,10 +325,28 @@ definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow>
   where
     "GHOST_heads_or_children \<sigma> = GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))"
 
-lemma (in Blockchain) GHSOT_type :
+lemma (in Blockchain) GHOST_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C"
-  apply auto
-  using best_children_type
+proof (rule ccontr)
+  assume "\<not> (\<forall>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C)"   
+  then show False
+  proof -
+    have "\<forall>\<sigma> b_set. b_set \<subseteq> C \<longrightarrow> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>} \<subseteq> C"
+      by blast 
+    (* 
+    then have "\<forall>\<sigma> b_set b'. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<and> b' \<in> GHOST (b_set, \<sigma>) \<and> b' \<notin> C
+            \<longrightarrow> (\<exists> b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset> \<and> b' \<notin> C \<and> b'\<in> GHOST (best_children (b, \<sigma>), \<sigma>))"
+      apply auto 
+     *)
+    then have "\<exists>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C
+      \<longrightarrow> (\<exists> b' \<in> (\<Union> b \<in> {b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset>}. GHOST (best_children (b, \<sigma>), \<sigma>)). b' \<notin> C)"
+      using \<open>\<not> (\<forall>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C)\<close> 
+      apply auto
+      by blast  
+    then have "\<exists>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C
+        \<longrightarrow> (\<exists> b b'. b \<in> b_set \<and> children (b, \<sigma>) \<noteq> \<emptyset> \<and> b' \<notin> C \<and> b' \<in> GHOST (best_children (b, \<sigma>), \<sigma>) \<and> best_children (b, \<sigma>) \<subseteq> C)"
+      by auto 
+    then show ?thesis      
   oops
 
 lemma (in Blockchain) GHOST_is_valid_estimator : 
