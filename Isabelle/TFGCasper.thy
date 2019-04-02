@@ -182,7 +182,8 @@ definition (in BlockchainParams) score :: "state \<Rightarrow> consensus_value \
   where
     "score \<sigma> b = sum W (agreeing_validators (block_membership b, \<sigma>))"  
 
-lemma (in Blockchain) equivalence_of_score_to_paper :
+(* A lemma to show the equivalence of the above definition of score and the one in the paper *)
+lemma (in Blockchain) unfolding_agreeing_on_block_membership :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (block_membership b, \<sigma>) =  {v \<in> V. \<exists> b' \<in> L_H_E \<sigma> v. b \<downharpoonright> b'}"
 proof -
   have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
