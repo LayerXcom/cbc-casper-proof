@@ -411,6 +411,13 @@ lemma (in Blockchain) agreeing_validators_on_sistor_blocks_are_not_more_than_dis
         agreeing_validators_type disagreeing_validators_type
   by auto
 
+lemma (in Blockchain) no_child_and_best_child_at_all_earlier_height_imps_GHOST_heads :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. children (b, \<sigma>) = \<emptyset> \<and>
+    (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
+    \<longrightarrow> (\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+  apply auto 
+  oops
+
 lemma (in Blockchain) best_child_at_all_earlier_height_imps_GHOST_heads :
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. 
     (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
@@ -453,6 +460,7 @@ proof -
           using \<open>genesis = n_cestor (b, Suc n) \<and> (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))\<close>
           using \<open>b \<in> C\<close> irreflexivity_of_blockchain_membership by blast
         then show "b \<downharpoonright> b''"   
+          using \<open>prev b \<downharpoonright> b''\<close> \<open>b'' \<in> GHOST ({genesis}, \<sigma>)\<close>          
           sorry
       qed
     qed
