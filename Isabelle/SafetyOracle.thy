@@ -104,6 +104,12 @@ definition (in Protocol) max_driven :: "consensus_value_property \<Rightarrow> b
     "max_driven p =
       (\<forall> \<sigma> \<in> \<Sigma>. weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (disagreeing_validators (p, \<sigma>)) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
+definition (in Protocol) max_driven_for_future :: "consensus_value_property \<Rightarrow> state \<Rightarrow> bool"
+  where
+    "max_driven_for_future p \<sigma> =
+      (\<forall> \<sigma>' \<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') 
+        \<longrightarrow> weight_measure (agreeing_validators (p, \<sigma>')) > weight_measure (disagreeing_validators (p, \<sigma>')) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>'. p c))"
+
 (* Definition 7.14 *)
 definition later_disagreeing_messages :: "(consensus_value_property * message * validator * state) \<Rightarrow> message set"
   where 

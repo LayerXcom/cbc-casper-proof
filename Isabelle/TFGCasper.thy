@@ -94,10 +94,10 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
 (* NOTE: Modified from the paper to include non-observed blocks so that (block_membership b) becomes max-driven for any b \<in> C *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
-    "children = (\<lambda>(b, \<sigma>). {b' \<in> C. b = prev b'})"
+    "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
 
-lemma (in BlockchainParams) block_is_children_of_prev_block :
-  "\<forall> b \<in> C. b \<in> children (prev b, \<sigma>)"
+lemma (in BlockchainParams) observed_block_is_children_of_prev_block :
+  "\<forall> b \<in> est `\<sigma>. b \<in> children (prev b, \<sigma>)"
   by (simp add: children_def)  
 
 lemma (in BlockchainParams) children_membership :
@@ -125,9 +125,9 @@ lemma (in Blockchain) children_type :
 lemma (in Blockchain) children_finite :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  finite (children (b, \<sigma>))"
   apply (simp add: children_def)
-  using state_is_finite C_type
-  by (metis Collect_mem_eq finite_Collect_conjI) 
-
+  using state_is_finite
+  by simp
+   
 lemma (in Blockchain) conflicting_blocks_imps_conflicting_decision :
   "\<forall> b1 b2 \<sigma>. {b1, b2} \<subseteq> C \<and> \<sigma> \<in> \<Sigma> 
     \<longrightarrow> block_conflicting (b1, b2) 
@@ -469,9 +469,13 @@ proof -
     using blockchain_membership_def genesis_type(2) by auto
 qed    
 
+lemma (in TFG) ancestor_of_observed_block_is_observed :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> est `\<sigma>. \<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> est `\<sigma>"
+  sorry
+
 lemma (in TFG) block_membership_is_max_driven :
-  "\<forall> b \<in> C. max_driven (block_membership b)"
-  apply (simp add: max_driven_def)
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> est `\<sigma>. max_driven_for_future (block_membership b) \<sigma>"
+  apply (simp add: max_driven_for_future_def)
 proof -
   have "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b
         \<longrightarrow> agreeing_validators (block_membership b, \<sigma>) \<subseteq> agreeing_validators (block_membership b', \<sigma>)"
@@ -488,44 +492,49 @@ proof -
         \<longrightarrow> weight_measure (disagreeing_validators (block_membership b, \<sigma>)) 
               \<ge> weight_measure (disagreeing_validators (block_membership b', \<sigma>))"
     by simp
-  show "\<forall>b\<in>C. \<forall>\<sigma> \<in> \<Sigma>. weight_measure (disagreeing_validators (block_membership b, \<sigma>)) < weight_measure (agreeing_validators (block_membership b, \<sigma>)) 
-            \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. block_membership b c)"
-    apply (rule, rule, rule, rule)
+  show "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> \<sigma>. \<forall> \<sigma>' \<in> \<Sigma>. \<sigma> \<subseteq> \<sigma>' \<longrightarrow> weight_measure (disagreeing_validators (block_membership (est m), \<sigma>')) < weight_measure (agreeing_validators (block_membership (est m), \<sigma>')) 
+            \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>'. block_membership (est m) c)"
+    apply (rule, rule, rule, rule, rule, rule)
   proof - 
-    fix b \<sigma> c
-    assume "b \<in> C" 
-    and  "\<sigma> \<in> \<Sigma>"
-    and "weight_measure (disagreeing_validators (block_membership b, \<sigma>)) < weight_measure (agreeing_validators (block_membership b, \<sigma>))"
-    and "c \<in> \<epsilon> \<sigma>"
-    hence "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b, \<sigma>))"
+    fix \<sigma> m \<sigma>' c
+    assume "\<sigma> \<in> \<Sigma>"
+    and "m \<in> \<sigma>"
+    and "\<sigma>' \<in> \<Sigma>"
+    and "\<sigma> \<subseteq> \<sigma>'"
+    and "weight_measure (disagreeing_validators (block_membership (est m), \<sigma>')) < weight_measure (agreeing_validators (block_membership (est m), \<sigma>'))"
+    and "c \<in> \<epsilon> \<sigma>'"
+    hence "est m \<in> C"
+      using M_type message_in_state_is_valid by blast
+    hence "\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>')) > weight_measure (disagreeing_validators (block_membership (est m), \<sigma>'))"
       using \<open>\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b 
         \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) \<ge> weight_measure (agreeing_validators (block_membership b, \<sigma>))\<close>
-      by fastforce
-    hence "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b', \<sigma>))"
+          \<open>weight_measure (disagreeing_validators (block_membership (est m), \<sigma>')) < weight_measure (agreeing_validators (block_membership (est m), \<sigma>'))\<close>
+          \<open>\<sigma>' \<in> \<Sigma>\<close> by fastforce      
+    hence "\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>')) > weight_measure (disagreeing_validators (block_membership b', \<sigma>'))"
       using \<open>\<forall> \<sigma> \<in> \<Sigma>. \<forall> b b'. {b, b'} \<subseteq> C \<and> b' \<downharpoonright> b
         \<longrightarrow> weight_measure (disagreeing_validators (block_membership b, \<sigma>)) \<ge> weight_measure (disagreeing_validators (block_membership b', \<sigma>))\<close>
-          \<open>b \<in> C\<close> \<open>\<sigma> \<in> \<Sigma>\<close>
-      by force
+          \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>est m \<in> C\<close> by force
     (* Here we prove best_children property is max driven *)
-    have "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)"
+    have "\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> b' \<in> best_children (prev b', \<sigma>')"
       apply (simp add: best_children_def is_arg_max_def score_def)
-      apply (auto)
+      apply (auto) 
+      using ancestor_of_observed_block_is_observed
+      apply (meson \<open>\<sigma> \<subseteq> \<sigma>'\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>m \<in> \<sigma>\<close> contra_subsetD image_eqI observed_block_is_children_of_prev_block) 
       using M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close>
-      apply (simp add: block_is_children_of_prev_block) 
       using agreeing_validators_on_sistor_blocks_are_not_more_than_disagreeing 
             prev_type 
-            \<open>\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b', \<sigma>))\<close>
-      by (smt M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close> bot.extremum children_type contra_subsetD image_eqI insert_subset block_is_children_of_prev_block)
-    have "c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))" 
-      using ghost_estimator \<open>c \<in> \<epsilon> \<sigma>\<close>
+            \<open>\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>')) > weight_measure (disagreeing_validators (block_membership b', \<sigma>'))\<close>
+      by (smt \<open>\<sigma>' \<in> \<Sigma>\<close> agreeing_validators_weight_combined children_type contra_subsetD empty_subsetI insert_absorb2 insert_subset)      
+    have "c \<in> GHOST ({genesis}, \<sigma>') \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>'). children (b, \<sigma>'))" 
+      using ghost_estimator \<open>c \<in> \<epsilon> \<sigma>'\<close>
       unfolding GHOST_heads_or_children_def
       by blast
-    have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b''"
-      using best_child_at_all_earlier_height_imps_GHOST_heads \<open>\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)\<close>
-      using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>b \<in> C\<close> by blast
-   then show "block_membership b c"
+    have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>'). est m \<downharpoonright> b''"
+      using best_child_at_all_earlier_height_imps_GHOST_heads \<open>\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> b' \<in> best_children (prev b', \<sigma>')\<close>
+            \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>est m \<in> C\<close> by blast 
+   then show "block_membership (est m) c"
      unfolding block_membership_def
-     using \<open>c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))\<close>  
+     using \<open>c \<in> GHOST ({genesis}, \<sigma>') \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>'). children (b, \<sigma>'))\<close>  
            transitivity_of_blockchain_membership children_membership
      by blast
  qed
