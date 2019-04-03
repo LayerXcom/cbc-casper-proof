@@ -344,36 +344,23 @@ definition (in BlockchainParams) GHOST_heads_or_children :: "state \<Rightarrow>
 
 lemma (in Blockchain) GHOST_type :
   "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C"
-proof (rule ccontr)
-  assume "\<not> (\<forall>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C)"   
-  then show False
-  proof -
-    have "\<forall>\<sigma> b_set. b_set \<subseteq> C \<longrightarrow> {b \<in> b_set. children (b, \<sigma>) = \<emptyset>} \<subseteq> C"
-      by blast 
-    (* 
-    then have "\<forall>\<sigma> b_set b'. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<and> b' \<in> GHOST (b_set, \<sigma>) \<and> b' \<notin> C
-            \<longrightarrow> (\<exists> b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset> \<and> b' \<notin> C \<and> b'\<in> GHOST (best_children (b, \<sigma>), \<sigma>))"
-      apply auto 
-     *)
-    then have "\<exists>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C
-      \<longrightarrow> (\<exists> b' \<in> (\<Union> b \<in> {b \<in> b_set. children (b, \<sigma>) \<noteq> \<emptyset>}. GHOST (best_children (b, \<sigma>), \<sigma>)). b' \<notin> C)"
-      using \<open>\<not> (\<forall>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> GHOST (b_set, \<sigma>) \<subseteq> C)\<close> 
-      apply auto
-      by blast  
-    then have "\<exists>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C
-        \<longrightarrow> (\<exists> b b'. b \<in> b_set \<and> children (b, \<sigma>) \<noteq> \<emptyset> \<and> b' \<notin> C \<and> b' \<in> GHOST (best_children (b, \<sigma>), \<sigma>) \<and> best_children (b, \<sigma>) \<subseteq> C)"
-      by auto 
-    then show ?thesis
-      sorry
-  qed
-qed
+proof - 
+  (* By calculating the head of GHOST, it eventually reaches blocks with no child because the set of descendant blocks is finite. *)
+  have "\<forall> \<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C \<longrightarrow> (\<exists> b_set'. b_set' \<subseteq> C \<and> GHOST (b_set, \<sigma>) = {b \<in> b_set'. children (b, \<sigma>) = \<emptyset>})"    
+    sorry
+  then show ?thesis
+    by blast
+qed    
+
 
 lemma (in Blockchain) GHOST_is_valid_estimator :
   "is_valid_estimator GHOST_heads_or_children"
   unfolding is_valid_estimator_def
   apply (simp add:  BlockchainParams.GHOST_heads_or_children_def)
   apply auto
-  using best_children_type 
+  using GHOST_type genesis_type(1) apply blast
+  using GHOST_type children_type genesis_type(1) apply blast
+  using best_children_existence  
   oops
 
 (* Locale for proofs *)
@@ -414,11 +401,11 @@ lemma (in Blockchain) agreeing_validators_on_sistor_blocks_are_not_more_than_dis
 lemma (in Blockchain) no_child_and_best_child_at_all_earlier_height_imps_GHOST_heads :
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. children (b, \<sigma>) = \<emptyset> \<and>
     (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
-    \<longrightarrow> (\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+    \<longrightarrow> b \<in> GHOST ({genesis}, \<sigma>)"
   apply auto 
   oops
 
-lemma (in Blockchain) best_child_at_all_earlier_height_imps_GHOST_heads :
+lemma (in Blockchain) best_child_at_all_earlier_height_imps_GHOST_heads_or_decendant :
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. 
     (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
     \<longrightarrow> (\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
@@ -530,7 +517,7 @@ proof -
       unfolding GHOST_heads_or_children_def
       by blast
     have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>'). est m \<downharpoonright> b''"
-      using best_child_at_all_earlier_height_imps_GHOST_heads \<open>\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> b' \<in> best_children (prev b', \<sigma>')\<close>
+      using best_child_at_all_earlier_height_imps_GHOST_heads_or_decendant \<open>\<forall> b' \<in> C. b' \<downharpoonright> est m \<longrightarrow> b' \<in> best_children (prev b', \<sigma>')\<close>
             \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>est m \<in> C\<close> by blast 
    then show "block_membership (est m) c"
      unfolding block_membership_def
