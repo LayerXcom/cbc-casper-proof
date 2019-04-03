@@ -166,7 +166,7 @@ locale Protocol = Params +
   assumes V_type: "V \<noteq> \<emptyset> \<and> finite V"
   and W_type: "\<forall> v \<in> V. W v > 0"
   and t_type: "0 \<le> t" "t < sum W V"
-  and C_type: "card C > 1"
+  and C_type: "card C > 1" "finite C"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
 lemma (in Protocol) estimates_are_non_empty: "\<And> \<sigma>. \<sigma> \<in> \<Sigma> \<Longrightarrow> \<epsilon> \<sigma> \<noteq> \<emptyset>"

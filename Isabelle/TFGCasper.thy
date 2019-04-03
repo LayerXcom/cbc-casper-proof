@@ -28,6 +28,11 @@ definition (in BlockchainParams) blockchain_membership :: "consensus_value \<Rig
 notation (ASCII)
   comp  (infixl "blockchain_membership" 70)
 
+lemma (in BlockchainParams) prev_membership :
+  "prev b \<downharpoonright> b"
+  apply (simp add: blockchain_membership_def)
+  by (metis BlockchainParams.n_cestor.simps(1) BlockchainParams.n_cestor.simps(2) Nats_1 One_nat_def diff_Suc_1) 
+
 definition (in BlockchainParams) block_conflicting :: "(consensus_value * consensus_value) \<Rightarrow> bool"
   where
     "block_conflicting = (\<lambda>(b1, b2). \<not> (b1 \<downharpoonright> b2 \<or> b2 \<downharpoonright> b1))"
@@ -86,13 +91,14 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
   using BlockchainParams.transitivity_of_blockchain_membership by blast
 
 (* Definition 4.28: Children *)
+(* NOTE: Modified from the paper to include non-observed blocks so that (block_membership b) becomes max-driven for any b \<in> C *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
-    "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
+    "children = (\<lambda>(b, \<sigma>). {b' \<in> C. b = prev b'})"
 
-lemma (in BlockchainParams) observed_block_is_children_of_prev_block :
-  "\<forall> b \<in> est `\<sigma>. b \<in> children (prev b, \<sigma>)"
-  by (simp add: children_def) 
+lemma (in BlockchainParams) block_is_children_of_prev_block :
+  "\<forall> b \<in> C. b \<in> children (prev b, \<sigma>)"
+  by (simp add: children_def)  
 
 lemma (in BlockchainParams) children_membership :
   "\<forall> b \<in> children (b', \<sigma>).  b' \<downharpoonright> b"
@@ -119,8 +125,8 @@ lemma (in Blockchain) children_type :
 lemma (in Blockchain) children_finite :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  finite (children (b, \<sigma>))"
   apply (simp add: children_def)
-  using state_is_finite
-  by (metis Collect_mem_eq finite_Collect_conjI finite_imageI) 
+  using state_is_finite C_type
+  by (metis Collect_mem_eq finite_Collect_conjI) 
 
 lemma (in Blockchain) conflicting_blocks_imps_conflicting_decision :
   "\<forall> b1 b2 \<sigma>. {b1, b2} \<subseteq> C \<and> \<sigma> \<in> \<Sigma> 
@@ -357,10 +363,12 @@ proof (rule ccontr)
     then have "\<exists>\<sigma> b_set. \<sigma> \<in> \<Sigma> \<and> b_set \<subseteq> C
         \<longrightarrow> (\<exists> b b'. b \<in> b_set \<and> children (b, \<sigma>) \<noteq> \<emptyset> \<and> b' \<notin> C \<and> b' \<in> GHOST (best_children (b, \<sigma>), \<sigma>) \<and> best_children (b, \<sigma>) \<subseteq> C)"
       by auto 
-    then show ?thesis      
-  oops
+    then show ?thesis
+      sorry
+  qed
+qed
 
-lemma (in Blockchain) GHOST_is_valid_estimator : 
+lemma (in Blockchain) GHOST_is_valid_estimator :
   "is_valid_estimator GHOST_heads_or_children"
   unfolding is_valid_estimator_def
   apply (simp add:  BlockchainParams.GHOST_heads_or_children_def)
@@ -402,7 +410,57 @@ lemma (in Blockchain) agreeing_validators_on_sistor_blocks_are_not_more_than_dis
         agreeing_validators_on_sistor_blocks_are_disagreeing weight_measure_subset_gte
         agreeing_validators_type disagreeing_validators_type
   by auto
-   
+
+lemma (in Blockchain) best_child_at_all_earlier_height_imps_GHOST_heads :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. 
+    (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
+    \<longrightarrow> (\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+proof -
+  have "\<And> n. \<forall> \<sigma> \<in> \<Sigma>. \<forall> b \<in> C. genesis = n_cestor (b, n) \<and>
+    (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))
+    \<longrightarrow> (\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+  proof -
+    fix n
+    show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>b\<in>C. genesis = n_cestor (b, n) \<and>
+                      (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)) \<longrightarrow>
+                      (\<forall>b''\<in>GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+      apply (induction n) 
+      using genesis_type GHOST_type
+      apply (metis contra_subsetD empty_subsetI insert_subset n_cestor.simps(1))
+    proof -
+      fix n
+      assume "\<forall>\<sigma>\<in>\<Sigma>. \<forall>b\<in>C. genesis = n_cestor (b, n) \<and>
+                      (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)) \<longrightarrow>
+                      (\<forall>b''\<in>GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')" 
+      show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>b\<in>C. genesis = n_cestor (b, Suc n) \<and>
+                      (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)) \<longrightarrow>
+                      (\<forall>b''\<in>GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')"
+        apply (rule, rule, rule, rule)
+      proof -
+        fix \<sigma> b b''
+        assume "\<sigma> \<in> \<Sigma>"
+        and "b \<in> C"
+        and "genesis = n_cestor (b, Suc n) \<and> (\<forall>b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))"
+        and "b'' \<in> GHOST ({genesis}, \<sigma>)"
+        then have "genesis = n_cestor (prev b, n) \<and> (\<forall> b' \<in> C. b' \<downharpoonright> prev b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))"
+          by (metis BlockchainParams.blockchain_membership_def BlockchainParams.n_cestor.simps(2) diff_Suc_1 id_apply of_nat_eq_id of_nat_in_Nats)
+        then have "prev b \<downharpoonright> b''"
+          using \<open>\<forall>\<sigma>\<in>\<Sigma>. \<forall> b \<in> C. genesis = n_cestor (b, n) \<and>
+                        (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)) \<longrightarrow>
+                        (\<forall>b''\<in>GHOST ({genesis}, \<sigma>). b \<downharpoonright> b'')\<close>
+          using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>b \<in> C\<close> prev_type \<open>b'' \<in> GHOST ({genesis}, \<sigma>)\<close> by auto 
+        have "b \<in> best_children (prev b, \<sigma>)"
+          using \<open>genesis = n_cestor (b, Suc n) \<and> (\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>))\<close>
+          using \<open>b \<in> C\<close> irreflexivity_of_blockchain_membership by blast
+        then show "b \<downharpoonright> b''"   
+          sorry
+      qed
+    qed
+  qed
+  then show ?thesis
+    using blockchain_membership_def genesis_type(2) by auto
+qed    
+
 lemma (in TFG) block_membership_is_max_driven :
   "\<forall> b \<in> C. max_driven (block_membership b)"
   apply (simp add: max_driven_def)
@@ -441,22 +499,22 @@ proof -
           \<open>b \<in> C\<close> \<open>\<sigma> \<in> \<Sigma>\<close>
       by force
     (* Here we prove best_children property is max driven *)
-    have "\<forall> b' \<in> est `\<sigma>. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)"
+    have "\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)"
       apply (simp add: best_children_def is_arg_max_def score_def)
       apply (auto)
-      using M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close> apply blast
-      apply (simp add: BlockchainParams.observed_block_is_children_of_prev_block)
+      using M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close>
+      apply (simp add: block_is_children_of_prev_block) 
       using agreeing_validators_on_sistor_blocks_are_not_more_than_disagreeing 
             prev_type 
             \<open>\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> weight_measure (agreeing_validators (block_membership b', \<sigma>)) > weight_measure (disagreeing_validators (block_membership b', \<sigma>))\<close>
-      by (smt M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close> bot.extremum children_type contra_subsetD image_eqI insert_subset observed_block_is_children_of_prev_block)
+      by (smt M_type Params.message_in_state_is_valid \<open>\<sigma> \<in> \<Sigma>\<close> bot.extremum children_type contra_subsetD image_eqI insert_subset block_is_children_of_prev_block)
     have "c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))" 
       using ghost_estimator \<open>c \<in> \<epsilon> \<sigma>\<close>
       unfolding GHOST_heads_or_children_def
       by blast
-    then have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b''"
-      using \<open>\<forall> b' \<in> est `\<sigma>. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)\<close>
-      sorry
+    have "\<forall> b'' \<in> GHOST ({genesis}, \<sigma>). b \<downharpoonright> b''"
+      using best_child_at_all_earlier_height_imps_GHOST_heads \<open>\<forall> b' \<in> C. b' \<downharpoonright> b \<longrightarrow> b' \<in> best_children (prev b', \<sigma>)\<close>
+      using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>b \<in> C\<close> by blast
    then show "block_membership b c"
      unfolding block_membership_def
      using \<open>c \<in> GHOST ({genesis}, \<sigma>) \<union> (\<Union> b \<in> GHOST ({genesis}, \<sigma>). children (b, \<sigma>))\<close>  
