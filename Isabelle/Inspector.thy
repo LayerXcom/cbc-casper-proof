@@ -235,15 +235,20 @@ lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_tran
   oops
 
 
-(* Lemma 16 (Minimal transition from outside clique maintains clique). *)
-lemma (in Protocol) clique_not_affected_by_minimal_transitions_outside_clique :
-  "\<forall> \<sigma> \<sigma>' m' v_set. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> is_clique (v_set, p, \<sigma>) = is_clique (v_set, p, \<sigma>')"
-  oops
+(* Lemma 16: Minimal transition from outside clique maintains clique *)
+lemma (in Protocol) clique_not_affected_by_message_from_non_member :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> sender m \<notin> v_set
+  \<longrightarrow> is_clique (v_set, p, \<sigma>) 
+  \<longrightarrow> is_clique (v_set, p, \<sigma> \<union> {m})"
+  sorry
 
 
+(* ###################################################### *)
 (* 7.4 Majority Cliques Survive Honest Messages from Validators in Clique *)
+(* ###################################################### *)
+
 (* 7.4.1 New messages at least leaves a smaller clique behind *)
 
 (* Lemma 17 (Free sub-clique)  *)
@@ -408,7 +413,11 @@ lemma (in Protocol) clique_oracles_preserved_over_message_from_non_member :
   \<longrightarrow> sender m \<notin> v_set
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m}, p)"
-  sorry
+  using clique_not_affected_by_message_from_non_member
+  unfolding is_clique_oracle_def gt_threshold_def
+  using equivocation_fault_weight_is_monotonic
+  apply auto
+  by (smt Un_insert_right \<Sigma>t_is_subset_of_\<Sigma> equivocation_fault_weight_def state_transition_by_immediately_next_message subsetCE subset_insertI sup_bot.right_neutral) 
 
 (* Lemma 34: Clique oracles preserved over message from non-equivocating member *)
 lemma (in Protocol) clique_oracles_preserved_over_message_from_non_equivocating_member :

@@ -330,8 +330,9 @@ lemma (in Protocol) equivocating_validators_is_equivalent_to_paper :
   "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> = equivocating_validators_paper \<sigma>"
   by (smt Collect_cong Params.equivocating_validators_paper_def equivocating_validators_def is_equivocating_def mem_Collect_eq observed_type_for_state observed_def subsetCE)
 
+(* NOTE: This holds without the assumption that \<sigma> and \<sigma>' are valid state *)
 lemma (in Protocol) equivocation_is_monotonic :
-  "\<forall> \<sigma> \<sigma>' v. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>') \<and> v \<in> V
+  "\<forall> \<sigma> \<sigma>' v. is_future_state (\<sigma>, \<sigma>') \<and> v \<in> V
   \<longrightarrow> v \<in> equivocating_validators \<sigma>
   \<longrightarrow> v \<in> equivocating_validators \<sigma>'"
   apply (simp add: equivocating_validators_def is_equivocating_def)
