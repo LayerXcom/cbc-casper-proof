@@ -174,6 +174,7 @@ lemma (in Protocol) state_transition_is_immediately_next_message:
   apply (simp add: immediately_next_message_def) 
   using insert_Diff state_is_in_pow_Mi by fastforce
 
+(* NJH19 Lemma 8 *)
 lemma (in Protocol) strict_subset_of_state_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'. \<sigma>' \<subset> \<sigma> \<longrightarrow> (\<exists> m \<in> \<sigma> - \<sigma>'. immediately_next_message (\<sigma>', m))"
   apply (simp add: immediately_next_message_def)

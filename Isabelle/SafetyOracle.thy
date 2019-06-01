@@ -132,7 +132,7 @@ definition is_clique :: "(validator set * consensus_value_property * state) \<Ri
  where
    "is_clique = (\<lambda>(v_set, p, \<sigma>). 
       (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
-       \<and> (\<forall>  v' \<in> v_set. 
+       \<and> (\<forall> v' \<in> v_set. 
              agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
              \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>)))"
 
@@ -257,6 +257,8 @@ lemma (in Protocol) free_sub_clique :
 lemma (in Protocol) later_messages_from_non_equivocating_validator_include_all_earlier_messages :
   "\<forall> v \<sigma> \<sigma>1 \<sigma>2. \<sigma> \<in> \<Sigma> \<and> \<sigma>1 \<in> \<Sigma> \<and> \<sigma>1 \<subseteq> \<sigma> \<and> \<sigma>2 \<subseteq> \<sigma> \<and> \<sigma>1 \<inter> \<sigma>2 = \<emptyset>
   \<longrightarrow> (\<forall> m1 \<in> \<sigma>1. sender(m1) = v \<longrightarrow> (\<forall> m2 \<in> \<sigma>2. sender(m2) = v \<longrightarrow> m1 \<in> justification(m2)))"
+  using strict_subset_of_state_have_immediately_next_messages
+  apply (simp add: immediately_next_message_def)  
   oops
 
 (* Lemma 19 (m' is its sender's latest message in \<sigma>’). *)
