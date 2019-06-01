@@ -1,4 +1,4 @@
-theory SafetyOracle
+theory Inspector
 
 imports Main CBCCasper LatestMessage StateTransition ConsensusSafety
 
@@ -392,53 +392,52 @@ definition (in Params) is_clique_oracle :: "(validator set * state * consensus_v
     "is_clique_oracle 
        = (\<lambda>(v_set, \<sigma>, p). (is_clique (v_set - (equivocating_validators \<sigma>), p, \<sigma>) \<and> gt_threshold (v_set - (equivocating_validators \<sigma>), \<sigma>)))"
 
-(* Lemma 33 (Clique oracles preserved over minimal transitions from validators not in clique). *)
-lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_validators_not_in_clique :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
+(* Lemma 33: Clique oracles preserved over message from non-member *)
+lemma (in Protocol) clique_oracles_preserved_over_message_from_non_member :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> sender m' \<notin> v_set - equivocating_validators \<sigma>
-      \<and> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
-  oops
-
-(* Lemma 34 (Clique oracles preserved over minimal transitions from non-equivocating validators) *)
-lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_non_equivocating_validator :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> sender m' \<in> v_set - equivocating_validators \<sigma> \<and> sender m' \<notin> equivocating_validators \<sigma>'
-      \<and> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
-  oops
-
-(* Lemma 35 (Clique oracles preserved over minimal transitions from non-equivocating validators) *)
-lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions_from_equivocating_validator :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
-  \<longrightarrow> sender m' \<in> v_set - equivocating_validators \<sigma> \<and> sender m' \<in> equivocating_validators \<sigma>'
-      \<and> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
-  oops
-
-(* Lemma 36 (Clique oracles preserved over minimal transitions) *)
-lemma (in Protocol) clique_oracles_preserved_over_minimal_transitions :
-  "\<forall> \<sigma> \<sigma>' m' v_set p. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> m' = the_elem (\<sigma>' - \<sigma>)
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> sender m \<notin> v_set
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> is_clique_oracle (v_set, \<sigma>', p)"
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m}, p)"
   sorry
 
-lemma (in Protocol) clique_oracles_preserved_over_nice_message :
-  "\<forall> \<sigma> m' v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+(* Lemma 34: Clique oracles preserved over message from non-equivocating member *)
+lemma (in Protocol) clique_oracles_preserved_over_message_from_non_equivocating_member :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
-  \<longrightarrow> \<sigma> \<union> {m'} \<in> \<Sigma>t
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> sender m \<in> v_set
+  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
-  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m'}, p)"
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m}, p)"
   sorry
 
+(* Lemma 35: Clique oracles preserved over message from equivocating member *)
+lemma (in Protocol) clique_oracles_preserved_over_message_from_equivocating_member :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  \<longrightarrow> majority_driven p
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> sender m \<in> v_set
+  \<longrightarrow> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m}, p)"
+  sorry
+
+
+(* NOTE: We will use this lemma instead of Lemma 36 *)
+lemma (in Protocol) clique_oracles_preserved_over_immediately_next_message :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> majority_driven p
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
+  \<longrightarrow> is_clique_oracle (v_set, \<sigma> \<union> {m}, p)"
+  using clique_oracles_preserved_over_message_from_non_member
+        clique_oracles_preserved_over_message_from_non_equivocating_member
+        clique_oracles_preserved_over_message_from_equivocating_member
+  by (metis (no_types, lifting) Un_insert_right \<Sigma>t_def insert_subset mem_Collect_eq state_is_subset_of_M)
 
 (* Lemma 37 *)
 (* Based on no later disagreeing message imps keep agreeing  *)
@@ -539,7 +538,7 @@ proof -
     using Mi.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
 qed
 
-(* Lemma 39 (Cliques exist in all futures) *)
+(* Lemma 39: Cliques exist in all futures *)
 lemma (in Protocol) clique_oracle_for_all_futures :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
@@ -550,11 +549,12 @@ proof -
   fix \<sigma> v_set p \<sigma>'
   assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "is_clique_oracle (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
   show "is_clique_oracle (v_set, \<sigma>', p)"
-    using clique_oracles_preserved_over_minimal_transitions
-  sorry
+    using clique_oracles_preserved_over_immediately_next_message
+    (* TODO: Pick up immediately next message continuously to reach \<sigma>' *)
+    sorry
 qed
 
-(* Lemma 40 (Clique oracle is a safety oracle) *)
+(* Lemma 40: Clique oracle is a safety oracle *)
 lemma (in Protocol) clique_oracle_is_safety_oracle :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> finite v_set

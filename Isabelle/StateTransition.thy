@@ -44,7 +44,7 @@ definition (in Protocol) minimal_transitions :: "(state * state) set"
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
 definition immediately_next_message where
-  "immediately_next_message = (\<lambda>(\<sigma>,m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
+  "immediately_next_message = (\<lambda>(\<sigma>, m). justification m \<subseteq> \<sigma> \<and> m \<notin> \<sigma>)"
 
 lemma (in Protocol) state_transition_by_immediately_next_message_of_same_depth_non_zero: 
   "\<forall>n\<ge>1. \<forall>\<sigma>\<in>\<Sigma>i (V,C,\<epsilon>) n. \<forall>m\<in>Mi (V,C,\<epsilon>) n. immediately_next_message (\<sigma>,m) \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>i (V,C,\<epsilon>) (n+1)"
@@ -163,13 +163,13 @@ proof -
 qed
 
 lemma (in Protocol) state_transition_only_made_by_immediately_next_message: 
-  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longleftrightarrow> immediately_next_message (\<sigma>,m)"
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma> \<and> m \<notin> \<sigma> \<longleftrightarrow> immediately_next_message (\<sigma>, m)"
   using state_transition_imps_immediately_next_message state_transition_by_immediately_next_message
   apply (simp add: immediately_next_message_def)
   by blast
 
 lemma (in Protocol) state_transition_is_immediately_next_message: 
-  "\<forall> \<sigma> \<in>\<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma>  \<longleftrightarrow> justification m \<subseteq> \<sigma>"
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> m \<in> M. \<sigma> \<union> {m} \<in> \<Sigma>  \<longleftrightarrow> justification m \<subseteq> \<sigma>"
   using state_transition_only_made_by_immediately_next_message 
   apply (simp add: immediately_next_message_def) 
   using insert_Diff state_is_in_pow_Mi by fastforce
@@ -394,6 +394,19 @@ proof -
   then show "\<sigma> \<union> {the_elem (\<sigma>'- \<sigma>)} = \<sigma>'"
     by (metis Diff_partition \<open>is_singleton (\<sigma>' - \<sigma>)\<close> is_singleton_the_elem)
 qed
+
+(* NOTE: This lemma will be unnecessary if we directly consider immediately next message as minimal step *)
+lemma (in Protocol) minimal_transition_is_immediately_next_message :
+  "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longleftrightarrow> immediately_next_message (\<sigma>, the_elem (\<sigma>'- \<sigma>))"
+proof -
+  have "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<longrightarrow> immediately_next_message (\<sigma>, the_elem (\<sigma>'- \<sigma>))"
+    using minimal_transition_implies_recieving_single_message state_transition_only_made_by_immediately_next_message
+          state_differences_have_immediately_next_messages
+          state_difference_is_valid_message
+    apply (simp add: minimal_transitions_def immediately_next_message_def)
+    (* by (smt Diff_iff \<Sigma>t_is_subset_of_\<Sigma> is_singleton_the_elem singletonD subsetCE) *)
+oops
+    
 
 lemma (in Protocol) road_to_future_state :
   "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state(\<sigma>, \<sigma>')
