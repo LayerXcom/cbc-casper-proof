@@ -1,6 +1,8 @@
 # cbc-casper-proof
 Proofs of properties of CBC Casper
 
+See [Refinement and Verification of CBC Casper](https://eprint.iacr.org/2019/415.pdf)
+
 ## Resources
 - [CBC Casper paper](https://github.com/cbc-casper/cbc-casper-paper)
 - [Isabelle proofs for the old version of CBC Casper](https://github.com/pirapira/cbc_casper)
