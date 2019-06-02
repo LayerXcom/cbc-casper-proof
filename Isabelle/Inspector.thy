@@ -5,7 +5,7 @@ imports Main CBCCasper LatestMessage StateTransition ConsensusSafety
 begin
 
 (* ###################################################### *)
-(* Safety oracle *)
+(* Safety oracle (Inspector) *)
 (* ###################################################### *)
 
 (* Section 7: Safety Oracles *)
@@ -180,7 +180,7 @@ definition (in Params) inspector :: "(validator set * state * consensus_value_pr
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
 (* ###################################################### *)
 
-(* Lemma 11: Minimal transitions do not change Later_From for any non-sender *)
+(* Lemma 11: Immediately next message does not change Later_From for any non-sender *)
 lemma (in Protocol) later_from_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m m' v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> m' \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m')
@@ -231,7 +231,7 @@ qed
  *)
   oops
 
-(* Lemma 12: Minimal transitions do not change equivocation status for any non-sender *)
+(* Lemma 12: Immediately next message does not change equivocation status for any non-sender *)
 lemma (in Protocol) equivocation_status_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -239,7 +239,7 @@ lemma (in Protocol) equivocation_status_of_non_sender_not_affected_by_minimal_tr
   \<longrightarrow> v \<in> equivocating_validators \<sigma> \<longleftrightarrow> v \<in> equivocating_validators (\<sigma> \<union> {m})"
   oops
 
-(* Lemma 13: Minimal transitions do not change latest messages for any non-sender. *)
+(* Lemma 13: Immediately next message does not change latest messages for any non-sender *)
 lemma (in Protocol) L_M_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -247,7 +247,7 @@ lemma (in Protocol) L_M_of_non_sender_not_affected_by_minimal_transitions :
   \<longrightarrow> L_H_M \<sigma> v = L_H_M (\<sigma> \<union> {m}) v"
   oops
 
-(* Lemma 14 (Minimal transitions do not change latest justification for any non-sender). *)
+(* Lemma 14 Immediately next message does not change latest justification for any non-sender *)
 lemma (in Protocol) latest_justificationss_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -255,7 +255,7 @@ lemma (in Protocol) latest_justificationss_of_non_sender_not_affected_by_minimal
   \<longrightarrow> L_H_J \<sigma> v = L_H_J (\<sigma> \<union> {m}) v"
   oops
 
-(* Lemma 15 (Minimal transitions do not change Later Disagreeing for any non-sender). *)
+(* Lemma 15 Immediately next message does not change Later Disagreeing for any non-sender *)
 lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m m' v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> m' \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m')
