@@ -99,6 +99,7 @@ definition (in Protocol) majority_driven :: "consensus_value_property \<Rightarr
     "majority_driven p = (\<forall> \<sigma> \<in> \<Sigma>. majority (agreeing_validators (p, \<sigma>), \<sigma>) \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c))"
 
 (* Definition 7.13 *)
+(* FIXME: Max driven and majority driven are equivalent. Keep one and discard the other. *)
 definition (in Protocol) max_driven :: "consensus_value_property \<Rightarrow> bool"
   where
     "max_driven p =
@@ -123,34 +124,14 @@ lemma (in Protocol) later_disagreeing_messages_type :
 (* Definition 7.15 *)
 (* NOTE: We use `the_elem` but is it return `undefined`?  *)
 
-(* Section 7.2: Validator Cliques *)
-
-(* Definition 7.16: Clique with 1 layers *)
-(* NOTE: The original definition implies that validators in clique are not equivocating. 
-         Here we explicitly states this. *)
-definition is_clique :: "(validator set * consensus_value_property * state) \<Rightarrow> bool"
- where
-   "is_clique = (\<lambda>(v_set, p, \<sigma>). 
-      (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
-       \<and> (\<forall> v' \<in> v_set. 
-             agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
-             \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>)))"
-
-(* FIXME: We should prove that validators in clique see each other have a single latest message, 
-          by the monotonicity of equivocations. The original definition implies it.  *)
 lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
   "\<forall> \<sigma> v \<sigma>'. v \<in> V \<and> {\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> is_future_state (\<sigma>', \<sigma>)
   \<longrightarrow> v \<notin> equivocating_validators \<sigma>
   \<longrightarrow> v \<notin> equivocating_validators \<sigma>'"
+  (* Will be proved by the monotonicity of equivocations. *)
   oops
 
-lemma (in Protocol) validator_in_clique_see_L_H_M_of_others_is_singleton : 
-  "\<forall> v_set p \<sigma>. v_set \<subseteq> V \<and> \<sigma> \<in> \<Sigma> 
-  \<longrightarrow> is_clique (v_set, p, \<sigma>) 
-  \<longrightarrow> (\<forall> v v'. {v, v'} \<subseteq> v_set \<longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
-  sorry
-
-(* Definition 7.18: One layer clique oracle threshold size *) 
+(* Definition 7.18: Inspector threshold size *) 
 definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
   where
     "gt_threshold 
@@ -163,9 +144,6 @@ lemma (in Protocol) gt_threshold_imps_majority_for_any_validator :
   \<longrightarrow> (\<forall> v \<in> v_set. majority (v_set, the_elem (L_H_J \<sigma> v)))"
   oops
 
-(* Definition 7.19: Clique oracle (1 layer) *)
-(* FIXME: Make the order of variables consistent to is_clique *)
-(* Removed "- E(\<sigma>)" part from the original definition since it is included in is_clique *)
 definition (in Params) inspector :: "(validator set * state * consensus_value_property) \<Rightarrow> bool"
   where
     "inspector 
@@ -175,6 +153,12 @@ definition (in Params) inspector :: "(validator set * state * consensus_value_pr
               \<and> (\<forall> v' \<in> v_set'. 
                     agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
                     \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>))))"
+
+lemma (in Protocol) validator_in_inspector_see_L_H_M_of_others_is_singleton : 
+  "\<forall> v_set p \<sigma>. v_set \<subseteq> V \<and> \<sigma> \<in> \<Sigma> 
+  \<longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<longrightarrow> (\<forall> v v'. {v, v'} \<subseteq> v_set \<longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
+  oops
 
 (* Lemma 37 *)
 (* Should we explicitly add "everyone agreeing" to the definition of inspector, regardless of the overhead?*)
@@ -208,7 +192,7 @@ lemma (in Protocol) inspector_imps_everyone_agreeing :
   then have justified_ok: "\<forall> v \<in> v_set. justified (the_elem (L_H_M 
                                                           (the_elem (L_H_J \<sigma> v)) v))
                                     (the_elem (L_H_M \<sigma> v))"
-    using validator_in_clique_see_L_H_M_of_others_is_singleton
+    using validator_in_inspector_see_L_H_M_of_others_is_singleton
     by (smt Diff_iff L_H_M_def L_H_M_is_in_the_state L_M_from_non_observed_validator_is_empty M_type \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_clique (v_set, p, \<sigma>)\<close> empty_subsetI insert_subset is_singleton_the_elem justified_def observed_non_equivocating_validators_def state_is_subset_of_M subsetCE)
   have sender_ok: "\<forall> v \<in> v_set. sender (the_elem (L_H_M \<sigma> v)) = v" 
     using \<open>\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M
@@ -370,10 +354,9 @@ lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_tran
   \<longrightarrow> later_disagreeing_messages (p, m, v, \<sigma>) = later_disagreeing_messages (p, m, v, \<sigma> \<union> {m'})"
   oops
 
-
-(* Lemma 16: Minimal transition from outside clique maintains clique *)
-(* Lemma 33: Clique oracles preserved over message from non-member *)
-lemma (in Protocol) clique_oracles_preserved_over_message_from_non_member :
+(* Lemma 33: Inspector preserved over message from non-member *)
+(* NOTE: Lemma 16 is not necessary*)
+lemma (in Protocol) inspector_preserved_over_message_from_non_member :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -406,7 +389,7 @@ lemma (in Protocol) clique_oracles_preserved_over_message_from_non_member :
   oops
  *)
 
-(* 7.4.2 Non-equivocating messages from clique members see clique agree *)
+(* 7.4.2 Non-equivocating messages from member see all members agreeing *)
 (* Lemma 18 (Later messages from a non-equivocating validator include all earlier messages) *)
 (* NOTE: \<sigma>2 is not a state, just a set of messages. *)
 lemma (in Protocol) later_messages_from_non_equivocating_validator_include_all_earlier_messages :
@@ -460,7 +443,7 @@ lemma (in Protocol) non_equivocating_message_from_member_see_all_members_agreein
 (* 7.4.3 Non-equivocating messages from member agree *)
 
 (* Lemma 24 (New messages from member is agreeing *)
-lemma (in Protocol) new_message_from_majority_clique_see_members_agreeing :
+lemma (in Protocol) new_message_from_member_see_all_members_agreeing :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -472,7 +455,7 @@ lemma (in Protocol) new_message_from_majority_clique_see_members_agreeing :
   oops
 
 
-(* 7.4.4 Honest messages from majority clique members do not break the clique *)
+(* 7.4.4 Honest messages from member do not break inspector *)
 
 (* Lemma 25 *)
 lemma (in Protocol) latest_message_in_justification_of_new_message_is_latest_message :
@@ -521,9 +504,9 @@ lemma (in Protocol) empty_later_disagreeing_messages_in_new_message :
   \<longrightarrow> later_disagreeing_messages (p, (the_elem (L_H_M (justification m) v)), v, \<sigma>) = \<emptyset>"
   oops
 
-(* Lemma 31: New non-equivocating latest messages from members of majority clique don’t break the clique *)
-(* Lemma 34: Clique oracles preserved over message from non-equivocating member *)
-lemma (in Protocol) clique_oracles_preserved_over_message_from_non_equivocating_member :
+(* Lemma 34: Inspector preserved over message from non-equivocating member *)
+(* NOTE: Lemma 31 is not necessary*)
+lemma (in Protocol) inspector_preserved_over_message_from_non_equivocating_member :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -539,11 +522,11 @@ lemma (in Protocol) clique_oracles_preserved_over_message_from_non_equivocating_
  *) sorry
 
 (* ###################################################### *)
-(* 7.5 Equivocations from Validators in Clique do not break cliques *)
+(* 7.5 Equivocations from validators in inspector do not break inspector *)
 (* ###################################################### *)
 
-(* Lemma 35: Clique oracles preserved over message from equivocating member *)
-lemma (in Protocol) clique_oracles_preserved_over_message_from_equivocating_member :
+(* Lemma 35: Inspector preserved over message from equivocating member *)
+lemma (in Protocol) inspector_preserved_over_message_from_equivocating_member :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -552,21 +535,21 @@ lemma (in Protocol) clique_oracles_preserved_over_message_from_equivocating_memb
   \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-  (* using free_sub_clique *)
+  (* Since \<sigma> \<union> {m} \<in> \<Sigma>t, gt_threshold still holds  *)
   sorry
 
 
-(* NOTE: We will use this lemma instead of Lemma 36 *)
-lemma (in Protocol) clique_oracles_preserved_over_immediately_next_message :
+(* Lemma 36 *)
+lemma (in Protocol) inspector_preserved_over_immediately_next_message :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-  using clique_oracles_preserved_over_message_from_non_member
-        clique_oracles_preserved_over_message_from_non_equivocating_member
-        clique_oracles_preserved_over_message_from_equivocating_member
+  using inspector_preserved_over_message_from_non_member
+        inspector_preserved_over_message_from_non_equivocating_member
+        inspector_preserved_over_message_from_equivocating_member
   by (metis (no_types, lifting) Un_insert_right \<Sigma>t_def insert_subset mem_Collect_eq state_is_subset_of_M)
 
 (* Lemma 39: Inspector exists in all future states *)
@@ -580,13 +563,13 @@ proof -
   fix \<sigma> v_set p \<sigma>'
   assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "inspector (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
   show "inspector (v_set, \<sigma>', p)"
-    using clique_oracles_preserved_over_immediately_next_message
+    using inspector_preserved_over_immediately_next_message
     (* TODO: Pick up immediately next message continuously to reach \<sigma>' *)
     sorry
 qed
 
-(* Lemma 40: Clique oracle is a safety oracle *)
-lemma (in Protocol) clique_oracle_is_safety_oracle :
+(* Lemma 40: Inspector is a safety oracle *)
+lemma (in Protocol) inspector_is_safety_oracle :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> finite v_set
   \<longrightarrow> majority_driven p
