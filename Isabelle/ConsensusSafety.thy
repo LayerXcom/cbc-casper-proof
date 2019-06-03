@@ -9,11 +9,6 @@ begin
 (* Section 3: Safety Proof *)
 (* Section 3.1: Guaranteeing Common Futures *)
 
-(* Definition 3.1 *)
-definition (in Protocol) futures :: "state \<Rightarrow> state set"
-  where
-    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>, \<sigma>')}"
-
 (* Lemma 1 *)
 lemma (in Protocol) monotonic_futures :
   "\<forall> \<sigma>' \<sigma>. \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma>t

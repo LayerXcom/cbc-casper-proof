@@ -447,6 +447,11 @@ definition (in Protocol) \<Sigma>t :: "state set"
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
 
+(* Definition 3.1 *)
+definition (in Protocol) futures :: "state \<Rightarrow> state set"
+  where
+    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>, \<sigma>')}"
+
 (* Definition 3.2 *)
 type_synonym state_property = "state \<Rightarrow> bool"
 

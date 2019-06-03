@@ -578,7 +578,7 @@ lemma (in Protocol) inspector_preserved_over_immediately_next_message :
         inspector_preserved_over_message_from_non_equivocating_member
         inspector_preserved_over_message_from_equivocating_member
   by (metis (no_types, lifting) Un_insert_right \<Sigma>t_def insert_subset mem_Collect_eq state_is_subset_of_M)
-
+  
 (* Lemma 39: Inspector exists in all future states *)
 lemma (in Protocol) inspector_presereved_forever :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
@@ -586,11 +586,20 @@ lemma (in Protocol) inspector_presereved_forever :
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. inspector (v_set, \<sigma>', p))"
   apply (rule+)
-proof -
+proof - 
+  have "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+        \<longrightarrow> majority_driven p
+        \<longrightarrow> inspector (v_set, \<sigma>, p) 
+        \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. \<sigma> \<subset> \<sigma>' 
+                \<longrightarrow> (\<exists> m \<in> \<sigma>' - \<sigma>. inspector (v_set, \<sigma> \<union> {m}, p)))"
+    using inspector_preserved_over_immediately_next_message
+          intermediate_state_towards_strict_future
+    by (metis (mono_tags, lifting) DiffE \<Sigma>t_def futures_def mem_Collect_eq message_in_state_is_valid state_transition_imps_immediately_next_message)  
   fix \<sigma> v_set p \<sigma>'
   assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "inspector (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
   show "inspector (v_set, \<sigma>', p)"
     using inspector_preserved_over_immediately_next_message
+          strict_subset_of_state_have_immediately_next_messages
     (* TODO: Pick up immediately next message continuously to reach \<sigma>' *)
     sorry
 qed

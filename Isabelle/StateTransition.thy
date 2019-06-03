@@ -199,6 +199,29 @@ proof -
   qed
 qed
 
+lemma (in Protocol) intermediate_state_towards_strict_future: 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>' \<in> futures \<sigma>. \<sigma> \<subset> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>' - \<sigma>. \<sigma> \<union> {m} \<in> \<Sigma>t)"
+  apply (rule, rule, rule)
+proof - 
+  fix \<sigma> \<sigma>'
+  assume "\<sigma> \<in> \<Sigma>"
+  assume "\<sigma>' \<in> futures \<sigma>"
+  assume "\<sigma> \<subset> \<sigma>'"
+  have "\<exists> m \<in> \<sigma>' - \<sigma>. immediately_next_message (\<sigma>, m)"
+    using strict_subset_of_state_have_immediately_next_messages
+          \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma> \<subset> \<sigma>'\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close>
+    by (simp add: futures_def \<Sigma>t_def)
+  then have "\<exists> m \<in> \<sigma>' - \<sigma>. \<sigma> \<union> {m} \<in> \<Sigma>"
+    using state_transition_only_made_by_immediately_next_message \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close>
+    by (smt DiffD1 \<Sigma>t_is_subset_of_\<Sigma> futures_def mem_Collect_eq message_in_state_is_valid subsetCE)
+  then have "\<exists> m \<in> \<sigma>' - \<sigma>. \<sigma> \<union> {m} \<in> \<Sigma> \<and> \<sigma> \<union> {m} \<subseteq> \<sigma>'"
+    using \<open>\<sigma> \<subset> \<sigma>'\<close> by auto    
+  then show "\<exists>m \<in> \<sigma>' - \<sigma>. \<sigma> \<union> {m} \<in> \<Sigma>t"
+    using equivocation_fault_weight_is_monotonic \<open>\<sigma>' \<in> futures \<sigma>\<close>    
+    apply (simp add: futures_def \<Sigma>t_def is_faults_lt_threshold_def)
+    by fastforce   
+qed
+
 lemma (in Protocol) union_of_two_states_is_state :
   "\<forall> \<sigma>1 \<in> \<Sigma>. \<forall> \<sigma>2 \<in> \<Sigma>. (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>"
   apply (rule, rule)
@@ -270,7 +293,6 @@ proof -
       using False \<open>\<sigma>1 \<in> \<Sigma>\<close> \<open>\<sigma>2 \<in> \<Sigma>\<close> by blast
   qed
 qed
-
 
 lemma (in Protocol) union_of_finite_set_of_states_is_state :
   "\<forall> \<sigma>_set \<subseteq> \<Sigma>. finite \<sigma>_set \<longrightarrow> \<Union> \<sigma>_set \<in> \<Sigma>"
