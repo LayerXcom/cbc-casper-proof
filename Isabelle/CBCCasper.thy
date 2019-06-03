@@ -447,6 +447,13 @@ definition (in Protocol) \<Sigma>t :: "state set"
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
 
+lemma (in Protocol) past_state_of_\<Sigma>t_is_\<Sigma>t :
+  "\<forall> \<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
+  \<longrightarrow> \<sigma> \<in> \<Sigma>t"
+  using equivocation_fault_weight_is_monotonic
+  apply (simp add: \<Sigma>t_def is_faults_lt_threshold_def)
+  by fastforce 
+
 (* Definition 3.1 *)
 definition (in Protocol) futures :: "state \<Rightarrow> state set"
   where

@@ -222,6 +222,11 @@ proof -
     by fastforce   
 qed
 
+lemma (in Protocol) state_differences_have_immediately_next_messages: 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>' - \<sigma>. immediately_next_message (\<sigma>, m))"
+  using strict_subset_of_state_have_immediately_next_messages
+  by (simp add: psubsetI)
+
 lemma (in Protocol) union_of_two_states_is_state :
   "\<forall> \<sigma>1 \<in> \<Sigma>. \<forall> \<sigma>2 \<in> \<Sigma>. (\<sigma>1 \<union> \<sigma>2) \<in> \<Sigma>"
   apply (rule, rule)
@@ -302,10 +307,10 @@ proof -
     apply (rule)
   proof -
     fix n
-    show "\<forall>\<sigma>_set\<subseteq>\<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>"
+    show "\<forall> \<sigma>_set \<subseteq> \<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>"
       apply (induction n)
       apply (rule, rule, rule, rule)
-       apply (simp add: empty_set_exists_in_\<Sigma>)
+      apply (simp add: empty_set_exists_in_\<Sigma>)
       apply (rule, rule, rule, rule)
     proof - 
       fix n \<sigma>_set
@@ -324,26 +329,36 @@ proof -
 qed
 
 
-lemma (in Protocol) state_differences_have_immediately_next_messages: 
-  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>'-\<sigma>. immediately_next_message (\<sigma>, m))"
-  using strict_subset_of_state_have_immediately_next_messages
-  by (simp add: psubsetI)
+lemma (in Protocol) non_empty_state_is_reached_by_receiving_single_message :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<noteq> \<emptyset> \<longrightarrow> (\<exists> \<sigma>' m. \<sigma>' \<in> \<Sigma> \<and> m \<in> \<sigma> \<and> m \<notin> \<sigma>' \<and> \<sigma> = \<sigma>' \<union> {m})"
+  sorry
 
-lemma non_empty_non_singleton_imps_two_elements : 
-  "A \<noteq> \<emptyset> \<Longrightarrow> \<not> is_singleton A \<Longrightarrow> \<exists> a1 a2. a1 \<noteq> a2 \<and> {a1, a2} \<subseteq> A"
-  by (metis inf.orderI inf_bot_left insert_subset is_singletonI')
+lemma (in Protocol) non_empty_state_is_reached_by_receiving_immediately_next_message :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<sigma> \<noteq> \<emptyset> \<longrightarrow> (\<exists> \<sigma>' m. \<sigma>' \<in> \<Sigma> \<and> m \<in> \<sigma> \<and> immediately_next_message(\<sigma>', m) \<and> \<sigma> = \<sigma>' \<union> {m})"
+  using state_differences_have_immediately_next_messages 
+        state_transition_only_made_by_immediately_next_message 
+        non_empty_state_is_reached_by_receiving_single_message
+  by (metis message_in_state_is_valid)
 
+lemma (in Protocol) intermediate_state_before_receiving_single_message :
+  "\<forall> \<sigma> \<sigma>'. {\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> \<sigma> \<subset> \<sigma>' \<and> \<sigma>' \<noteq> \<emptyset> 
+  \<longrightarrow> (\<exists> \<sigma>'' m. \<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message(\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>'')"
+  using non_empty_state_is_reached_by_receiving_immediately_next_message
+  sorry
 
 (* ###################################################### *)
 (* Minimal transitions (to be deprecated) *)
 (* ###################################################### *)
-
 
 (* Definition 7.17 *)
 definition (in Protocol) minimal_transitions :: "(state * state) set"
   where
     "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'
       \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
+
+lemma non_empty_non_singleton_imps_two_elements : 
+  "A \<noteq> \<emptyset> \<Longrightarrow> \<not> is_singleton A \<Longrightarrow> \<exists> a1 a2. a1 \<noteq> a2 \<and> {a1, a2} \<subseteq> A"
+  by (metis inf.orderI inf_bot_left insert_subset is_singletonI')
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
