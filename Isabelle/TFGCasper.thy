@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper LatestMessage SafetyOracle ConsensusSafety
+imports Main HOL.Real CBCCasper LatestMessage CliqueOracle ConsensusSafety
 
 begin
 
