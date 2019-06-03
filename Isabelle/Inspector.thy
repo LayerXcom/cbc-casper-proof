@@ -147,7 +147,7 @@ lemma (in Protocol) gt_threshold_imps_majority_for_any_validator :
 definition (in Params) inspector :: "(validator set * state * consensus_value_property) \<Rightarrow> bool"
   where
     "inspector 
-       = (\<lambda>(v_set, \<sigma>, p). 
+       = (\<lambda>(v_set, \<sigma>, p). v_set \<noteq> \<emptyset> \<and>
             (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
               \<and> (\<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) 
               \<and> (\<forall> v' \<in> v_set'. 
@@ -212,6 +212,33 @@ lemma (in Protocol) inspector_imps_everyone_agreeing :
 qed
  *)
   oops
+
+
+lemma (in Protocol) inspector_imps_gt_threshold :
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V 
+  \<longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<longrightarrow> gt_threshold(v_set, \<sigma>)"
+  apply (rule+)
+proof - 
+  fix \<sigma> v_set p
+  assume "\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V"
+  assume "inspector (v_set, \<sigma>, p)" 
+  hence "\<exists> v \<in> v_set. \<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v))"
+    apply (simp add: inspector_def)
+    by blast
+  hence "\<exists> v \<in> v_set.  gt_threshold(v_set, the_elem (L_H_J \<sigma> v))"
+    apply (simp add: gt_threshold_def)
+    using weight_measure_subset_gte
+    by (smt \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close>) 
+  hence "\<exists> v \<in> v_set.  gt_threshold(v_set, the_elem (L_H_J \<sigma> v)) \<and> the_elem (L_H_J \<sigma> v) \<subseteq> \<sigma>"
+    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close>  
+    sorry
+  show "gt_threshold (v_set, \<sigma>)"
+    apply (simp add: gt_threshold_def)
+    using equivocation_fault_weight_is_monotonic          
+    apply (simp add: equivocation_fault_weight_def) 
+    oops
+
 
 (* Lemma 38 *)
 lemma (in Protocol) inspector_imps_estimator_agreeing :
