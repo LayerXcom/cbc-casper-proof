@@ -51,7 +51,7 @@ lemma (in Protocol) n_party_common_futures_exists :
 (* Definition 3.3  *)
 definition (in Protocol) state_property_is_decided :: "(state_property * state) \<Rightarrow> bool"
   where
-    "state_property_is_decided  = (\<lambda>(p, \<sigma>). (\<forall> \<sigma>' \<in> futures \<sigma> . p \<sigma>'))"
+    "state_property_is_decided = (\<lambda>(p, \<sigma>). (\<forall> \<sigma>' \<in> futures \<sigma> . p \<sigma>'))"
 
 (* Lemma 2 *)
 lemma (in Protocol) forward_consistency :

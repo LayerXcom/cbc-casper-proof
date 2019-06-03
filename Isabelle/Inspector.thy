@@ -600,10 +600,10 @@ lemma (in Protocol) inspector_is_safety_oracle :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> finite v_set
   \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>')"    
+  \<longrightarrow> inspector (v_set, \<sigma>, p)
+  \<longrightarrow> state_property_is_decided (naturally_corresponding_state_property p, \<sigma>)"    
   using inspector_presereved_forever inspector_imps_estimator_agreeing
-  apply (simp add: naturally_corresponding_state_property_def futures_def)
+  apply (simp add: naturally_corresponding_state_property_def futures_def state_property_is_decided_def)
   by meson
 
 end
