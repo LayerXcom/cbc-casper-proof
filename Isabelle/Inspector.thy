@@ -135,7 +135,7 @@ lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
 definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
   where
     "gt_threshold 
-       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure V) div 2 + t - weight_measure (equivocating_validators \<sigma>)))"
+       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure V) div 2 + t div 2 - weight_measure (equivocating_validators \<sigma>)))"
 
 (* Lemma 32 *)
 lemma (in Protocol) gt_threshold_imps_majority_for_any_validator :
