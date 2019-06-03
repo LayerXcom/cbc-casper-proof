@@ -35,12 +35,6 @@ lemma (in Params) state_transition_is_partial_order :
   "partial_order_on \<Sigma> state_transition"
   by (simp add: partial_order_on_def state_transition_is_preorder antisymmetry_of_state_transition)
 
-(* Definition 7.17 *)
-definition (in Protocol) minimal_transitions :: "(state * state) set"
-  where
-    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'
-      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
-
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
 definition immediately_next_message where
@@ -316,6 +310,18 @@ lemma (in Protocol) state_differences_have_immediately_next_messages:
 lemma non_empty_non_singleton_imps_two_elements : 
   "A \<noteq> \<emptyset> \<Longrightarrow> \<not> is_singleton A \<Longrightarrow> \<exists> a1 a2. a1 \<noteq> a2 \<and> {a1, a2} \<subseteq> A"
   by (metis inf.orderI inf_bot_left insert_subset is_singletonI')
+
+
+(* ###################################################### *)
+(* Minimal transitions (to be deprecated) *)
+(* ###################################################### *)
+
+
+(* Definition 7.17 *)
+definition (in Protocol) minimal_transitions :: "(state * state) set"
+  where
+    "minimal_transitions \<equiv> {(\<sigma>, \<sigma>') | \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Sigma>t \<and> is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'
+      \<and> (\<nexists> \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>'') \<and> is_future_state (\<sigma>'', \<sigma>') \<and> \<sigma> \<noteq> \<sigma>'' \<and> \<sigma>'' \<noteq> \<sigma>')}"
 
 (* A minimal transition corresponds to receiving a single new message with justification drawn from the initial
 protocol state *)
