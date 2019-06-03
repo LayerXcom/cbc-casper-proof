@@ -249,6 +249,7 @@ lemma (in Protocol) inspector_imps_estimator_agreeing :
   \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c)"
   (* First, prove inspector imps v_est is gt than threshold *)
   apply (rule, rule, rule, rule, rule, rule, rule, rule)
+  sorry
 (* Old proof *)
 (* proof -
   fix \<sigma> v_set p c
@@ -292,7 +293,6 @@ lemma (in Protocol) inspector_imps_estimator_agreeing :
     using Mi.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0 by blast    
 qed
  *)
-  oops
 
 (* ###################################################### *)
 (* Section 7.3: Cliques Survive Messages from Validators Outside Clique *)
@@ -602,9 +602,8 @@ lemma (in Protocol) inspector_is_safety_oracle :
   \<longrightarrow> majority_driven p
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>')"    
-(*   using inspector_presereved_forever inspector_imps_estimator_agreeing
-  apply (simp add: inspector_def naturally_corresponding_state_property_def)
- *)  
-  oops
+  using inspector_presereved_forever inspector_imps_estimator_agreeing
+  apply (simp add: naturally_corresponding_state_property_def futures_def)
+  by meson
 
 end
