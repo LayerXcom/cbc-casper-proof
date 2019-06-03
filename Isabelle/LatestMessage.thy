@@ -83,23 +83,28 @@ lemma (in Protocol) later_from_type_for_state :
   using later_type_for_state from_sender_type_for_state by auto
 
 (* Definition 4.6: Latest Messages *)
-definition latest_messages :: "message set \<Rightarrow> (validator \<Rightarrow> message set)"
+definition L_M :: "message set \<Rightarrow> (validator \<Rightarrow> message set)"
   where
-    "latest_messages \<sigma> v = {m \<in> from_sender (v, \<sigma>). later_from (m, v, \<sigma>) = \<emptyset>}"
+    "L_M \<sigma> v = {m \<in> from_sender (v, \<sigma>). later_from (m, v, \<sigma>) = \<emptyset>}"
 
-lemma (in Protocol) latest_messages_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<in> Pow M"
-  apply (simp add: latest_messages_def later_from_def)
+lemma (in Protocol) L_M_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> Pow M \<and> v \<in> V \<longrightarrow> L_M \<sigma> v \<in> Pow M"
+  apply (simp add: L_M_def later_from_def)
   using from_sender_type by auto
 
-lemma (in Protocol) latest_messages_type_for_state :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v \<subseteq> M"
-  apply (simp add: latest_messages_def later_from_def)
+lemma (in Protocol) L_M_type_for_state :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_M \<sigma> v \<subseteq> M"
+  apply (simp add: L_M_def later_from_def)
   using from_sender_type_for_state by auto
 
-lemma (in Protocol) latest_messages_from_non_observed_validator_is_empty :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_messages \<sigma> v = \<emptyset>"
-  by (simp add: latest_messages_def observed_def later_def from_sender_def)
+lemma (in Protocol) L_M_from_non_observed_validator_is_empty :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> L_M \<sigma> v = \<emptyset>"
+  by (simp add: L_M_def observed_def later_def from_sender_def)
+
+lemma (in Protocol) L_M_is_subset_of_the_state :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> V. L_M \<sigma> v \<subseteq> \<sigma>"
+  apply (simp add: L_M_def later_from_def from_sender_def) 
+  by auto
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 definition observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
@@ -110,6 +115,11 @@ lemma (in Protocol) observed_non_equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<in> Pow V"
   apply (simp add: observed_non_equivocating_validators_def)
   using observed_type_for_state equivocating_validators_type by auto
+
+lemma (in Protocol) observed_non_equivocating_validators_are_not_equivocating :
+  "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<inter> equivocating_validators \<sigma> = \<emptyset>"
+  unfolding observed_non_equivocating_validators_def
+  by blast
 
 lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> V.  wfp_on justified (from_sender (v, \<sigma>)))"
@@ -143,15 +153,15 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
   by blast
 
 lemma (in Protocol) latest_message_is_maximal_element_of_justification :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
-  apply (simp add: latest_messages_def later_from_def later_def message_justification_def maximal_on_def)
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_M \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
+  apply (simp add: L_M_def later_from_def later_def message_justification_def maximal_on_def)
   using from_sender_type_for_state apply auto
   apply (metis (no_types, lifting) IntI empty_iff from_sender_def mem_Collect_eq prod.simps(2))
   by blast  
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
-  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v))"  
+  "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (L_M \<sigma> v))"  
   apply (simp add: observed_non_equivocating_validators_def)
 proof -
   have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed \<sigma> - equivocating_validators \<sigma>. is_singleton {m. maximal_on (from_sender (v, \<sigma>)) message_justification m})"
@@ -164,58 +174,124 @@ proof -
         strict_linear_order_on_finite_non_empty_set_has_one_maximum
         maximal_and_maximum_coincide_for_strict_linear_order
     by (smt Collect_cong DiffD1 DiffD2 set_mp)
-  then show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>v\<in>observed \<sigma> - equivocating_validators \<sigma>. is_singleton (latest_messages \<sigma> v)"  
+  then show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>v\<in>observed \<sigma> - equivocating_validators \<sigma>. is_singleton (L_M \<sigma> v)"  
     using latest_message_is_maximal_element_of_justification
           observed_non_equivocating_validators_def observed_non_equivocating_validators_type 
     by fastforce
 qed
+
 
 (* NOTE: Lemma 5 ~ 9 and definition 4.10 are unnecessary so would be omitted. *)
 (* Definition 4.7: Latest message driven estimator *)
 (* TODO *)
 
 (* Definition 4.8: Latest Estimates *)
-definition latest_estimates :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
+definition L_E :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
   where
-    "latest_estimates \<sigma> v = {est m | m. m \<in> latest_messages \<sigma> v}"
+    "L_E \<sigma> v = {est m | m. m \<in> L_M \<sigma> v}"
 
-lemma (in Protocol) latest_estimates_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates \<sigma> v \<subseteq> C"
-  using M_type Protocol.latest_messages_type_for_state Protocol_axioms latest_estimates_def by fastforce
+lemma (in Protocol) L_E_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_E \<sigma> v \<subseteq> C"
+  using M_type Protocol.L_M_type_for_state Protocol_axioms L_E_def by fastforce
 
-lemma (in Protocol) latest_estimates_from_non_observed_validator_is_empty :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_estimates \<sigma> v = \<emptyset>"
-  using latest_estimates_def latest_messages_from_non_observed_validator_is_empty by auto
+lemma (in Protocol) L_E_from_non_observed_validator_is_empty :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> L_E \<sigma> v = \<emptyset>"
+  using L_E_def L_M_from_non_observed_validator_is_empty by auto
 
 (* Definition 4.9: Latest estimate driven estimator *)
 (* TODO *)
 
 (* Definition 4.11: Latest messages from non-Equivocating validators *)
-definition latest_messages_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> message set"
+definition L_H_M :: "state \<Rightarrow> validator \<Rightarrow> message set"
   where
-    "latest_messages_from_non_equivocating_validators \<sigma> v = (if is_equivocating \<sigma> v then \<emptyset> else latest_messages \<sigma> v)"
+    "L_H_M \<sigma> v = (if v \<in> equivocating_validators \<sigma> then \<emptyset> else L_M \<sigma> v)"
 
-lemma (in Protocol) latest_messages_from_non_equivocating_validators_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_messages_from_non_equivocating_validators \<sigma> v \<subseteq> M"
-  by (simp add: latest_messages_type_for_state latest_messages_from_non_equivocating_validators_def)
+lemma (in Protocol) L_H_M_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_H_M \<sigma> v \<subseteq> M"
+  by (simp add: L_M_type_for_state L_H_M_def)
 
+
+lemma (in Protocol) L_H_M_of_observed_non_equivocating_validator_is_singleton :
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>.
+      is_singleton (L_H_M \<sigma> v)"
+  using observed_non_equivocating_validators_have_one_latest_message 
+  by (simp add: L_H_M_def observed_non_equivocating_validators_def)
+
+
+lemma (in Protocol) sender_of_L_H_M: 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. sender (the_elem (L_H_M \<sigma> v)) = v" 
+    using L_H_M_of_observed_non_equivocating_validator_is_singleton 
+        L_H_M_def L_M_def from_sender_def
+    by (smt Diff_iff is_singleton_the_elem mem_Collect_eq observed_non_equivocating_validators_def prod.simps(2) singletonI)
+
+lemma (in Protocol) L_H_M_is_in_the_state: 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. the_elem (L_H_M \<sigma> v) \<in> \<sigma>" 
+    using L_H_M_of_observed_non_equivocating_validator_is_singleton 
+        L_H_M_def L_M_is_subset_of_the_state
+    by (metis Diff_iff contra_subsetD insert_subset is_singleton_the_elem observed_non_equivocating_validators_def observed_type_for_state)
+  
 (* Definition 4.12: Latest honest message driven estimator *)
 (* TODO *)
 
 (* Definition 4.13: Latest estimates from non-Equivocating validators *)
-definition latest_estimates_from_non_equivocating_validators :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
+definition L_H_E :: "state \<Rightarrow> validator \<Rightarrow> consensus_value set"
   where
-    "latest_estimates_from_non_equivocating_validators \<sigma> v = {est m | m. m \<in> latest_messages_from_non_equivocating_validators \<sigma> v}"
+    (* "L_H_E \<sigma> v = {est m | m. m \<in> L_H_M \<sigma> v}" *)
+    "L_H_E \<sigma> v = est `L_H_M \<sigma> v"
 
-lemma (in Protocol) latest_estimates_from_non_equivocating_validators_type :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> latest_estimates_from_non_equivocating_validators \<sigma> v \<in> Pow C"
-  using Protocol.latest_estimates_type Protocol_axioms latest_estimates_def latest_estimates_from_non_equivocating_validators_def latest_messages_from_non_equivocating_validators_def by auto
+lemma (in Protocol) L_H_E_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_H_E \<sigma> v \<in> Pow C"
+  using Protocol.L_E_type Protocol_axioms L_E_def L_H_E_def L_H_M_def 
+  using M_type L_H_M_type by fastforce
 
-lemma (in Protocol) latest_estimates_from_non_equivocating_validators_from_non_observed_validator_is_empty :
-  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> latest_estimates_from_non_equivocating_validators \<sigma> v = \<emptyset>"
-  by (simp add: latest_estimates_from_non_equivocating_validators_def latest_messages_from_non_equivocating_validators_def latest_messages_from_non_observed_validator_is_empty)
+lemma (in Protocol) L_H_E_from_non_observed_validator_is_empty :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> v \<notin> observed \<sigma> \<longrightarrow> L_H_E \<sigma> v = \<emptyset>"
+  by (simp add: L_H_E_def L_H_M_def L_M_from_non_observed_validator_is_empty)
+
+lemma image_of_singleton_is_singleton : 
+  "is_singleton A \<Longrightarrow> is_singleton (f `A)" 
+  apply (simp add: is_singleton_def)
+  by blast
+
+lemma (in Protocol) L_H_E_of_observed_non_equivocating_validator_is_singleton : 
+  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>.
+      is_singleton (L_H_E \<sigma> v)"
+  using L_H_M_of_observed_non_equivocating_validator_is_singleton
+  apply (simp add: L_H_E_def)
+  using image_of_singleton_is_singleton
+  by blast
 
 (* Definition 4.14: Latest honest estimate driven estimator *)
 (* TODO *)
+
+(* Definition 7.7 *)
+definition L_H_J :: "state \<Rightarrow> validator \<Rightarrow> state set"
+  where
+(*     "L_H_J \<sigma> v = 
+      {justification m | m. m \<in> L_H_M \<sigma> v}"
+ *)    "L_H_J \<sigma> v = justification `L_H_M \<sigma> v"
+
+
+lemma (in Protocol) L_H_J_type :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_H_J \<sigma> v \<subseteq> \<Sigma>"
+  using M_type L_H_M_type 
+      L_H_J_def by auto
+
+lemma (in Protocol) L_H_J_of_observed_non_equivocating_validator_is_singleton : 
+  "\<forall> \<sigma> \<in> \<Sigma>. v \<in> observed_non_equivocating_validators \<sigma>
+    \<longrightarrow> is_singleton (L_H_J \<sigma> v)"
+  using L_H_M_of_observed_non_equivocating_validator_is_singleton
+  apply (simp add: L_H_J_def)
+  using image_of_singleton_is_singleton
+  by blast
+
+lemma (in Protocol) L_H_J_is_subset_of_the_state :
+  "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> (\<forall> \<sigma>' \<in> L_H_J \<sigma> v. \<sigma>' \<subset> \<sigma>)"
+  apply (simp add: L_H_J_def
+                    L_H_M_def)
+  using L_M_is_subset_of_the_state
+      message_in_state_is_strict_subset_of_the_state
+  by blast
+
 
 end

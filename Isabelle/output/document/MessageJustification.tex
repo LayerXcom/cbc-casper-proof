@@ -444,6 +444,26 @@
 \isanewline
 %
 \endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ message{\isacharunderscore}in{\isacharunderscore}state{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ m\ {\isasymin}\ {\isasymsigma}{\isachardot}\ justification\ m\ {\isasymsubset}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ justification{\isacharunderscore}implies{\isacharunderscore}different{\isacharunderscore}messages\ justified{\isacharunderscore}def\ message{\isacharunderscore}in{\isacharunderscore}state{\isacharunderscore}is{\isacharunderscore}valid\ state{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}pow{\isacharunderscore}Mi\ \isacommand{by}\isamarkupfalse%
+\ fastforce%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
 %
 \isadelimtheory
 \isanewline
@@ -734,5 +754,14 @@
 %:%438=142%:%
 %:%439=142%:%
 %:%444=142%:%
-%:%449=143%:%
-%:%454=144%:%
+%:%447=143%:%
+%:%448=144%:%
+%:%449=144%:%
+%:%450=145%:%
+%:%453=146%:%
+%:%457=146%:%
+%:%458=146%:%
+%:%459=146%:%
+%:%464=146%:%
+%:%469=147%:%
+%:%474=148%:%

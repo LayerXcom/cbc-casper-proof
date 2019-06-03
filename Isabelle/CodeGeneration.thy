@@ -47,11 +47,11 @@ interpretation p: Params V W t C \<epsilon> for V W t C \<epsilon>
 (* Define a constant *)
 definition "is_clique_oracle = p.is_clique_oracle"
 
+(* FIXME: Wellsortedness error *)
 export_code is_clique is_clique_oracle in Haskell
   module_name SafetyOracle file "GeneratedCode/src"
 
-
-interpretation gp: GhostParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev 
+interpretation gp: BlockchainParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev 
   done
 
 (* FIXME: Wellsortedness error *)

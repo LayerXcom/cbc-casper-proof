@@ -5,7 +5,8 @@ session "all" = HOL +
     LatestMessage
     StateTransition
     ConsensusSafety
-    SafetyOracle
+    CliqueOracle
+    Inspector
     TFGCasper
 
 
@@ -20,7 +21,8 @@ session "Documentation" = HOL +
     LatestMessage
     StateTransition
     ConsensusSafety
-    SafetyOracle
+    CliqueOracle
+    Inspector
     TFGCasper
     "Libraries/Strict_Order"
   document_files

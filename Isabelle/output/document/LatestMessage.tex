@@ -284,13 +284,13 @@
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
-\ latest{\isacharunderscore}messages\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}message\ set\ {\isasymRightarrow}\ {\isacharparenleft}validator\ {\isasymRightarrow}\ message\ set{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ L{\isacharunderscore}M\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}message\ set\ {\isasymRightarrow}\ {\isacharparenleft}validator\ {\isasymRightarrow}\ message\ set{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}m\ {\isasymin}\ from{\isacharunderscore}sender\ {\isacharparenleft}v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isachardot}\ later{\isacharunderscore}from\ {\isacharparenleft}m{\isacharcomma}\ v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\ {\isasymemptyset}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}m\ {\isasymin}\ from{\isacharunderscore}sender\ {\isacharparenleft}v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isachardot}\ later{\isacharunderscore}from\ {\isacharparenleft}m{\isacharcomma}\ v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}\ {\isacharequal}\ {\isasymemptyset}{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}type\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ Pow\ M\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isasymin}\ Pow\ M{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}M{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ Pow\ M\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isasymin}\ Pow\ M{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -298,7 +298,7 @@
 %
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def{\isacharparenright}\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{using}\isamarkupfalse%
 \ from{\isacharunderscore}sender{\isacharunderscore}type\ \isacommand{by}\isamarkupfalse%
 \ auto%
@@ -311,8 +311,8 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isasymsubseteq}\ M{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}M{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isasymsubseteq}\ M{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -320,7 +320,7 @@
 %
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def{\isacharparenright}\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{using}\isamarkupfalse%
 \ from{\isacharunderscore}sender{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ \isacommand{by}\isamarkupfalse%
 \ auto%
@@ -333,8 +333,8 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}M{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -342,7 +342,28 @@
 %
 \isatagproof
 \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}def\ observed{\isacharunderscore}def\ later{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def{\isacharparenright}%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}def\ observed{\isacharunderscore}def\ later{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}M{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ V{\isachardot}\ L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isasymsubseteq}\ {\isasymsigma}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def{\isacharparenright}\ \isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ auto%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -371,6 +392,27 @@
 \ \ \isacommand{using}\isamarkupfalse%
 \ observed{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ equivocating{\isacharunderscore}validators{\isacharunderscore}type\ \isacommand{by}\isamarkupfalse%
 \ auto%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}are{\isacharunderscore}not{\isacharunderscore}equivocating\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ {\isasyminter}\ equivocating{\isacharunderscore}validators\ {\isasymsigma}\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{unfolding}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -486,7 +528,7 @@
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}message{\isacharunderscore}is{\isacharunderscore}maximal{\isacharunderscore}element{\isacharunderscore}of{\isacharunderscore}justification\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}m{\isachardot}\ maximal{\isacharunderscore}on\ {\isacharparenleft}from{\isacharunderscore}sender\ {\isacharparenleft}v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}\ message{\isacharunderscore}justification\ m{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}m{\isachardot}\ maximal{\isacharunderscore}on\ {\isacharparenleft}from{\isacharunderscore}sender\ {\isacharparenleft}v{\isacharcomma}\ {\isasymsigma}{\isacharparenright}{\isacharparenright}\ message{\isacharunderscore}justification\ m{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -494,7 +536,7 @@
 %
 \isatagproof
 \isacommand{apply}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def\ later{\isacharunderscore}def\ message{\isacharunderscore}justification{\isacharunderscore}def\ maximal{\isacharunderscore}on{\isacharunderscore}def{\isacharparenright}\isanewline
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}def\ later{\isacharunderscore}from{\isacharunderscore}def\ later{\isacharunderscore}def\ message{\isacharunderscore}justification{\isacharunderscore}def\ maximal{\isacharunderscore}on{\isacharunderscore}def{\isacharparenright}\isanewline
 \ \ \isacommand{using}\isamarkupfalse%
 \ from{\isacharunderscore}sender{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ \isacommand{apply}\isamarkupfalse%
 \ auto\isanewline
@@ -513,7 +555,7 @@
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
 \ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}have{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message{\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isacharparenleft}{\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ is{\isacharunderscore}singleton\ {\isacharparenleft}latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isacharparenleft}{\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ is{\isacharunderscore}singleton\ {\isacharparenleft}L{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}{\isacharparenright}{\isachardoublequoteclose}\ \ \isanewline
 %
 \isadelimproof
 \ \ %
@@ -539,7 +581,7 @@
 \ {\isacharparenleft}smt\ Collect{\isacharunderscore}cong\ DiffD{\isadigit{1}}\ DiffD{\isadigit{2}}\ set{\isacharunderscore}mp{\isacharparenright}\isanewline
 \ \ \isacommand{then}\isamarkupfalse%
 \ \isacommand{show}\isamarkupfalse%
-\ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}{\isasymSigma}{\isachardot}\ {\isasymforall}v{\isasymin}observed\ {\isasymsigma}\ {\isacharminus}\ equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ is{\isacharunderscore}singleton\ {\isacharparenleft}latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\ \ \isanewline
+\ {\isachardoublequoteopen}{\isasymforall}{\isasymsigma}{\isasymin}{\isasymSigma}{\isachardot}\ {\isasymforall}v{\isasymin}observed\ {\isasymsigma}\ {\isacharminus}\ equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ is{\isacharunderscore}singleton\ {\isacharparenleft}L{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\ \ \isanewline
 \ \ \ \ \isacommand{using}\isamarkupfalse%
 \ latest{\isacharunderscore}message{\isacharunderscore}is{\isacharunderscore}maximal{\isacharunderscore}element{\isacharunderscore}of{\isacharunderscore}justification\isanewline
 \ \ \ \ \ \ \ \ \ \ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ \isanewline
@@ -560,14 +602,15 @@
 \isanewline
 \isanewline
 \isanewline
+\isanewline
 \isacommand{definition}\isamarkupfalse%
-\ latest{\isacharunderscore}estimates\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
+\ L{\isacharunderscore}E\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}estimates\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}est\ m\ {\isacharbar}\ m{\isachardot}\ m\ {\isasymin}\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}L{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}est\ m\ {\isacharbar}\ m{\isachardot}\ m\ {\isasymin}\ L{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharbraceright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}estimates{\isacharunderscore}type\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}estimates\ {\isasymsigma}\ v\ {\isasymsubseteq}\ C{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}E{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isasymsubseteq}\ C{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -575,7 +618,7 @@
 %
 \isatagproof
 \isacommand{using}\isamarkupfalse%
-\ M{\isacharunderscore}type\ Protocol{\isachardot}latest{\isacharunderscore}messages{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ Protocol{\isacharunderscore}axioms\ latest{\isacharunderscore}estimates{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
+\ M{\isacharunderscore}type\ Protocol{\isachardot}L{\isacharunderscore}M{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ Protocol{\isacharunderscore}axioms\ L{\isacharunderscore}E{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
 \ fastforce%
 \endisatagproof
 {\isafoldproof}%
@@ -586,8 +629,8 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ latest{\isacharunderscore}estimates\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}E{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ L{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -595,7 +638,7 @@
 %
 \isatagproof
 \isacommand{using}\isamarkupfalse%
-\ latest{\isacharunderscore}estimates{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ \isacommand{by}\isamarkupfalse%
+\ L{\isacharunderscore}E{\isacharunderscore}def\ L{\isacharunderscore}M{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ \isacommand{by}\isamarkupfalse%
 \ auto%
 \endisatagproof
 {\isafoldproof}%
@@ -610,13 +653,13 @@
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
-\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ message\ set{\isachardoublequoteclose}\isanewline
+\ L{\isacharunderscore}H{\isacharunderscore}M\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ message\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharparenleft}if\ is{\isacharunderscore}equivocating\ {\isasymsigma}\ v\ then\ {\isasymemptyset}\ else\ latest{\isacharunderscore}messages\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharparenleft}if\ v\ {\isasymin}\ equivocating{\isacharunderscore}validators\ {\isasymsigma}\ then\ {\isasymemptyset}\ else\ L{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isasymsubseteq}\ M{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v\ {\isasymsubseteq}\ M{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -624,7 +667,173 @@
 %
 \isatagproof
 \isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}messages{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}M{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\isanewline
+\ \ \ \ \ \ is{\isacharunderscore}singleton\ {\isacharparenleft}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}have{\isacharunderscore}one{\isacharunderscore}latest{\isacharunderscore}message\ \isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ sender{\isacharunderscore}of{\isacharunderscore}L{\isacharunderscore}H{\isacharunderscore}M{\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ sender\ {\isacharparenleft}the{\isacharunderscore}elem\ {\isacharparenleft}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}{\isacharparenright}\ {\isacharequal}\ v{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ \ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\ \isanewline
+\ \ \ \ \ \ \ \ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def\ L{\isacharunderscore}M{\isacharunderscore}def\ from{\isacharunderscore}sender{\isacharunderscore}def\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}smt\ Diff{\isacharunderscore}iff\ is{\isacharunderscore}singleton{\isacharunderscore}the{\isacharunderscore}elem\ mem{\isacharunderscore}Collect{\isacharunderscore}eq\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ prod{\isachardot}simps{\isacharparenleft}{\isadigit{2}}{\isacharparenright}\ singletonI{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}is{\isacharunderscore}in{\isacharunderscore}the{\isacharunderscore}state{\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\ the{\isacharunderscore}elem\ {\isacharparenleft}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v{\isacharparenright}\ {\isasymin}\ {\isasymsigma}{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ \ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\ \isanewline
+\ \ \ \ \ \ \ \ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def\ L{\isacharunderscore}M{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \ \ \isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}metis\ Diff{\isacharunderscore}iff\ contra{\isacharunderscore}subsetD\ insert{\isacharunderscore}subset\ is{\isacharunderscore}singleton{\isacharunderscore}the{\isacharunderscore}elem\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ observed{\isacharunderscore}type{\isacharunderscore}for{\isacharunderscore}state{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\ \ \isanewline
+\isanewline
+\isanewline
+\isanewline
+\isanewline
+\isacommand{definition}\isamarkupfalse%
+\ L{\isacharunderscore}H{\isacharunderscore}E\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
+\ \ \isakeyword{where}\isanewline
+\ \ \ \ \isanewline
+\ \ \ \ {\isachardoublequoteopen}L{\isacharunderscore}H{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isacharequal}\ est\ {\isacharbackquote}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v{\isachardoublequoteclose}\isanewline
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}H{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isasymin}\ Pow\ C{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ Protocol{\isachardot}L{\isacharunderscore}E{\isacharunderscore}type\ Protocol{\isacharunderscore}axioms\ L{\isacharunderscore}E{\isacharunderscore}def\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}def\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def\ \isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ M{\isacharunderscore}type\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}type\ \isacommand{by}\isamarkupfalse%
+\ fastforce%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ L{\isacharunderscore}H{\isacharunderscore}E\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{by}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}def\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def\ L{\isacharunderscore}M{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty{\isacharparenright}%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}is{\isacharunderscore}singleton\ A\ {\isasymLongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharparenleft}f\ {\isacharbackquote}A{\isacharparenright}{\isachardoublequoteclose}\ \isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ is{\isacharunderscore}singleton{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
+\isanewline
+%
+\endisadelimproof
+\isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ {\isasymforall}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}{\isachardot}\isanewline
+\ \ \ \ \ \ is{\isacharunderscore}singleton\ {\isacharparenleft}L{\isacharunderscore}H{\isacharunderscore}E\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{using}\isamarkupfalse%
+\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}H{\isacharunderscore}E{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -638,13 +847,14 @@
 \isanewline
 \isanewline
 \isacommand{definition}\isamarkupfalse%
-\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ consensus{\isacharunderscore}value\ set{\isachardoublequoteclose}\isanewline
+\ L{\isacharunderscore}H{\isacharunderscore}J\ {\isacharcolon}{\isacharcolon}\ {\isachardoublequoteopen}state\ {\isasymRightarrow}\ validator\ {\isasymRightarrow}\ state\ set{\isachardoublequoteclose}\isanewline
 \ \ \isakeyword{where}\isanewline
-\ \ \ \ {\isachardoublequoteopen}latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isacharbraceleft}est\ m\ {\isacharbar}\ m{\isachardot}\ m\ {\isasymin}\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v{\isacharbraceright}{\isachardoublequoteclose}\isanewline
+\ \ \ \ {\isachardoublequoteopen}L{\isacharunderscore}H{\isacharunderscore}J\ {\isasymsigma}\ v\ {\isacharequal}\ justification\ {\isacharbackquote}L{\isacharunderscore}H{\isacharunderscore}M\ {\isasymsigma}\ v{\isachardoublequoteclose}\isanewline
+\isanewline
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}type\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isasymin}\ Pow\ C{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}type\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ L{\isacharunderscore}H{\isacharunderscore}J\ {\isasymsigma}\ v\ {\isasymsubseteq}\ {\isasymSigma}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
@@ -652,7 +862,8 @@
 %
 \isatagproof
 \isacommand{using}\isamarkupfalse%
-\ Protocol{\isachardot}latest{\isacharunderscore}estimates{\isacharunderscore}type\ Protocol{\isacharunderscore}axioms\ latest{\isacharunderscore}estimates{\isacharunderscore}def\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
+\ M{\isacharunderscore}type\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}type\ \isanewline
+\ \ \ \ \ \ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}def\ \isacommand{by}\isamarkupfalse%
 \ auto%
 \endisatagproof
 {\isafoldproof}%
@@ -663,16 +874,23 @@
 \endisadelimproof
 \isanewline
 \isacommand{lemma}\isamarkupfalse%
-\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty\ {\isacharcolon}\isanewline
-\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymand}\ v\ {\isasymnotin}\ observed\ {\isasymsigma}\ {\isasymlongrightarrow}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\ v\ {\isacharequal}\ {\isasymemptyset}{\isachardoublequoteclose}\isanewline
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\ {\isacharcolon}\ \isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}{\isachardot}\ v\ {\isasymin}\ observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators\ {\isasymsigma}\isanewline
+\ \ \ \ {\isasymlongrightarrow}\ is{\isacharunderscore}singleton\ {\isacharparenleft}L{\isacharunderscore}H{\isacharunderscore}J\ {\isasymsigma}\ v{\isacharparenright}{\isachardoublequoteclose}\isanewline
 %
 \isadelimproof
 \ \ %
 \endisadelimproof
 %
 \isatagproof
-\isacommand{by}\isamarkupfalse%
-\ {\isacharparenleft}simp\ add{\isacharcolon}\ latest{\isacharunderscore}estimates{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validators{\isacharunderscore}def\ latest{\isacharunderscore}messages{\isacharunderscore}from{\isacharunderscore}non{\isacharunderscore}observed{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}empty{\isacharparenright}%
+\isacommand{using}\isamarkupfalse%
+\ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}of{\isacharunderscore}observed{\isacharunderscore}non{\isacharunderscore}equivocating{\isacharunderscore}validator{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ image{\isacharunderscore}of{\isacharunderscore}singleton{\isacharunderscore}is{\isacharunderscore}singleton\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
 \endisatagproof
 {\isafoldproof}%
 %
@@ -681,7 +899,30 @@
 %
 \endisadelimproof
 \isanewline
+\isacommand{lemma}\isamarkupfalse%
+\ {\isacharparenleft}\isakeyword{in}\ Protocol{\isacharparenright}\ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\ {\isacharcolon}\isanewline
+\ \ {\isachardoublequoteopen}{\isasymforall}\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}\ {\isasymin}\ {\isasymSigma}\ {\isasymand}\ v\ {\isasymin}\ V\ {\isasymlongrightarrow}\ {\isacharparenleft}{\isasymforall}\ {\isasymsigma}{\isacharprime}\ {\isasymin}\ L{\isacharunderscore}H{\isacharunderscore}J\ {\isasymsigma}\ v{\isachardot}\ {\isasymsigma}{\isacharprime}\ {\isasymsubset}\ {\isasymsigma}{\isacharparenright}{\isachardoublequoteclose}\isanewline
+%
+\isadelimproof
+\ \ %
+\endisadelimproof
+%
+\isatagproof
+\isacommand{apply}\isamarkupfalse%
+\ {\isacharparenleft}simp\ add{\isacharcolon}\ L{\isacharunderscore}H{\isacharunderscore}J{\isacharunderscore}def\isanewline
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ L{\isacharunderscore}H{\isacharunderscore}M{\isacharunderscore}def{\isacharparenright}\isanewline
+\ \ \isacommand{using}\isamarkupfalse%
+\ L{\isacharunderscore}M{\isacharunderscore}is{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \ \ \ \ message{\isacharunderscore}in{\isacharunderscore}state{\isacharunderscore}is{\isacharunderscore}strict{\isacharunderscore}subset{\isacharunderscore}of{\isacharunderscore}the{\isacharunderscore}state\isanewline
+\ \ \isacommand{by}\isamarkupfalse%
+\ blast%
+\endisatagproof
+{\isafoldproof}%
+%
+\isadelimproof
 \isanewline
+%
+\endisadelimproof
 \isanewline
 %
 \isadelimtheory
@@ -882,201 +1123,332 @@
 %:%350=102%:%
 %:%353=103%:%
 %:%354=104%:%
-%:%355=105%:%
+%:%355=104%:%
 %:%356=105%:%
-%:%357=106%:%
-%:%358=107%:%
-%:%359=108%:%
-%:%360=109%:%
-%:%361=109%:%
-%:%362=110%:%
-%:%365=111%:%
-%:%369=111%:%
-%:%370=111%:%
-%:%371=112%:%
-%:%372=112%:%
-%:%373=112%:%
-%:%378=112%:%
-%:%381=113%:%
+%:%359=106%:%
+%:%363=106%:%
+%:%364=106%:%
+%:%365=107%:%
+%:%366=107%:%
+%:%371=107%:%
+%:%374=108%:%
+%:%375=109%:%
+%:%376=110%:%
+%:%377=110%:%
+%:%378=111%:%
+%:%379=112%:%
+%:%380=113%:%
+%:%381=114%:%
 %:%382=114%:%
-%:%383=114%:%
-%:%384=115%:%
-%:%387=116%:%
+%:%383=115%:%
+%:%386=116%:%
+%:%390=116%:%
 %:%391=116%:%
-%:%392=116%:%
-%:%393=116%:%
-%:%398=116%:%
-%:%401=117%:%
+%:%392=117%:%
+%:%393=117%:%
+%:%394=117%:%
+%:%399=117%:%
 %:%402=118%:%
-%:%403=118%:%
+%:%403=119%:%
 %:%404=119%:%
-%:%411=120%:%
-%:%412=120%:%
+%:%405=120%:%
+%:%408=121%:%
+%:%412=121%:%
 %:%413=121%:%
-%:%414=121%:%
+%:%414=122%:%
 %:%415=122%:%
-%:%416=122%:%
-%:%417=123%:%
-%:%418=123%:%
-%:%419=123%:%
-%:%420=124%:%
-%:%421=125%:%
-%:%422=125%:%
-%:%423=126%:%
-%:%424=126%:%
-%:%425=127%:%
-%:%426=127%:%
-%:%427=127%:%
-%:%428=128%:%
-%:%429=128%:%
-%:%430=129%:%
-%:%431=129%:%
-%:%432=129%:%
-%:%433=130%:%
-%:%439=130%:%
-%:%442=131%:%
-%:%443=132%:%
-%:%444=132%:%
-%:%445=133%:%
-%:%448=134%:%
-%:%452=134%:%
-%:%453=134%:%
-%:%454=135%:%
-%:%459=135%:%
-%:%462=136%:%
-%:%463=137%:%
-%:%464=138%:%
-%:%465=138%:%
-%:%466=139%:%
-%:%467=140%:%
-%:%470=141%:%
-%:%474=141%:%
-%:%475=141%:%
-%:%476=142%:%
-%:%477=143%:%
-%:%478=143%:%
-%:%483=143%:%
-%:%486=144%:%
-%:%487=145%:%
-%:%488=145%:%
-%:%489=146%:%
-%:%492=147%:%
-%:%496=147%:%
-%:%497=147%:%
-%:%498=148%:%
-%:%499=148%:%
-%:%500=148%:%
-%:%501=149%:%
-%:%502=149%:%
-%:%503=150%:%
-%:%504=150%:%
+%:%420=122%:%
+%:%423=123%:%
+%:%424=124%:%
+%:%425=124%:%
+%:%426=125%:%
+%:%429=126%:%
+%:%433=126%:%
+%:%434=126%:%
+%:%435=126%:%
+%:%440=126%:%
+%:%443=127%:%
+%:%444=128%:%
+%:%445=128%:%
+%:%446=129%:%
+%:%453=130%:%
+%:%454=130%:%
+%:%455=131%:%
+%:%456=131%:%
+%:%457=132%:%
+%:%458=132%:%
+%:%459=133%:%
+%:%460=133%:%
+%:%461=133%:%
+%:%462=134%:%
+%:%463=135%:%
+%:%464=135%:%
+%:%465=136%:%
+%:%466=136%:%
+%:%467=137%:%
+%:%468=137%:%
+%:%469=137%:%
+%:%470=138%:%
+%:%471=138%:%
+%:%472=139%:%
+%:%473=139%:%
+%:%474=139%:%
+%:%475=140%:%
+%:%481=140%:%
+%:%484=141%:%
+%:%485=142%:%
+%:%486=142%:%
+%:%487=143%:%
+%:%490=144%:%
+%:%494=144%:%
+%:%495=144%:%
+%:%496=145%:%
+%:%501=145%:%
+%:%504=146%:%
+%:%505=147%:%
+%:%506=148%:%
+%:%507=148%:%
+%:%508=149%:%
 %:%509=150%:%
 %:%512=151%:%
-%:%513=152%:%
-%:%514=153%:%
-%:%515=153%:%
-%:%516=154%:%
-%:%519=155%:%
-%:%523=155%:%
-%:%524=155%:%
-%:%525=156%:%
-%:%526=156%:%
-%:%527=157%:%
-%:%528=157%:%
-%:%529=158%:%
-%:%530=158%:%
-%:%531=159%:%
-%:%532=160%:%
-%:%533=161%:%
-%:%534=162%:%
-%:%535=163%:%
-%:%536=164%:%
-%:%537=165%:%
-%:%538=166%:%
-%:%539=166%:%
-%:%540=167%:%
-%:%541=167%:%
-%:%542=167%:%
-%:%543=168%:%
-%:%544=168%:%
-%:%545=169%:%
-%:%546=170%:%
-%:%547=170%:%
-%:%548=171%:%
-%:%554=171%:%
-%:%557=172%:%
-%:%558=173%:%
-%:%559=174%:%
-%:%560=175%:%
-%:%561=176%:%
-%:%562=177%:%
-%:%563=178%:%
-%:%564=178%:%
-%:%565=179%:%
-%:%566=180%:%
-%:%567=181%:%
-%:%568=182%:%
-%:%569=182%:%
-%:%570=183%:%
-%:%573=184%:%
-%:%577=184%:%
-%:%578=184%:%
-%:%579=184%:%
-%:%584=184%:%
-%:%587=185%:%
-%:%588=186%:%
-%:%589=186%:%
-%:%590=187%:%
-%:%593=188%:%
-%:%597=188%:%
-%:%598=188%:%
-%:%599=188%:%
-%:%604=188%:%
+%:%516=151%:%
+%:%517=151%:%
+%:%518=152%:%
+%:%519=153%:%
+%:%520=153%:%
+%:%525=153%:%
+%:%528=154%:%
+%:%529=155%:%
+%:%530=155%:%
+%:%531=156%:%
+%:%534=157%:%
+%:%538=157%:%
+%:%539=157%:%
+%:%540=158%:%
+%:%541=158%:%
+%:%542=158%:%
+%:%543=159%:%
+%:%544=159%:%
+%:%545=160%:%
+%:%546=160%:%
+%:%551=160%:%
+%:%554=161%:%
+%:%555=162%:%
+%:%556=163%:%
+%:%557=163%:%
+%:%558=164%:%
+%:%561=165%:%
+%:%565=165%:%
+%:%566=165%:%
+%:%567=166%:%
+%:%568=166%:%
+%:%569=167%:%
+%:%570=167%:%
+%:%571=168%:%
+%:%572=168%:%
+%:%573=169%:%
+%:%574=170%:%
+%:%575=171%:%
+%:%576=172%:%
+%:%577=173%:%
+%:%578=174%:%
+%:%579=175%:%
+%:%580=176%:%
+%:%581=176%:%
+%:%582=177%:%
+%:%583=177%:%
+%:%584=177%:%
+%:%585=178%:%
+%:%586=178%:%
+%:%587=179%:%
+%:%588=180%:%
+%:%589=180%:%
+%:%590=181%:%
+%:%596=181%:%
+%:%599=182%:%
+%:%600=183%:%
+%:%601=184%:%
+%:%602=185%:%
+%:%603=186%:%
+%:%604=187%:%
+%:%605=188%:%
+%:%606=189%:%
 %:%607=189%:%
 %:%608=190%:%
 %:%609=191%:%
 %:%610=192%:%
 %:%611=193%:%
-%:%612=194%:%
+%:%612=193%:%
 %:%613=194%:%
-%:%614=195%:%
-%:%615=196%:%
-%:%616=197%:%
-%:%617=198%:%
-%:%618=198%:%
-%:%619=199%:%
-%:%622=200%:%
-%:%626=200%:%
-%:%627=200%:%
-%:%632=200%:%
-%:%635=201%:%
-%:%636=202%:%
-%:%637=203%:%
-%:%638=204%:%
-%:%639=205%:%
-%:%640=206%:%
-%:%641=206%:%
-%:%642=207%:%
-%:%643=208%:%
-%:%644=209%:%
-%:%645=210%:%
-%:%646=210%:%
-%:%647=211%:%
-%:%650=212%:%
-%:%654=212%:%
-%:%655=212%:%
-%:%656=212%:%
-%:%661=212%:%
-%:%664=213%:%
-%:%665=214%:%
-%:%666=214%:%
-%:%667=215%:%
-%:%670=216%:%
-%:%674=216%:%
-%:%675=216%:%
-%:%680=216%:%
-%:%683=217%:%
-%:%684=218%:%
-%:%685=219%:%
-%:%688=220%:%
-%:%693=221%:%
+%:%616=195%:%
+%:%620=195%:%
+%:%621=195%:%
+%:%622=195%:%
+%:%627=195%:%
+%:%630=196%:%
+%:%631=197%:%
+%:%632=197%:%
+%:%633=198%:%
+%:%636=199%:%
+%:%640=199%:%
+%:%641=199%:%
+%:%642=199%:%
+%:%647=199%:%
+%:%650=200%:%
+%:%651=201%:%
+%:%652=202%:%
+%:%653=203%:%
+%:%654=204%:%
+%:%655=205%:%
+%:%656=205%:%
+%:%657=206%:%
+%:%658=207%:%
+%:%659=208%:%
+%:%660=209%:%
+%:%661=209%:%
+%:%662=210%:%
+%:%665=211%:%
+%:%669=211%:%
+%:%670=211%:%
+%:%675=211%:%
+%:%678=212%:%
+%:%679=213%:%
+%:%680=214%:%
+%:%681=214%:%
+%:%682=215%:%
+%:%683=216%:%
+%:%686=217%:%
+%:%690=217%:%
+%:%691=217%:%
+%:%692=218%:%
+%:%693=218%:%
+%:%698=218%:%
+%:%701=219%:%
+%:%702=220%:%
+%:%703=221%:%
+%:%704=221%:%
+%:%705=222%:%
+%:%708=223%:%
+%:%712=223%:%
+%:%713=223%:%
+%:%714=224%:%
+%:%715=225%:%
+%:%716=225%:%
+%:%721=225%:%
+%:%724=226%:%
+%:%725=227%:%
+%:%726=227%:%
+%:%727=228%:%
+%:%730=229%:%
+%:%734=229%:%
+%:%735=229%:%
+%:%736=230%:%
+%:%737=231%:%
+%:%738=231%:%
+%:%743=231%:%
+%:%746=232%:%
+%:%747=233%:%
+%:%748=234%:%
+%:%749=235%:%
+%:%750=236%:%
+%:%751=237%:%
+%:%752=237%:%
+%:%753=238%:%
+%:%754=239%:%
+%:%755=240%:%
+%:%756=241%:%
+%:%757=242%:%
+%:%758=242%:%
+%:%759=243%:%
+%:%762=244%:%
+%:%766=244%:%
+%:%767=244%:%
+%:%768=245%:%
+%:%769=245%:%
+%:%770=245%:%
+%:%775=245%:%
+%:%778=246%:%
+%:%779=247%:%
+%:%780=247%:%
+%:%781=248%:%
+%:%784=249%:%
+%:%788=249%:%
+%:%789=249%:%
+%:%794=249%:%
+%:%797=250%:%
+%:%798=251%:%
+%:%799=251%:%
+%:%800=252%:%
+%:%803=253%:%
+%:%807=253%:%
+%:%808=253%:%
+%:%809=254%:%
+%:%810=254%:%
+%:%815=254%:%
+%:%818=255%:%
+%:%819=256%:%
+%:%820=256%:%
+%:%821=257%:%
+%:%822=258%:%
+%:%825=259%:%
+%:%829=259%:%
+%:%830=259%:%
+%:%831=260%:%
+%:%832=260%:%
+%:%833=261%:%
+%:%834=261%:%
+%:%835=262%:%
+%:%836=262%:%
+%:%841=262%:%
+%:%844=263%:%
+%:%845=264%:%
+%:%846=265%:%
+%:%847=266%:%
+%:%848=267%:%
+%:%849=268%:%
+%:%850=268%:%
+%:%851=269%:%
+%:%852=272%:%
+%:%853=273%:%
+%:%854=274%:%
+%:%855=275%:%
+%:%856=275%:%
+%:%857=276%:%
+%:%860=277%:%
+%:%864=277%:%
+%:%865=277%:%
+%:%866=278%:%
+%:%867=278%:%
+%:%872=278%:%
+%:%875=279%:%
+%:%876=280%:%
+%:%877=280%:%
+%:%878=281%:%
+%:%879=282%:%
+%:%882=283%:%
+%:%886=283%:%
+%:%887=283%:%
+%:%888=284%:%
+%:%889=284%:%
+%:%890=285%:%
+%:%891=285%:%
+%:%892=286%:%
+%:%893=286%:%
+%:%898=286%:%
+%:%901=287%:%
+%:%902=288%:%
+%:%903=288%:%
+%:%904=289%:%
+%:%907=290%:%
+%:%911=290%:%
+%:%912=290%:%
+%:%913=291%:%
+%:%914=292%:%
+%:%915=292%:%
+%:%916=293%:%
+%:%917=294%:%
+%:%918=294%:%
+%:%923=294%:%
+%:%926=295%:%
+%:%929=296%:%
+%:%934=297%:%
