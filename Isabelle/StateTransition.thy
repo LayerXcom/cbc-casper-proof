@@ -222,6 +222,14 @@ proof -
     by fastforce   
 qed
 
+lemma (in Protocol) intermediate_state_by_immediately_next_message_towards_strict_future: 
+  "\<forall> \<sigma> \<in> \<Sigma>t. \<forall> \<sigma>' \<in> futures \<sigma>. \<sigma> \<subset> \<sigma>' 
+    \<longrightarrow> (\<exists> m \<in> \<sigma>' - \<sigma>. immediately_next_message (\<sigma>, m) \<and> \<sigma> \<union> {m} \<in> \<Sigma>t \<and> \<sigma>' \<in> futures (\<sigma> \<union> {m}))"
+  using intermediate_state_towards_strict_future
+        message_in_state_is_valid state_transition_imps_immediately_next_message
+  apply (simp add: \<Sigma>t_def futures_def)
+  by (meson DiffE)
+
 lemma (in Protocol) state_differences_have_immediately_next_messages: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> \<sigma>'\<in> \<Sigma>. is_future_state (\<sigma>, \<sigma>') \<and> \<sigma> \<noteq> \<sigma>' \<longrightarrow> (\<exists> m \<in> \<sigma>' - \<sigma>. immediately_next_message (\<sigma>, m))"
   using strict_subset_of_state_have_immediately_next_messages
