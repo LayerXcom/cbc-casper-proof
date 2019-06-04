@@ -68,20 +68,21 @@ lemma (in Protocol) from_group_type_for_state :
   using state_is_subset_of_M by auto
 
 (* Definition 4.5 *)
+(* NOTE: Modified like Section 7 *)
 definition later_from :: "(message * validator * message set) \<Rightarrow> message set"
   where
-    "later_from = (\<lambda>(m, v, \<sigma>). later (m, \<sigma>) \<inter> from_sender (v, \<sigma>))"
+    "later_from = (\<lambda>(m, v, \<sigma>). {m' \<in> \<sigma>. sender m' = v \<and> justified m m'})"
 
 lemma (in Protocol) later_from_type :
   "\<forall> \<sigma> v m. \<sigma> \<in> Pow M \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<in> Pow M"
   apply (simp add: later_from_def)
-  using later_type from_sender_type by auto
+  by auto
 
 lemma (in Protocol) later_from_type_for_state :
   "\<forall> \<sigma> v m. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<and> m \<in> M \<longrightarrow> later_from (m, v, \<sigma>) \<subseteq> M"
   apply (simp add: later_from_def)
-  using later_type_for_state from_sender_type_for_state by auto
-
+  using message_in_state_is_valid by auto
+  
 (* Definition 4.6: Latest Messages *)
 definition L_M :: "message set \<Rightarrow> (validator \<Rightarrow> message set)"
   where
@@ -154,10 +155,9 @@ lemma (in Protocol) justification_is_strict_well_order_on_messages_from_non_equi
 
 lemma (in Protocol) latest_message_is_maximal_element_of_justification :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V \<longrightarrow> L_M \<sigma> v = {m. maximal_on (from_sender (v, \<sigma>)) message_justification m}"
-  apply (simp add: L_M_def later_from_def later_def message_justification_def maximal_on_def)
+  apply (simp add: L_M_def later_from_def from_sender_def message_justification_def maximal_on_def)
   using from_sender_type_for_state apply auto
-  apply (metis (no_types, lifting) IntI empty_iff from_sender_def mem_Collect_eq prod.simps(2))
-  by blast  
+  using message_in_state_is_valid by blast 
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
