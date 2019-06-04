@@ -312,7 +312,7 @@ proof -
       apply (rule, rule, rule, rule)
       apply (simp add: empty_set_exists_in_\<Sigma>)
       apply (rule, rule, rule, rule)
-    proof - 
+    proof -
       fix n \<sigma>_set
       assume "\<forall>\<sigma>_set\<subseteq>\<Sigma>. n = card \<sigma>_set \<longrightarrow> finite \<sigma>_set \<longrightarrow> \<Union>\<sigma>_set \<in> \<Sigma>" and "\<sigma>_set \<subseteq> \<Sigma>" and "Suc n = card \<sigma>_set" and "finite \<sigma>_set" 
       then have "\<forall> \<sigma> \<in> \<sigma>_set. \<sigma>_set - {\<sigma>} \<subseteq> \<Sigma> \<and> \<Union> (\<sigma>_set - {\<sigma>}) \<in> \<Sigma>"
@@ -343,8 +343,24 @@ lemma (in Protocol) non_empty_state_is_reached_by_receiving_immediately_next_mes
 lemma (in Protocol) intermediate_state_before_receiving_single_message :
   "\<forall> \<sigma> \<sigma>'. {\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> \<sigma> \<subset> \<sigma>' \<and> \<sigma>' \<noteq> \<emptyset> 
   \<longrightarrow> (\<exists> \<sigma>'' m. \<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message(\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>'')"
-  using non_empty_state_is_reached_by_receiving_immediately_next_message
-  sorry
+  apply (rule, rule, rule)
+proof -
+  fix \<sigma> \<sigma>'
+  assume "{\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> \<sigma> \<subset> \<sigma>' \<and> \<sigma>' \<noteq> \<emptyset>"
+  then have "\<exists> \<sigma>'' m. \<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message(\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m}"
+    using non_empty_state_is_reached_by_receiving_immediately_next_message
+    by simp    
+  then obtain \<sigma>'' m where "\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message(\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m}"
+    by auto
+  then have "\<sigma> \<subset> \<sigma>' \<and> \<sigma>' \<noteq> \<emptyset> \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> m \<in> \<sigma>' \<and> m \<notin> \<sigma>''"
+    apply (simp add: immediately_next_message_def)
+    using \<open>{\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> \<sigma> \<subset> \<sigma>' \<and> \<sigma>' \<noteq> \<emptyset>\<close> by auto    
+  then have "\<sigma> \<subseteq> \<sigma>''"    
+    sorry
+  then show "\<exists>\<sigma>'' m. \<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''"
+    using \<open>\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m}\<close> by blast
+qed
+
 
 (* ###################################################### *)
 (* Minimal transitions (to be deprecated) *)
@@ -373,7 +389,7 @@ proof (rule ccontr)
     by (simp add: minimal_transitions_def)
   have "\<forall> \<sigma> \<sigma>'. (\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>'- \<sigma>)
     \<longrightarrow> (\<exists> m1 m2. {m1, m2} \<subseteq> M \<and> m1 \<in> \<sigma>'- \<sigma> \<and> m2 \<in> \<sigma>'- \<sigma> \<and> m1 \<noteq> m2 \<and> immediately_next_message (\<sigma>, m1))"
-    apply (rule, rule, rule)
+    apply (rule, rule, rule) 
   proof -
     fix \<sigma> \<sigma>'
     assume "(\<sigma>, \<sigma>') \<in> minimal_transitions \<and> \<not> is_singleton (\<sigma>' - \<sigma>)"

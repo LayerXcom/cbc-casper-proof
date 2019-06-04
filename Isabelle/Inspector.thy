@@ -213,7 +213,6 @@ qed
  *)
   oops
 
-
 lemma (in Protocol) inspector_imps_gt_threshold :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V 
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
@@ -230,15 +229,25 @@ proof -
     apply (simp add: gt_threshold_def)
     using weight_measure_subset_gte
     by (smt \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close>) 
-  hence "\<exists> v \<in> v_set.  gt_threshold(v_set, the_elem (L_H_J \<sigma> v)) \<and> the_elem (L_H_J \<sigma> v) \<subseteq> \<sigma>"
-    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close>  
-    sorry
-  show "gt_threshold (v_set, \<sigma>)"
+  obtain v where "v \<in> v_set \<and>  gt_threshold(v_set, the_elem (L_H_J \<sigma> v))"
+    using \<open>\<exists>v\<in>v_set. gt_threshold (v_set, the_elem (L_H_J \<sigma> v))\<close> by blast
+  hence "\<forall> \<sigma>' \<in> L_H_J \<sigma> v. \<sigma>' \<subseteq> \<sigma>"
+    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close>
+    by blast
+  hence "is_singleton (L_H_J \<sigma> v) \<and> (\<forall> \<sigma>' \<in> L_H_J \<sigma> v. \<sigma>' \<subseteq> \<sigma>)"
+    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> L_H_J_of_observed_non_equivocating_validator_is_singleton
+          \<open>inspector (v_set, \<sigma>, p)\<close> 
+    apply (simp add: inspector_def)
+    using \<open>v \<in> v_set \<and> gt_threshold (v_set, the_elem (L_H_J \<sigma> v))\<close> by auto  
+  hence "the_elem (L_H_J \<sigma> v) \<subseteq> \<sigma>"
+    by (metis insert_iff is_singleton_the_elem)
+  then show "gt_threshold (v_set, \<sigma>)"
+    using \<open>v \<in> v_set \<and> gt_threshold(v_set, the_elem (L_H_J \<sigma> v))\<close> 
     apply (simp add: gt_threshold_def)
     using equivocation_fault_weight_is_monotonic          
-    apply (simp add: equivocation_fault_weight_def) 
-    oops
-
+    apply (simp add: equivocation_fault_weight_def)
+    by (smt L_H_J_type \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_singleton (L_H_J \<sigma> v) \<and> (\<forall>\<sigma>'\<in>L_H_J \<sigma> v. \<sigma>' \<subseteq> \<sigma>)\<close> is_singleton_the_elem singletonI subsetCE) 
+qed
 
 (* Lemma 38 *)
 lemma (in Protocol) inspector_imps_estimator_agreeing :
