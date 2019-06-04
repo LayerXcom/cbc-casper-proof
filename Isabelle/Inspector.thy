@@ -167,51 +167,8 @@ lemma (in Protocol) inspector_imps_everyone_agreeing :
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> v_set \<subseteq> agreeing_validators (p, \<sigma>)"
   (* Based on no later disagreeing message imps keep agreeing  *)
-  apply (rule, rule, rule, rule, rule)
-(* Old proof *)
-(* proof-
-  fix \<sigma> v_set p assume "\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V"  and "is_clique (v_set, p, \<sigma>)" 
-  then have clique: "\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
-           \<and> later_disagreeing_messages (p,
-                                         the_elem (L_H_M 
-                                            (the_elem (L_H_J \<sigma> v)) v)
-                                        , v, \<sigma>) = \<emptyset>"
-    by (simp add: is_clique_def) 
-  then have p_on_est : "\<forall> v \<in> v_set. (\<forall> m \<in> {m' \<in> \<sigma>. sender m' = v 
-                                       \<and> justified (the_elem (L_H_M 
-                                                          (the_elem (L_H_J \<sigma> v)) v))
-                                                    m'}.
-                                        p(est m))"
-    by (simp add: later_disagreeing_messages_def later_from_def later_def from_sender_def)
-  have "\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>" 
-    using clique by simp
-  then have "\<forall> v \<in> v_set. the_elem (L_H_J \<sigma> v)
-                    =  justification (the_elem (L_H_M \<sigma> v))"
-    apply (simp add: L_H_J_def)
-    by (metis \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> empty_iff is_singleton_the_elem L_H_M_of_observed_non_equivocating_validator_is_singleton singletonD singletonI the_elem_image_unique)
-  then have justified_ok: "\<forall> v \<in> v_set. justified (the_elem (L_H_M 
-                                                          (the_elem (L_H_J \<sigma> v)) v))
-                                    (the_elem (L_H_M \<sigma> v))"
-    using validator_in_inspector_see_L_H_M_of_others_is_singleton
-    by (smt Diff_iff L_H_M_def L_H_M_is_in_the_state L_M_from_non_observed_validator_is_empty M_type \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_clique (v_set, p, \<sigma>)\<close> empty_subsetI insert_subset is_singleton_the_elem justified_def observed_non_equivocating_validators_def state_is_subset_of_M subsetCE)
-  have sender_ok: "\<forall> v \<in> v_set. sender (the_elem (L_H_M \<sigma> v)) = v" 
-    using \<open>\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M
-    using \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> by blast
-  have "\<forall> v \<in> v_set.  the_elem (L_H_M \<sigma> v) \<in> \<sigma>"
-    using \<open>\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> L_H_M_is_in_the_state
-    using \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> by blast
-  then have "\<forall> v \<in> v_set. p (est (the_elem (L_H_M \<sigma> v)))"
-    using p_on_est sender_ok justified_ok
-    by blast   
-  then have "\<forall> v \<in> v_set. p (the_elem (L_H_E \<sigma> v))"
-    apply (simp add: L_H_E_def)
-    by (metis (no_types, lifting) \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> empty_iff is_singleton_the_elem L_H_M_of_observed_non_equivocating_validator_is_singleton singletonD singletonI the_elem_image_unique)  
-  then show "v_set \<subseteq> agreeing_validators (p, \<sigma>)"
-    unfolding agreeing_validators_def agreeing_def
-    by (smt \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> is_singleton_the_elem mem_Collect_eq L_H_E_of_observed_non_equivocating_validator_is_singleton old.prod.case singletonD subsetI)
-qed
- *)
-  sorry
+  apply (simp add: inspector_def)
+  by blast
 
 lemma (in Protocol) inspector_imps_gt_threshold :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V 
