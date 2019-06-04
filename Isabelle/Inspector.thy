@@ -295,7 +295,24 @@ lemma (in Protocol) equivocation_status_of_non_sender_not_affected_by_minimal_tr
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> v \<in> V - {sender m}
   \<longrightarrow> v \<in> equivocating_validators \<sigma> \<longleftrightarrow> v \<in> equivocating_validators (\<sigma> \<union> {m})"
-  oops
+  apply (rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma> m v
+  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V"
+  and "immediately_next_message (\<sigma>, m)"
+  and "v \<in> V - {sender m}"
+  then have g1: "observed \<sigma> \<subseteq> observed (\<sigma> \<union> {m})"
+    apply (simp add: observed_def)
+    by auto
+  have g2: "is_equivocating \<sigma> v = is_equivocating (\<sigma> \<union> {m}) v"
+    using \<open>v \<in> V - {sender m}\<close>
+    apply (simp add: is_equivocating_def equivocation_def)
+    by blast
+  show "(v \<in> equivocating_validators \<sigma>) = (v \<in> equivocating_validators (\<sigma> \<union> {m}))"
+    apply (simp add: equivocating_validators_def)
+    using g1 g2
+    by (metis (mono_tags, lifting) Un_insert_right is_equivocating_def mem_Collect_eq observed_def sup_bot.right_neutral)
+qed
 
 (* Lemma 13: Immediately next message does not change latest messages for any non-sender *)
 lemma (in Protocol) L_M_of_non_sender_not_affected_by_minimal_transitions :
