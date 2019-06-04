@@ -148,7 +148,7 @@ definition (in Params) inspector :: "(validator set * state * consensus_value_pr
   where
     "inspector 
        = (\<lambda>(v_set, \<sigma>, p). v_set \<noteq> \<emptyset> \<and>
-            (\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>  
+            (\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma>)
               \<and> (\<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) 
               \<and> (\<forall> v' \<in> v_set'. 
                     agreeing (p, (the_elem (L_H_J \<sigma> v)), v')
