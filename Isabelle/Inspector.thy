@@ -314,13 +314,60 @@ proof -
     by (metis (mono_tags, lifting) Un_insert_right is_equivocating_def mem_Collect_eq observed_def sup_bot.right_neutral)
 qed
 
+lemma (in Protocol) agreeing_status_of_non_sender_not_affected_by_minimal_transitions :
+  "\<forall> \<sigma> m v p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V
+  \<longrightarrow> v \<in> V - {sender m}
+  \<longrightarrow> agreeing (p, \<sigma>, v) = agreeing (p, \<sigma> \<union> {m}, v)"
+  apply (rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma> m v p
+  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V" and "v \<in> V - {sender m}"
+  then have "L_M \<sigma> v = L_M ( \<sigma> \<union> {m}) v"
+    apply (simp add: L_M_def later_from_def from_sender_def)
+    using \<open>v \<in> V - {sender m}\<close>
+    sorry
+  then show "\<And>\<sigma> m v p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V \<Longrightarrow> v \<in> V - {sender m} \<Longrightarrow> agreeing (p, \<sigma>, v) = agreeing (p, \<sigma> \<union> {m}, v)"
+    using equivocation_status_of_non_sender_not_affected_by_minimal_transitions
+    apply (simp add: agreeing_def L_H_E_def L_H_M_def)
+    sorry
+qed
+
+
+lemma (in Protocol) agreeing_validators_of_non_sender_not_affected_by_minimal_transitions :
+  "\<forall> \<sigma> m v p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> v \<in> V - {sender m}
+  \<longrightarrow> v \<in> agreeing_validators (p, \<sigma>) \<longleftrightarrow> v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
+  apply (rule, rule, rule, rule, rule, rule, rule)
+proof -
+  fix \<sigma> m v p
+  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V" and "immediately_next_message (\<sigma>, m)" and "v \<in> V - {sender m}"
+  then have g1 : "v \<in> observed_non_equivocating_validators \<sigma> \<longleftrightarrow> v \<in> observed_non_equivocating_validators (\<sigma> \<union> {m})"
+    apply (simp add:  observed_non_equivocating_validators_def observed_def)
+    using equivocation_status_of_non_sender_not_affected_by_minimal_transitions
+    by auto
+
+  have g2 : "agreeing (p, \<sigma>, v) = agreeing (p, \<sigma> \<union> {m}, v)"
+    apply (simp add: agreeing_def)
+    apply (simp add: L_H_E_def)
+    apply (simp add: L_H_M_def)
+    using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v \<in> V - {sender m}\<close>
+    using equivocation_status_of_non_sender_not_affected_by_minimal_transitions
+    sorry
+
+  then show "(v \<in> agreeing_validators (p, \<sigma>)) = (v \<in> agreeing_validators (p, \<sigma> \<union> {m}))"
+    apply (simp add: agreeing_validators_def)
+    using g1 g2
+    by simp
+qed
+
 (* Lemma 13: Immediately next message does not change latest messages for any non-sender *)
 lemma (in Protocol) L_M_of_non_sender_not_affected_by_minimal_transitions :
   "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> v \<in> V - {sender m}
   \<longrightarrow> L_H_M \<sigma> v = L_H_M (\<sigma> \<union> {m}) v"
-  oops
+  sorry
 
 (* Lemma 14 Immediately next message does not change latest justification for any non-sender *)
 lemma (in Protocol) latest_justificationss_of_non_sender_not_affected_by_minimal_transitions :
@@ -328,15 +375,15 @@ lemma (in Protocol) latest_justificationss_of_non_sender_not_affected_by_minimal
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> v \<in> V - {sender m}
   \<longrightarrow> L_H_J \<sigma> v = L_H_J (\<sigma> \<union> {m}) v"
-  oops
+  sorry
 
 (* Lemma 15 Immediately next message does not change Later Disagreeing for any non-sender *)
 lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_transitions :
-  "\<forall> \<sigma> m m' v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> m' \<in> M \<and> v \<in> V 
+  "\<forall> \<sigma> m m' v p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> m' \<in> M \<and> v \<in> V
   \<longrightarrow> immediately_next_message (\<sigma>, m')
   \<longrightarrow> v \<in> V - {sender m'}
   \<longrightarrow> later_disagreeing_messages (p, m, v, \<sigma>) = later_disagreeing_messages (p, m, v, \<sigma> \<union> {m'})"
-  oops
+  sorry
 
 (* Lemma 33: Inspector preserved over message from non-member *)
 (* NOTE: Lemma 16 is not necessary*)
