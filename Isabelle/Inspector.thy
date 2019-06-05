@@ -356,7 +356,7 @@ lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_tran
 (* Lemma 33: Inspector preserved over message from non-member *)
 (* NOTE: Lemma 16 is not necessary *)
 lemma (in Protocol) inspector_preserved_over_message_from_non_member :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<notin> v_set
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
@@ -364,16 +364,15 @@ lemma (in Protocol) inspector_preserved_over_message_from_non_member :
   apply (rule, rule, rule, rule, rule, rule, rule, rule)
 proof - 
   fix \<sigma> m v_set p
-  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V" "immediately_next_message (\<sigma>, m)" "sender m \<notin> v_set" "inspector (v_set, \<sigma>, p)" 
+  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V" "immediately_next_message (\<sigma>, m)" "sender m \<notin> v_set" "inspector (v_set, \<sigma>, p)" 
   then have "\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma>) \<longrightarrow> v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
     using agreeing_status_of_non_sender_not_affected_by_minimal_transitions
     unfolding \<Sigma>t_def
     by blast 
   moreover have "\<forall> v \<in> v_set. 
                     (\<forall> v_set'. gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) \<longrightarrow> gt_threshold(v_set', the_elem (L_H_J (\<sigma> \<union> {m}) v)))"
-    using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> v_set\<close>
+    using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> v_set\<close>
           L_H_J_of_non_sender_not_affected_by_minimal_transitions
-    unfolding \<Sigma>t_def
     by fastforce
   moreover have "\<forall> v \<in> v_set.
                     (\<forall> v_set'. v_set' \<subseteq> v_set \<and>
@@ -394,16 +393,15 @@ proof -
       by blast      
     have "v \<in> observed_non_equivocating_validators \<sigma>"
       using \<open>v \<in> v_set\<close> \<open>inspector (v_set, \<sigma>, p)\<close> inspector_imps_everyone_observed_non_equivocating
-            \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by blast 
+            \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by blast 
     have "v' \<in> observed_non_equivocating_validators (the_elem (L_H_J \<sigma> v))"
       using l1 by (simp add: agreeing_validators_def)
     then have "v' \<in> V - {sender m}"
-      using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>sender m \<notin> v_set\<close> \<open>v' \<in> v_set'\<close>
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>sender m \<notin> v_set\<close> \<open>v' \<in> v_set'\<close>
             a1 by blast 
     then moreover have "the_elem (L_H_J \<sigma> v) = the_elem (L_H_J (\<sigma> \<union> {m}) v)"
-      using L_H_J_of_non_sender_not_affected_by_minimal_transitions \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> v_set\<close> \<open>v \<in> v_set\<close>
-      unfolding \<Sigma>t_def
-      by (metis (no_types, lifting) M_type \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> insert_Diff insert_iff subsetCE)       
+      using L_H_J_of_non_sender_not_affected_by_minimal_transitions \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> v_set\<close> \<open>v \<in> v_set\<close>
+      by (metis (no_types, lifting) M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> insert_Diff insert_iff subsetCE)       
     then moreover have "the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v') = the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v')"
       using L_H_M_of_non_sender_not_affected_by_minimal_transitions
       by simp 
@@ -412,25 +410,25 @@ proof -
         have ll1: "later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v'), v', \<sigma>)"
           by (simp add: calculation(2))
         have "\<sigma> \<union> {m} \<in> \<Sigma> \<and> v \<in> V"
-          using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close>  state_transition_only_made_by_immediately_next_message
-          using \<Sigma>t_is_subset_of_\<Sigma> \<open>v \<in> v_set\<close> by blast  
+          using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close>  state_transition_only_made_by_immediately_next_message
+                \<open>v \<in> v_set\<close> by blast
         hence "the_elem (L_H_J (\<sigma> \<union> {m}) v) \<in> \<Sigma>"
           using L_H_J_type L_H_J_of_observed_non_equivocating_validator_is_singleton \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close>
-          by (metis \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> calculation(2) insert_subset is_singleton_the_elem subsetCE) 
+          by (metis  \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> calculation(2) insert_subset is_singleton_the_elem) 
         hence "the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v') \<in> M"
           using L_H_M_type L_H_M_of_observed_non_equivocating_validator_is_singleton \<open>v' \<in> observed_non_equivocating_validators (the_elem (L_H_J \<sigma> v))\<close>
-          using L_H_M_is_in_the_state calculation(2) state_is_subset_of_M by fastforce          
+          using L_H_M_is_in_the_state calculation(2) state_is_subset_of_M by fastforce
         hence "later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v'), v', \<sigma>) = later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v'), v', \<sigma> \<union> {m})"              
             using later_disagreeing_of_non_sender_not_affected_by_minimal_transitions ll1 
-                  \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v' \<in> V - {sender m}\<close>
-                  \<Sigma>t_is_subset_of_\<Sigma> by auto
+                  \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v' \<in> V - {sender m}\<close>
+                  by auto
         then show ?thesis
           using l1 ll1 by blast  
         qed
     ultimately show "v' \<in> agreeing_validators (p, the_elem (L_H_J (\<sigma> \<union> {m}) v)) \<and>
             later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J (\<sigma> \<union> {m}) v)) v'), v', \<sigma> \<union> {m}) = \<emptyset>"
       using later_disagreeing_of_non_sender_not_affected_by_minimal_transitions l1
-          \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v' \<in> V - {sender m}\<close>
+          \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v' \<in> V - {sender m}\<close>
       by simp         
   qed
   ultimately show "inspector (v_set, \<sigma> \<union> {m}, p)"
@@ -440,13 +438,12 @@ proof -
 qed
 
 (* ###################################################### *)
-(* 7.4 Majority Cliques Survive Honest Messages from Validators in Clique *)
+(* 7.4 Inspector Survives Honest Messages from Member *)
 (* ###################################################### *)
 
-(* 7.4.1 New messages at least leaves a smaller clique behind *)
-
-(* Lemma 17: Free sub-clique *)
 (* TODO: This lemma must be redefined to consider threshold *)
+(* 7.4.1 New messages at least leaves a smaller clique behind *)
+(* Lemma 17: Free sub-clique *)
 (* lemma (in Protocol) free_sub_clique :
   "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
@@ -457,7 +454,7 @@ qed
  *)
 
 (* 7.4.2 Non-equivocating messages from member see all members agreeing *)
-(* Lemma 18 (Later messages from a non-equivocating validator include all earlier messages) *)
+(* Lemma 18: Later messages from a non-equivocating validator include all earlier messages *)
 (* NOTE: \<sigma>2 is not a state, just a set of messages. *)
 lemma (in Protocol) later_messages_from_non_equivocating_validator_include_all_earlier_messages :
   "\<forall> v \<sigma> \<sigma>1 \<sigma>2. \<sigma> \<in> \<Sigma> \<and> \<sigma>1 \<in> \<Sigma> \<and> \<sigma>1 \<subseteq> \<sigma> \<and> \<sigma>2 \<subseteq> \<sigma> \<and> \<sigma>1 \<inter> \<sigma>2 = \<emptyset>
@@ -465,26 +462,26 @@ lemma (in Protocol) later_messages_from_non_equivocating_validator_include_all_e
       \<longrightarrow> (\<forall> m2 \<in> \<sigma>2. sender m2 = v \<longrightarrow> m1 \<in> justification m2))"
   using strict_subset_of_state_have_immediately_next_messages
   apply (simp add: immediately_next_message_def)  
-  oops
+  sorry
 
-(* Lemma 19 Immediately next message is it's sender's latest message in the next state *)
+(* Lemma 19: Immediately next message is it's sender's latest message in the next state *)
 lemma (in Protocol) message_between_minimal_transition_is_latest_message :
-  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
+  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> v \<notin> equivocating_validators (\<sigma> \<union> {m})
-  \<longrightarrow> m = the_elem (L_H_M (\<sigma> \<union> {m}) v)"
-  oops
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
+  \<longrightarrow> m = the_elem (L_H_M (\<sigma> \<union> {m}) (sender m))"
+  sorry
 
 (* Lemma 20: Latest honest messages from non-equivocating messages are either the same as in their previous
 latest message, or later *)
-lemma (in Protocol) latest_message_from_non_equivocating_validator_is_the_previous_one_or_later:
-  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
+lemma (in Protocol) L_H_M_of_others_for_sender_is_the_previous_one_or_later:
+  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> v \<notin> equivocating_validators \<sigma>
   \<longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)
         \<or> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))"
-  oops
+  sorry
 
 (* Lemma 21 *)
 lemma (in Protocol) justified_message_exists_in_later_from:
@@ -497,88 +494,89 @@ lemma (in Protocol) justified_message_exists_in_later_from:
 
 (* Lemma 23: Non-equivocating messages from member see all members agreeing *)
 lemma (in Protocol) non_equivocating_message_from_member_see_all_members_agreeing :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<in> v_set
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> v_set \<subseteq> agreeing_validators (p, justification m)"
-  oops
+  sorry
 
 
 (* 7.4.3 Non-equivocating messages from member agree *)
 
-(* Lemma 24 (New messages from member is agreeing *)
-lemma (in Protocol) new_message_from_member_see_all_members_agreeing :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
+(* Lemma 24: New messages from member is agreeing *)
+lemma (in Protocol) new_message_from_member_see_itself_agreeing :
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<in> v_set
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> sender m \<in> agreeing_validators (p, justification m)"
-  (* Almost direct from Lemma 23  *)
-  oops
-
+  using non_equivocating_message_from_member_see_all_members_agreeing
+  by blast 
 
 (* 7.4.4 Honest messages from member do not break inspector *)
 
 (* Lemma 25 *)
-lemma (in Protocol) latest_message_in_justification_of_new_message_is_latest_message :
-  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma>t \<and> m \<in> M 
+lemma (in Protocol) L_H_M_of_sender_is_previous_L_H_M :
+  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> the_elem (L_H_M (justification m) (sender m)) = the_elem (L_H_M \<sigma> (sender m))"
-  oops
+  sorry
 
 (* Lemma 26 *)
-lemma (in Protocol) latest_message_justified_by_new_message :
-  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma>t \<and> m \<in> M 
+lemma (in Protocol) L_H_M_of_sender_justified_by_new_message :
+  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> justified (the_elem (L_H_M \<sigma> (sender m))) m"
-  oops
+  sorry
 
 (* Lemma 27: Nothing later than latest honest message *)
-lemma (in Protocol) nothing_later_than_latest_honest_message :
-  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V
+lemma (in Protocol) nothing_later_than_L_H_M :
+  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V
   \<longrightarrow> v \<notin> equivocating_validators \<sigma>
-  \<longrightarrow> later_from (the_elem (L_H_M \<sigma> v), v, \<sigma>) =  \<emptyset>"
-  oops
+  \<longrightarrow> later_from (the_elem (L_H_M \<sigma> v), v, \<sigma>) = \<emptyset>"
+  apply (simp add: later_from_def L_H_M_def L_M_def from_sender_def justified_def equivocating_validators_def is_equivocating_def) 
+  sorry
 
 (* Lemma 28: Later messages for sender is just the new message *)
-lemma (in Protocol) later_messages_for_sender_is_new_message :
-  "\<forall> \<sigma> m v_set. \<sigma> \<in> \<Sigma>t \<and> m \<in> M 
+lemma (in Protocol) later_messages_for_sender_is_only_new_message :
+  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> later_from (the_elem (L_H_M \<sigma> (sender m)), sender m, \<sigma> \<union> {m}) =  {m}"
-  oops
+  sorry
 
 (* Lemma 29: Later disagreeing is monotonic *)
 lemma (in Protocol) later_disagreeing_is_monotonic:
   "\<forall> v \<sigma> m1 m2 p. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<and> {m1, m2} \<subseteq> M
   \<longrightarrow> justified m1 m2
   \<longrightarrow> later_disagreeing_messages (p, m2, v, \<sigma>) \<subseteq> later_disagreeing_messages (p, m1, v, \<sigma>)"
-  oops
+  using message_in_state_is_strict_subset_of_the_state message_in_state_is_valid M_type state_is_in_pow_Mi  
+  apply (simp add: later_disagreeing_messages_def later_from_def justified_def)
+  by auto
 
 (* Lemma 30 *)
-lemma (in Protocol) empty_later_disagreeing_messages_in_new_message :
-  "\<forall> \<sigma> m v p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v \<in> V 
+lemma (in Protocol) previous_empty_later_disagreeing_messages_imps_empty_in_new_message :
+  "\<forall> \<sigma> m v p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V 
   \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> later_disagreeing_messages (p, (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)), v, \<sigma>) = \<emptyset>
   \<longrightarrow> later_disagreeing_messages (p, (the_elem (L_H_M (justification m) v)), v, \<sigma>) = \<emptyset>"
-  oops
+  apply (simp add: later_disagreeing_messages_def)
+  sorry
 
 (* Lemma 34: Inspector preserved over message from non-equivocating member *)
 (* NOTE: Lemma 31 is not necessary*)
 lemma (in Protocol) inspector_preserved_over_message_from_non_equivocating_member :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<in> v_set
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
 (*   using clique_not_affected_by_honest_message_from_member
@@ -589,16 +587,16 @@ lemma (in Protocol) inspector_preserved_over_message_from_non_equivocating_membe
  *) sorry
 
 (* ###################################################### *)
-(* 7.5 Equivocations from validators in inspector do not break inspector *)
+(* 7.5 Equivocations from member do not break inspector *)
 (* ###################################################### *)
 
 (* Lemma 35: Inspector preserved over message from equivocating member *)
 lemma (in Protocol) inspector_preserved_over_message_from_equivocating_member :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
   \<longrightarrow> immediately_next_message (\<sigma>, m)
   \<longrightarrow> sender m \<in> v_set
-  \<longrightarrow> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<in> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
   \<longrightarrow> inspector (v_set, \<sigma>, p) 
   \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"

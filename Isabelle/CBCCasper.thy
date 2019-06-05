@@ -310,6 +310,7 @@ definition is_equivocating :: "state \<Rightarrow> validator \<Rightarrow> bool"
   where
     "is_equivocating \<sigma> v =  (\<exists> m1 \<in> \<sigma>. \<exists> m2 \<in> \<sigma>. equivocation (m1, m2) \<and> sender m1 = v)"
 
+(* Use "v \<in> equivocating_validators \<sigma>" instead of is_equivocating by default *)
 definition equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = {v \<in> observed \<sigma>. is_equivocating \<sigma> v}"
@@ -340,7 +341,7 @@ lemma (in Protocol) equivocation_is_monotonic :
 
 lemma (in Protocol) equivocating_validators_preserved_over_honest_message :
   "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
+  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
   apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def)
   by auto
