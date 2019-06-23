@@ -1,6 +1,6 @@
 theory CodeGeneration
 
-imports Main CBCCasper SafetyOracle TFGCasper
+imports Main CBCCasper Inspector
 
 begin
 
@@ -45,17 +45,17 @@ interpretation p: Params V W t C \<epsilon> for V W t C \<epsilon>
   done
 
 (* Define a constant *)
-definition "is_clique_oracle = p.is_clique_oracle"
+definition "inspector = p.inspector"
 
 (* FIXME: Wellsortedness error *)
-export_code is_clique is_clique_oracle in Haskell
-  module_name SafetyOracle file "GeneratedCode/src"
-
-interpretation gp: BlockchainParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev 
-  done
+export_code inspector in Haskell
+  module_name Insepctor file "GeneratedCode/src"
 
 (* FIXME: Wellsortedness error *)
 (* 
+interpretation gp: BlockchainParams V W t C \<epsilon> genesis B prev for V W t C \<epsilon> genesis B prev
+  done
+
 definition "best_children = gp.best_children"
 export_code best_children in Haskell
   module_name TFGCasper file GeneratedCode
