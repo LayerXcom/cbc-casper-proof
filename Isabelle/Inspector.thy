@@ -41,8 +41,7 @@ lemma (in Protocol) agreeing_validators_finite :
 
 lemma (in Protocol) agreeing_validators_are_observed_non_equivocating_validators :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> observed_non_equivocating_validators \<sigma>"
-  apply (simp add: agreeing_validators_def)
-  by blast
+  by (simp add: agreeing_validators_def)
 
 lemma (in Protocol) agreeing_validators_are_not_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<inter> equivocating_validators \<sigma> = \<emptyset>"
