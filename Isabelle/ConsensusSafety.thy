@@ -252,7 +252,7 @@ proof -
   hence "\<not> state_property_is_decided (state_property_not (naturally_corresponding_state_property p), \<sigma>')"
       (* NOTE: About the non-deterministicity, should we define this as safety? *)
       using backword_consistency \<open>state_property_is_decided (naturally_corresponding_state_property p, \<sigma>'')\<close>
-      using \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> p \<in> consensus_value_property_decisions \<sigma>\<close> by auto  
+      using \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> \<open>{\<sigma>, \<sigma>'} \<subseteq> \<sigma>_set \<and> p \<in> consensus_value_property_decisions \<sigma>\<close> by auto  
   then show "consensus_value_property_not p \<notin> consensus_value_property_decisions \<sigma>'"
     apply (simp add: consensus_value_property_decisions_def consensus_value_property_is_decided_def naturally_corresponding_state_property_def state_property_is_decided_def)
     using \<Sigma>t_def estimates_are_non_empty futures_def by fastforce   
@@ -282,7 +282,7 @@ proof -
   then show False
     using \<open>state_property_is_decided (naturally_corresponding_state_property p, \<sigma>'')\<close>
     apply (simp add: state_property_is_decided_def naturally_corresponding_state_property_def)
-    by (meson \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> estimates_are_non_empty monotonic_futures order_refl subsetCE)
+    by (meson \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma>'' \<in> \<Sigma>t \<and> \<sigma>'' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> estimates_are_non_empty monotonic_futures order_refl subsetCE)
 qed
 
 
@@ -327,17 +327,17 @@ proof -
     apply (simp add: consensus_value_property_decisions_def consensus_value_property_is_decided_def)
     by blast
   have "\<forall> \<sigma>'' \<in> \<sigma>_set. \<sigma>' \<in> futures \<sigma>''"
-    using \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> by blast
+    using \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> by blast
   hence "\<forall> p \<in> p_set. state_property_is_decided (naturally_corresponding_state_property p, \<sigma>')"
     using forward_consistency \<open>\<forall> p \<in> p_set. \<exists> \<sigma>'' \<in> \<sigma>_set. state_property_is_decided (naturally_corresponding_state_property p, \<sigma>'')\<close> 
-    by (meson \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> subsetCE)
+    by (meson \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> \<open>\<sigma>_set \<subseteq> \<Sigma>t\<close> subsetCE)
   hence "state_property_is_decided (naturally_corresponding_state_property (\<lambda>c. \<forall> p \<in> p_set. p c), \<sigma>')"
     apply (simp add: naturally_corresponding_state_property_def state_property_is_decided_def)
     by auto
   then show False
     using \<open>(\<lambda>c. \<not> (\<forall> p \<in> p_set. p c)) \<in> consensus_value_property_decisions \<sigma>\<close>  
     apply (simp add: consensus_value_property_decisions_def  consensus_value_property_is_decided_def naturally_corresponding_state_property_def  state_property_is_decided_def)
-    using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<sigma>_set \<and> p_set \<in> Pow (\<Union>_Collect (consensus_value_property_decisions \<sigma>') (\<sigma>' \<in> \<sigma>_set)) - {\<emptyset>}\<close> \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter>_Collect (futures \<sigma>) (\<sigma> \<in> \<sigma>_set)\<close> estimates_are_non_empty monotonic_futures by fastforce
+    using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<sigma>_set \<and> p_set \<in> Pow (\<Union> {consensus_value_property_decisions \<sigma>' | \<sigma>'. \<sigma>' \<in> \<sigma>_set}) - {\<emptyset>}\<close> \<open>\<sigma>' \<in> \<Sigma>t \<and> \<sigma>' \<in> \<Inter> {futures \<sigma> | \<sigma>. \<sigma> \<in> \<sigma>_set}\<close> estimates_are_non_empty monotonic_futures by fastforce
 qed
 
 end

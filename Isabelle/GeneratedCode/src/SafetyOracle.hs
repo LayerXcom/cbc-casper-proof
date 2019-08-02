@@ -12,33 +12,7 @@ import qualified Params;
 
 data Num = One | Bit0 Num | Bit1 Num;
 
-equal_num :: Num -> Num -> Bool;
-equal_num (Bit0 x2) (Bit1 x3) = False;
-equal_num (Bit1 x3) (Bit0 x2) = False;
-equal_num One (Bit1 x3) = False;
-equal_num (Bit1 x3) One = False;
-equal_num One (Bit0 x2) = False;
-equal_num (Bit0 x2) One = False;
-equal_num (Bit1 x3) (Bit1 y3) = equal_num x3 y3;
-equal_num (Bit0 x2) (Bit0 y2) = equal_num x2 y2;
-equal_num One One = True;
-
 data Int = Zero_int | Pos Num | Neg Num;
-
-equal_int :: Int -> Int -> Bool;
-equal_int (Neg k) (Neg l) = equal_num k l;
-equal_int (Neg k) (Pos l) = False;
-equal_int (Neg k) Zero_int = False;
-equal_int (Pos k) (Neg l) = False;
-equal_int (Pos k) (Pos l) = equal_num k l;
-equal_int (Pos k) Zero_int = False;
-equal_int Zero_int (Neg l) = False;
-equal_int Zero_int (Pos l) = False;
-equal_int Zero_int Zero_int = True;
-
-instance Eq Int where {
-  a == b = equal_int a b;
-};
 
 one_int :: Int;
 one_int = Pos One;
@@ -63,23 +37,6 @@ class (One a, Zero a) => Zero_neq_one a where {
 };
 
 instance Zero_neq_one Int where {
-};
-
-newtype Rat = Frct (Int, Int);
-
-quotient_of :: Rat -> (Int, Int);
-quotient_of (Frct x) = x;
-
-equal_rat :: Rat -> Rat -> Bool;
-equal_rat a b = quotient_of a == quotient_of b;
-
-newtype Real = Ratreal Rat;
-
-equal_real :: Real -> Real -> Bool;
-equal_real (Ratreal x) (Ratreal y) = equal_rat x y;
-
-instance Eq Real where {
-  a == b = equal_real a b;
 };
 
 plus_num :: Num -> Num -> Num;
@@ -152,6 +109,11 @@ minus_int (Pos m) (Pos n) = sub m n;
 minus_int Zero_int l = uminus_int l;
 minus_int k Zero_int = k;
 
+newtype Rat = Frct (Int, Int);
+
+quotient_of :: Rat -> (Int, Int);
+quotient_of (Frct x) = x;
+
 less_eq_num :: Num -> Num -> Bool;
 less_eq_num (Bit1 m) (Bit0 n) = less_num m n;
 less_eq_num (Bit1 m) (Bit1 n) = less_eq_num m n;
@@ -210,6 +172,28 @@ divmod_int One One = (Pos One, Zero_int);
 of_bool :: forall a. (Zero_neq_one a) => Bool -> a;
 of_bool True = one;
 of_bool False = zero;
+
+equal_num :: Num -> Num -> Bool;
+equal_num (Bit0 x2) (Bit1 x3) = False;
+equal_num (Bit1 x3) (Bit0 x2) = False;
+equal_num One (Bit1 x3) = False;
+equal_num (Bit1 x3) One = False;
+equal_num One (Bit0 x2) = False;
+equal_num (Bit0 x2) One = False;
+equal_num (Bit1 x3) (Bit1 y3) = equal_num x3 y3;
+equal_num (Bit0 x2) (Bit0 y2) = equal_num x2 y2;
+equal_num One One = True;
+
+equal_int :: Int -> Int -> Bool;
+equal_int (Neg k) (Neg l) = equal_num k l;
+equal_int (Neg k) (Pos l) = False;
+equal_int (Neg k) Zero_int = False;
+equal_int (Pos k) (Neg l) = False;
+equal_int (Pos k) (Pos l) = equal_num k l;
+equal_int (Pos k) Zero_int = False;
+equal_int Zero_int (Neg l) = False;
+equal_int Zero_int (Pos l) = False;
+equal_int Zero_int Zero_int = True;
 
 adjust_div :: (Int, Int) -> Int;
 adjust_div (q, r) = plus_int q (of_bool (not (equal_int r Zero_int)));
@@ -284,6 +268,8 @@ plus_rat p q =
                               times_int c d);
                       });
              }));
+
+newtype Real = Ratreal Rat;
 
 plus_real :: Real -> Real -> Real;
 plus_real (Ratreal x) (Ratreal y) = Ratreal (plus_rat x y);
@@ -478,6 +464,10 @@ l_H_E sigma v = image est (l_H_M sigma v);
 l_H_J :: Set Message -> Params.Validator -> Set (Set Message);
 l_H_J sigma v = image justification (l_H_M sigma v);
 
+agreeing ::
+  (Params.ConsensusValue -> Bool, (Set Message, Params.Validator)) -> Bool;
+agreeing = (\ (p, (sigma, v)) -> ball (l_H_E sigma v) p);
+
 minus_set :: forall a. (Eq a) => Set a -> Set a -> Set a;
 minus_set a (Coset xs) = Set (filter (\ x -> member x a) xs);
 minus_set a (Set xs) = fold remove xs a;
@@ -493,10 +483,6 @@ later_disagreeing_messages =
   (\ (p, (m, (v, sigma))) ->
     filtera (\ ma -> not (p (est ma))) (later_from (m, (v, sigma))));
 
-is_agreeing ::
-  (Params.ConsensusValue -> Bool, (Set Message, Params.Validator)) -> Bool;
-is_agreeing = (\ (p, (sigma, v)) -> ball (l_H_E sigma v) p);
-
 is_clique ::
   (Set Params.Validator, (Params.ConsensusValue -> Bool, Set Message)) -> Bool;
 is_clique =
@@ -506,7 +492,7 @@ is_clique =
         member v (observed_non_equivocating_validators sigma) &&
           ball v_set
             (\ va ->
-              is_agreeing (p, (the_elem (l_H_J sigma v), va)) &&
+              agreeing (p, (the_elem (l_H_J sigma v), va)) &&
                 equal_set
                   (later_disagreeing_messages
                     (p, (the_elem (l_H_M (the_elem (l_H_J sigma v)) va),
@@ -565,7 +551,7 @@ sum :: forall a b. (Eq a, Comm_monoid_add b) => (a -> b) -> Set a -> b;
 sum g (Set xs) = sum_list (map g (remdups xs));
 
 weight_measure :: (Params.Validator -> Real) -> Set Params.Validator -> Real;
-weight_measure w v_set = sum (\ x -> x) (image w v_set);
+weight_measure w v_set = sum w v_set;
 
 divide_real :: Real -> Real -> Real;
 divide_real (Ratreal x) (Ratreal y) = Ratreal (divide_rat x y);
@@ -595,9 +581,7 @@ is_clique_oraclea ::
           Bool;
 is_clique_oraclea v w t =
   (\ (v_set, (sigma, p)) ->
-    is_clique (minus_set v_set (equivocating_validators sigma), (p, sigma)) &&
-      gt_threshold v w t
-        (minus_set v_set (equivocating_validators sigma), sigma));
+    is_clique (v_set, (p, sigma)) && gt_threshold v w t (v_set, sigma));
 
 is_clique_oracle ::
   Set Params.Validator ->

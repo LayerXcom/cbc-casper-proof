@@ -41,8 +41,7 @@ lemma (in Protocol) agreeing_validators_finite :
 
 lemma (in Protocol) agreeing_validators_are_observed_non_equivocating_validators :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> observed_non_equivocating_validators \<sigma>"
-  apply (simp add: agreeing_validators_def)
-  by blast
+  by (simp add: agreeing_validators_def)
 
 lemma (in Protocol) agreeing_validators_are_not_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<inter> equivocating_validators \<sigma> = \<emptyset>"
@@ -651,7 +650,9 @@ proof -
       then have "\<forall> c \<in> \<epsilon> (the_elem (L_H_J (\<sigma> \<union> {m}) (sender m))). p c"
         using  \<open>majority_driven p\<close> \<open>sender m \<in> v_set\<close> gt_threshold_imps_estimator_agreeing \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close>
               \<open>sender m \<in> observed_non_equivocating_validators (\<sigma> \<union> {m})\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> \<open>the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)) = justification m\<close>        
-        by (metis (no_types, lifting) M_type \<Sigma>t_def  is_future_state.simps mem_Collect_eq past_state_of_\<Sigma>t_is_\<Sigma>t state_transition_is_immediately_next_message)
+              past_state_of_\<Sigma>t_is_\<Sigma>t state_transition_is_immediately_next_message M_type
+        unfolding \<Sigma>t_def
+        by (smt \<Sigma>t_def \<Sigma>t_is_subset_of_\<Sigma> is_future_state.simps subsetD)
       then have "\<forall> c \<in> L_H_E (\<sigma> \<union> {m}) (sender m). p c"
         using \<open>sender m \<in> observed_non_equivocating_validators (\<sigma> \<union> {m})\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> L_H_M_of_observed_non_equivocating_validator_is_singleton
         apply (simp add: L_H_E_def L_H_J_def)      
