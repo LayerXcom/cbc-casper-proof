@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: makarius/isabelle:Isabelle2018
+      - image: makarius/isabelle:Isabelle2019
     steps:
       - checkout
       - run: ./test.sh /home/isabelle/Isabelle/bin/isabelle

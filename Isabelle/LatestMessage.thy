@@ -103,8 +103,7 @@ lemma (in Protocol) L_M_from_non_observed_validator_is_empty :
 
 lemma (in Protocol) L_M_is_subset_of_the_state :
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> V. L_M \<sigma> v \<subseteq> \<sigma>"
-  apply (simp add: L_M_def later_from_def from_sender_def) 
-  by auto
+  by (simp add: L_M_def later_from_def from_sender_def) 
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 definition observed_non_equivocating_validators :: "state \<Rightarrow> validator set"

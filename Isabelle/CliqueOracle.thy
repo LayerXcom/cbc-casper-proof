@@ -41,8 +41,7 @@ lemma (in Protocol) agreeing_validators_finite :
 
 lemma (in Protocol) agreeing_validators_are_observed_non_equivocating_validators :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> observed_non_equivocating_validators \<sigma>"
-  apply (simp add: agreeing_validators_def)
-  by blast
+  by (simp add: agreeing_validators_def)
 
 lemma (in Protocol) agreeing_validators_are_not_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<inter> equivocating_validators \<sigma> = \<emptyset>"
@@ -582,8 +581,21 @@ lemma (in Protocol) clique_oracle_is_safety_oracle :
   \<longrightarrow> majority_driven p
   \<longrightarrow> is_clique_oracle (v_set, \<sigma>, p) 
   \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. naturally_corresponding_state_property p \<sigma>')"    
-  using clique_oracle_for_all_futures threshold_sized_clique_imps_estimator_agreeing
-  apply (simp add: is_clique_oracle_def naturally_corresponding_state_property_def)
-  by (metis (mono_tags, lifting) futures_def mem_Collect_eq)
-  
+  apply rule+
+proof -
+  fix \<sigma> v_set p \<sigma>'
+ assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "finite v_set" and "majority_driven p" and "is_clique_oracle (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" 
+ then have "\<forall> \<sigma>' \<in> futures \<sigma>. is_clique_oracle (v_set, \<sigma>', p)" 
+   using clique_oracle_for_all_futures
+   by blast 
+ then have "\<forall> \<sigma>' \<in> futures \<sigma>. \<forall> c \<in> \<epsilon> \<sigma>'. p c"
+   using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>finite v_set\<close> \<open>majority_driven p\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close>
+   using threshold_sized_clique_imps_estimator_agreeing 
+   apply (simp add: futures_def is_clique_oracle_def)
+   sorry 
+ then show "naturally_corresponding_state_property p \<sigma>'"
+   apply (simp add: naturally_corresponding_state_property_def)
+   using \<open>\<sigma>' \<in> futures \<sigma>\<close> by blast  
+qed            
+    
 end

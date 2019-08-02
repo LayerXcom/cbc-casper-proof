@@ -300,8 +300,7 @@ definition (in BlockchainParams) best_children :: "consensus_value * state \<Rig
 
 lemma (in Blockchain) best_children_type :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> best_children (b, \<sigma>) \<subseteq> C"
-  apply (simp add: is_arg_max_def best_children_def)
-  by (metis (mono_tags, lifting) mem_Collect_eq subsetI)
+  by (simp add: is_arg_max_def best_children_def)
 
 lemma (in Blockchain) best_children_finite :
   "\<forall> b \<sigma>. b \<in> C \<and> \<sigma> \<in> \<Sigma> \<longrightarrow> finite (best_children (b, \<sigma>))"

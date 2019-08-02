@@ -1,6 +1,6 @@
 theory CodeGeneration
 
-imports Main CBCCasper SafetyOracle TFGCasper
+imports Main CBCCasper CliqueOracle TFGCasper
 
 begin
 
