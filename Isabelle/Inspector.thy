@@ -915,7 +915,8 @@ proof-
         obtain prev_list where "MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))"
           using False \<open>\<And>\<sigma>' \<sigma>. \<lbrakk>n = card (\<sigma>' - \<sigma>); finite \<sigma>; finite \<sigma>'; \<sigma> \<noteq> \<sigma>'; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma> \<subseteq> \<sigma>'\<rbrakk> \<Longrightarrow> \<exists>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = card (\<sigma>' - \<sigma>)\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> \<open>\<sigma> \<union> {m} \<subseteq> \<sigma>'\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>finite (\<sigma> \<union> {m})\<close> \<open>finite \<sigma>'\<close> cardn by blast
         have "MessagePath \<sigma> \<sigma>' (m # prev_list)"
-          using P_cons \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))\<close> \<open>immediately_next_message (\<sigma>, m)\<close> by blast
+          using P_cons \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))\<close> \<open>immediately_next_message (\<sigma>, m)\<close>
+                \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> by blast 
         then show ?thesis
           using \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))\<close> cardn length_Suc_conv that by blast
       qed
