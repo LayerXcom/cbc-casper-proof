@@ -724,231 +724,8 @@ lemma (in Protocol) inspector_preserved_over_immediately_next_message :
   apply (simp add: \<Sigma>t_def)
   by (metis V_type insert_iff message_in_state_is_valid rev_finite_subset)
 
+
 (* Lemma 39: Inspector exists in all future states *)
-lemma (in Protocol) inspector_presereved_forever :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. inspector (v_set, \<sigma>', p))"
-  apply (rule+)
-proof -
-  fix \<sigma> v_set p \<sigma>'
-  assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "inspector (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>"
-  then show "inspector (v_set, \<sigma>', p)"
-    apply (cases "\<sigma> = \<sigma>'")
-    apply blast
-  proof -
-    fix \<sigma> v_set p \<sigma>'
-    assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" and "majority_driven p" and "inspector (v_set, \<sigma>, p)" and "\<sigma>' \<in> futures \<sigma>" and "\<sigma> \<noteq> \<sigma>'"
-    then have "\<sigma> \<subset> \<sigma>' "
-      by (simp add: futures_def psubsetI)      
-(*     then have "\<exists> m \<in> \<sigma>' - \<sigma>. \<sigma> \<union> {m} \<in> \<Sigma>t \<and> inspector (v_set, \<sigma> \<union> {m}, p) \<and> \<sigma> \<union> {m} \<in> futures \<sigma>"
-      using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>majority_driven p\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close>
-      using inspector_preserved_over_immediately_next_message
-            intermediate_state_by_immediately_next_message_towards_strict_future
-      apply (simp add: futures_def)
-      by (meson subset_insertI)        
- *)    
-    then show "inspector (v_set, \<sigma>', p)"
-      using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>majority_driven p\<close> 
-      using inspector_preserved_over_immediately_next_message state_is_finite
-            intermediate_state_by_immediately_next_message_towards_strict_future 
-      sorry               
-    qed
-  qed
-
-lemma (in Protocol) inspector_presereved_forever_by_induction :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. inspector (v_set, \<sigma>', p))"
-proof - 
-  have "\<forall> n. \<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. card (\<sigma>' - \<sigma>) = n \<longrightarrow> inspector (v_set, \<sigma>', p))"
-    apply (rule)
-  proof -
-    fix n
-    show "\<forall>\<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V \<longrightarrow>
-            majority_driven p \<longrightarrow>
-            inspector (v_set, \<sigma>, p) \<longrightarrow>
-            (\<forall>\<sigma>'\<in>futures \<sigma>.
-                card (\<sigma>' - \<sigma>) = n \<longrightarrow>
-                inspector (v_set, \<sigma>', p))"
-      apply (induction n)
-      apply (simp add: futures_def)
-      using \<Sigma>t_is_subset_of_\<Sigma> state_is_finite apply auto[1] 
-      apply (rule+)
-   proof -
-     fix n \<sigma> v_set p \<sigma>'
-     assume a1: "\<forall>\<sigma> v_set p.
-          \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V \<longrightarrow>
-          majority_driven p \<longrightarrow>
-          inspector (v_set, \<sigma>, p) \<longrightarrow>
-          (\<forall>\<sigma>'\<in>futures \<sigma>.
-              card (\<sigma>' - \<sigma>) = n \<longrightarrow>
-              inspector (v_set, \<sigma>', p))"
-       and "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V"
-       and "majority_driven p"
-       and "inspector (v_set, \<sigma>, p)"
-       and "\<sigma>' \<in> futures \<sigma>"
-       and "card (\<sigma>' - \<sigma>) = Suc n" 
-     then have "\<sigma>' \<in> \<Sigma> \<and> \<sigma>' \<noteq> \<emptyset>"
-       apply (simp add: futures_def)
-       by (metis \<Sigma>t_is_subset_of_\<Sigma> card_Diff_subset card_mono diff_is_0_eq' finite.emptyI nat.simps(3) subsetCE subset_empty)       
-     have "\<sigma> \<subset> \<sigma>'"
-       using \<open>\<sigma>' \<in> futures \<sigma>\<close> \<open>card (\<sigma>' - \<sigma>) = Suc n\<close> 
-       apply (simp add: futures_def \<Sigma>t_def)
-       by force 
-     then have "\<exists> m \<sigma>''. \<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''"
-       using intermediate_state_before_receiving_single_message \<open>\<sigma>' \<in> \<Sigma> \<and> \<sigma>' \<noteq> \<emptyset>\<close> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close>
-       apply (simp add: \<Sigma>t_def)
-       by blast         
-     then obtain m \<sigma>'' where "\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''"
-       by auto
-     then have "\<sigma>'' \<in> futures \<sigma>"
-       using past_state_of_\<Sigma>t_is_\<Sigma>t \<open>\<sigma>' \<in> futures \<sigma>\<close> 
-       apply (simp add: futures_def)
-       by blast 
-     have "is_singleton (\<sigma>' - \<sigma>'')" 
-       using \<open>\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''\<close> \<open>\<sigma>' \<in> \<Sigma> \<and> \<sigma>' \<noteq> \<emptyset>\<close>      
-       by (simp add: immediately_next_message_def insert_Diff_if) 
-     then have "card (\<sigma>'' - \<sigma>) = n"
-       using \<open>card (\<sigma>' - \<sigma>) = Suc n\<close>
-       by (smt Suc_diff_le Un_insert_right \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>\<sigma> \<subset> \<sigma>'\<close> \<open>\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''\<close> add_left_cancel card.insert card_Diff_subset card_mono message_in_state_is_valid plus_1_eq_Suc psubsetE state_is_finite state_transition_only_made_by_immediately_next_message subsetCE sup_bot.right_neutral)      
-     then have "inspector (v_set, \<sigma>'', p)"
-       using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>majority_driven p\<close> \<open>inspector (v_set, \<sigma>, p)\<close> a1
-              \<open>\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''\<close>
-              \<open>\<sigma>'' \<in> futures \<sigma>\<close> by auto        
-     then show "inspector (v_set, \<sigma>', p)"
-       using inspector_preserved_over_immediately_next_message
-              \<open>\<sigma>'' \<in> \<Sigma> \<and> m \<in> \<sigma>' \<and> immediately_next_message (\<sigma>'', m) \<and> \<sigma>' = \<sigma>'' \<union> {m} \<and> \<sigma> \<subseteq> \<sigma>''\<close>
-              \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close> \<open>\<sigma>'' \<in> futures \<sigma>\<close> \<open>majority_driven p\<close> futures_def
-       by auto 
-   qed
- qed
- then show ?thesis
-    by blast
-qed    
-
-(* Lemma 40: Inspector is a safety oracle *)
-lemma (in Protocol) inspector_is_safety_oracle :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> finite v_set
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p)
-  \<longrightarrow> state_property_is_decided (naturally_corresponding_state_property p, \<sigma>)"    
-  using inspector_presereved_forever inspector_imps_estimator_agreeing
-  apply (simp add: naturally_corresponding_state_property_def futures_def state_property_is_decided_def)
-  by meson
-
-inductive (in Protocol) MessagePath :: "state \<Rightarrow> state \<Rightarrow> message list \<Rightarrow> bool" where
-  P_nil: "MessagePath \<sigma> \<sigma> []"
-| P_cons: "\<lbrakk> immediately_next_message (\<sigma>, m); \<sigma> \<union> {m} \<in> \<Sigma>; MessagePath (\<sigma> \<union> {m}) \<sigma>' list \<rbrakk> \<Longrightarrow> MessagePath \<sigma> \<sigma>' (m # list)"
-
-lemma (in Protocol) exist_message_path_nonnil:
-  assumes "\<sigma>' \<in> futures \<sigma>"
-  and "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>" "\<sigma> \<noteq> \<sigma>'"
-  obtains message_list where "MessagePath \<sigma> \<sigma>' message_list"
-proof-
-  have "finite \<sigma> \<and> finite \<sigma>'"
-    using assms(1)
-    unfolding futures_def \<Sigma>t_def
-    using rev_finite_subset state_is_finite by fastforce
-  obtain d where "d = \<sigma>' - \<sigma>"
-    by auto
-  have "finite d"
-    by (simp add: \<open>d = \<sigma>' - \<sigma>\<close> \<open>finite \<sigma> \<and> finite \<sigma>'\<close>)
-
-  assume "\<And>message_list. MessagePath \<sigma> \<sigma>' message_list \<Longrightarrow> thesis"
-
-  {
-    fix n
-    have "\<lbrakk> n = card (\<sigma>' - \<sigma>); finite \<sigma>; finite \<sigma>'; \<sigma> \<noteq> \<sigma>'; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma> \<subseteq> \<sigma>' \<rbrakk> \<Longrightarrow> \<exists>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = n"
-      apply (induct n arbitrary: \<sigma> \<sigma>' d)
-      apply (simp)
-    proof simp
-      fix n and \<sigma> :: state and \<sigma>'
-      assume "\<And>\<sigma> \<sigma>'.
-           n = card (\<sigma>' - \<sigma>) \<Longrightarrow>
-           finite \<sigma> \<Longrightarrow>
-           finite \<sigma>' \<Longrightarrow>
-           \<sigma> \<noteq> \<sigma>' \<Longrightarrow>
-           \<sigma> \<in> \<Sigma> \<Longrightarrow> \<sigma>' \<in> \<Sigma> \<Longrightarrow> \<sigma> \<subseteq> \<sigma>' \<Longrightarrow> \<exists>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = card (\<sigma>' - \<sigma>)"
-        and "Suc n = card (\<sigma>' - \<sigma>)" "finite \<sigma>" "finite \<sigma>'" "\<sigma> \<noteq> \<sigma>'" "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>" "\<sigma> \<subseteq> \<sigma>'"
-
-      obtain m where "immediately_next_message (\<sigma>, m)" "m \<in> \<sigma>' - \<sigma>" 
-        using state_differences_have_immediately_next_messages
-        by (meson \<open>\<sigma> \<noteq> \<sigma>'\<close> \<open>\<sigma> \<subseteq> \<sigma>'\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> psubsetI strict_subset_of_state_have_immediately_next_messages)
-      have cardn: "card (\<sigma>' - (\<sigma> \<union> {m})) = n"
-        using \<open>Suc n = card (\<sigma>' - \<sigma>)\<close> \<open>finite \<sigma>'\<close> \<open>m \<in> \<sigma>' - \<sigma>\<close> by auto
-      have "finite (\<sigma> \<union> {m})"
-        by (simp add: \<open>finite \<sigma>\<close>)
-      have "\<sigma> \<union> {m} \<in> \<Sigma>"
-        using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>m \<in> \<sigma>' - \<sigma>\<close> message_in_state_is_valid state_transition_by_immediately_next_message by fastforce
-      have "\<sigma> \<union> {m} \<subseteq> \<sigma>'"
-        using \<open>\<sigma> \<subseteq> \<sigma>'\<close> \<open>m \<in> \<sigma>' - \<sigma>\<close> by auto
-      have "m \<notin> \<sigma>"
-        using \<open>m \<in> \<sigma>' - \<sigma>\<close> by auto
-
-      obtain message_list where "MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = Suc n"
-      proof (cases "\<sigma> \<union> {m} = \<sigma>'")
-        case True
-        assume "\<And>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = Suc n \<Longrightarrow> thesis"
-        have "\<sigma>' - (\<sigma> \<union> {m}) = \<emptyset>"
-          using True by auto
-        hence "card (\<sigma>' - (\<sigma> \<union> {m})) = 0"
-          by (metis card_empty)
-        hence "n = 0"
-          using cardn by simp
-        have "MessagePath \<sigma> \<sigma>' [m]"
-          using P_cons True \<open>immediately_next_message (\<sigma>, m)\<close> 
-          using P_nil \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> by auto
-        have "length [m] = Suc 0"
-          by simp
-        show ?thesis
-          using \<open>MessagePath \<sigma> \<sigma>' [m]\<close> \<open>length [m] = Suc 0\<close> \<open>n = 0\<close> that by blast
-      next
-        case False
-        assume "\<And>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = Suc n \<Longrightarrow> thesis"
-        obtain prev_list where "MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))"
-          using False \<open>\<And>\<sigma>' \<sigma>. \<lbrakk>n = card (\<sigma>' - \<sigma>); finite \<sigma>; finite \<sigma>'; \<sigma> \<noteq> \<sigma>'; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma> \<subseteq> \<sigma>'\<rbrakk> \<Longrightarrow> \<exists>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = card (\<sigma>' - \<sigma>)\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> \<open>\<sigma> \<union> {m} \<subseteq> \<sigma>'\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>finite (\<sigma> \<union> {m})\<close> \<open>finite \<sigma>'\<close> cardn by blast
-        have "MessagePath \<sigma> \<sigma>' (m # prev_list)"
-          using P_cons \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))\<close> \<open>immediately_next_message (\<sigma>, m)\<close>
-                \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> by blast 
-        then show ?thesis
-          using \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' prev_list \<and> length prev_list = card (\<sigma>' - (\<sigma> \<union> {m}))\<close> cardn length_Suc_conv that by blast
-      qed
-
-      then show "\<exists>message_list. MessagePath \<sigma> \<sigma>' message_list \<and> length message_list = card (\<sigma>' - \<sigma>)"
-        using \<open>Suc n = card (\<sigma>' - \<sigma>)\<close> by auto
-    qed
-  }
-
-  then show ?thesis
-    using Params.state_is_finite assms(1) assms(2) assms(3) assms(4) futures_def that by fastforce
-qed
-
-lemma (in Protocol) coherent_nonnil_message_path:
-  assumes "MessagePath \<sigma> \<sigma>' message_list" "length message_list \<noteq> 0"
-  obtains m ms where "message_list = m # ms" "MessagePath (\<sigma> \<union> {m}) \<sigma>' ms" "immediately_next_message (\<sigma>,m)" "\<sigma> \<union> {m} \<in> \<Sigma>"
-  using assms
-  apply (cases rule: MessagePath.cases)
-   apply simp
-  by blast
-
-lemma (in Protocol) coherent_nil_message_path: "MessagePath \<sigma> \<sigma>' [] \<Longrightarrow> \<sigma> = \<sigma>'"
-  using MessagePath.cases by blast
-
-lemma (in Protocol) coherent_message_path_inclusive: "MessagePath \<sigma> \<sigma>' ms \<Longrightarrow> \<sigma> \<subseteq> \<sigma>'"
-  by (induct rule: MessagePath.induct, auto)
-
-lemma (in Protocol) exist_message_path:
-  assumes "\<sigma>' \<in> futures \<sigma>" "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>"
-  obtains message_list where "MessagePath \<sigma> \<sigma>' message_list"
-  using P_nil Protocol.exist_message_path_nonnil Protocol_axioms assms(1) assms(2) assms(3) by blast
-
 lemma (in Protocol) inspector_preserved_in_future:
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
   \<longrightarrow> majority_driven p
@@ -1001,5 +778,17 @@ proof auto
   thus "inspector (v_set, \<sigma>', p)"
     using \<open>MessagePath \<sigma> \<sigma>' message_list\<close> \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> \<open>inspector (v_set, \<sigma>, p)\<close> by blast
 qed
+
+
+(* Lemma 40: Inspector is a safety oracle *)
+lemma (in Protocol) inspector_is_safety_oracle :
+  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> finite v_set
+  \<longrightarrow> majority_driven p
+  \<longrightarrow> inspector (v_set, \<sigma>, p)
+  \<longrightarrow> state_property_is_decided (naturally_corresponding_state_property p, \<sigma>)"    
+  using inspector_preserved_in_future inspector_imps_estimator_agreeing
+  apply (simp add: naturally_corresponding_state_property_def futures_def state_property_is_decided_def)
+  by meson
 
 end
