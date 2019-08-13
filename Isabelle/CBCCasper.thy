@@ -165,7 +165,7 @@ end
 locale Protocol = Params +
   assumes V_type: "V \<noteq> \<emptyset> \<and> finite V"
   and W_type: "\<forall> v \<in> V. W v > 0"
-  and t_type: "0 \<le> t" "t < sum W V"
+  and t_type: "0 < t" "t < sum W V"
   and C_type: "card C > 1"
   and \<epsilon>_type: "is_valid_estimator \<epsilon>"
 
@@ -440,7 +440,7 @@ lemma (in Protocol) equivocation_fault_weight_is_monotonic :
 definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
   where 
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
-
+                      
 definition (in Protocol) \<Sigma>t :: "state set"
   where
     "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 

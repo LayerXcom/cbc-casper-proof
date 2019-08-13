@@ -1,6 +1,6 @@
 theory Inspector
 
-imports Main CBCCasper LatestMessage StateTransition ConsensusSafety
+imports Main CBCCasper LatestMessage StateTransition ConsensusSafety "Libraries/DiGraph"
 
 begin
 
@@ -790,5 +790,63 @@ lemma (in Protocol) inspector_is_safety_oracle :
   using inspector_preserved_in_future inspector_imps_estimator_agreeing
   apply (simp add: naturally_corresponding_state_property_def futures_def state_property_is_decided_def)
   by meson
+
+
+
+(* *********************** *)
+(* Accumulating MessagePath *)
+primrec accumulating_MessagePath where
+  "accumulating_MessagePath \<sigma> [] = []"
+| "accumulating_MessagePath \<sigma> (m # ms) = (m, \<sigma> \<union> {m}) # accumulating_MessagePath \<sigma> ms"
+
+inductive (in Protocol) vMessagePath :: "validator \<Rightarrow> state \<Rightarrow> (message \<times> state) list \<Rightarrow> bool" where
+  vMP_intro: "\<lbrakk> MessagePath \<emptyset> \<sigma> ms; vms = filter (\<lambda>(m,_). sender m = v) (accumulating_MessagePath \<emptyset> ms) \<rbrakk> \<Longrightarrow> vMessagePath v \<sigma> vms"
+
+lemma (in Protocol) exist_validator_message_path:
+  assumes "\<sigma> \<in> \<Sigma>t"
+  obtains ms where "vMessagePath v \<sigma> ms"
+proof-
+  have "\<sigma> \<in> futures \<emptyset>"
+    by (simp add: assms futures_def)
+  obtain ms where "MessagePath \<emptyset> \<sigma> ms"
+    using Protocol.exist_message_path Protocol_axioms \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> futures \<emptyset>\<close> assms empty_set_exists_in_\<Sigma> by blast
+  hence "vMessagePath v \<sigma> (filter (\<lambda>(m,_). sender m = v) (accumulating_MessagePath \<emptyset> ms))"
+    by (simp add: vMP_intro)
+  thus "(\<And>ms. vMessagePath v \<sigma> ms \<Longrightarrow> thesis) \<Longrightarrow> thesis"
+    by simp
+qed
+
+fun last_opt :: "'a list \<Rightarrow> 'a option" where
+  "last_opt [] = None"
+| "last_opt (x # []) = Some x"
+| "last_opt (x # xs) = last_opt xs"
+
+inductive (in Protocol) latest_vMessage :: "state \<Rightarrow> validator \<Rightarrow> (message \<times> state) option \<Rightarrow> bool" where
+  "\<lbrakk> vMessagePath v \<sigma> ms; v \<in> V \<rbrakk> \<Longrightarrow> latest_vMessage \<sigma> v (last_opt ms)"
+
+definition (in Protocol) mGraph :: "state \<Rightarrow> (validator \<times> state, message) digraph" where
+  "mGraph \<sigma> = \<lparr> vertices = V \<times> Pow \<sigma>, edges = \<sigma>, source = (\<lambda>m. (sender m, \<sigma>)), target = (\<lambda>m. {(v,s) \<in> V \<times> Pow \<sigma>. \<exists>u \<in> justification m. latest_vMessage \<sigma> v (Some (u,s))}) \<rparr>"
+
+lemma (in Protocol) mGraph_is_digraph:
+  assumes "\<sigma> \<in> \<Sigma>"
+  shows "digraph (mGraph \<sigma>)"
+  apply (auto simp add: digraph_def mGraph_def)
+  using M_type assms message_in_state_is_valid apply blast
+  done
+
+(*
+  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<longrightarrow> majority_driven p
+  \<longrightarrow> immediately_next_message (\<sigma>, m)
+  \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
+  \<longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
+*)
+
+definition (in Protocol) vinspector where
+  "vinspector \<sigma> p = (\<exists>v \<subseteq> V. inspector (v,\<sigma>,p))"
+
+definition dg_inspector :: "('v,'e) digraph \<Rightarrow> bool" where
+  "dg_inspector G = (\<exists>vset \<subseteq> V. (\<forall>v \<in> vset. v \<in> ))"
 
 end
