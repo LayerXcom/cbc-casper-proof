@@ -91,7 +91,6 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
   using BlockchainParams.transitivity_of_blockchain_membership by blast
 
 (* Definition 4.28: Children *)
-(* NOTE: Modified from the paper to include non-observed blocks so that (block_membership b) becomes max-driven for any b \<in> C *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
     "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
