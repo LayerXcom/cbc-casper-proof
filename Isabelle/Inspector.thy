@@ -795,9 +795,77 @@ lemma (in Protocol) inspector_is_safety_oracle :
 
 (* *********************** *)
 (* Accumulating MessagePath *)
-primrec accumulating_MessagePath where
+(* *********************** *)
+primrec accumulating_MessagePath :: "state \<Rightarrow> message list \<Rightarrow> (message \<times> state) list" where
   "accumulating_MessagePath \<sigma> [] = []"
-| "accumulating_MessagePath \<sigma> (m # ms) = (m, \<sigma> \<union> {m}) # accumulating_MessagePath \<sigma> ms"
+| "accumulating_MessagePath \<sigma> (m # ms) = (m, \<sigma> \<union> {m}) # accumulating_MessagePath (\<sigma> \<union> {m}) ms"
+
+lemma (in Protocol) recover_state_from_message_path: "MessagePath \<sigma> \<sigma>' ms \<Longrightarrow> \<sigma> \<union> set ms = \<sigma>'"
+  apply (induct rule: MessagePath.induct)
+  apply simp
+  apply simp
+  done
+
+lemma (in Protocol) acc_message_path_backward: "(a, {a} \<union> \<sigma>) # accumulating_MessagePath ({a} \<union> \<sigma>) ms = accumulating_MessagePath \<sigma> (a # ms)"
+  apply simp
+  done
+
+lemma (in Protocol) acc_message_path_contains_first: "x \<in> set (accumulating_MessagePath \<sigma> ms) \<Longrightarrow> \<sigma> \<subseteq> snd x"
+  apply (induct ms arbitrary: x \<sigma>)
+  apply simp
+  apply simp
+  apply auto
+  done
+
+lemma (in Protocol) acc_message_path_nth: "i < length ms \<Longrightarrow> \<Union> (snd ` set (take (Suc i) (accumulating_MessagePath \<sigma> ms))) = snd (accumulating_MessagePath \<sigma> ms ! i)"
+  apply (induct ms arbitrary: i)
+  apply simp
+  sorry
+
+inductive sorted_on_snd where
+  "sorted_on_snd []"
+| "\<lbrakk> (\<And>x. x \<in> set xs \<Longrightarrow> z \<subseteq> snd x); sorted_on_snd xs \<rbrakk> \<Longrightarrow> sorted_on_snd ((y,z) # xs)"
+
+lemma (in Protocol) accumulating_message_path_sorted_on_snd: "MessagePath \<emptyset> \<sigma> ms \<Longrightarrow> sorted_on_snd (accumulating_MessagePath \<sigma> ms)"
+  apply (induct rule: MessagePath.induct)
+  apply (simp, rule)
+  apply (simp, rule)
+  using acc_message_path_contains_first apply blast
+  sorry
+
+lemma (in Protocol) message_path_accumulation_subsets: "\<lbrakk> MessagePath \<emptyset> \<sigma> ms; acc = accumulating_MessagePath \<emptyset> ms; (m,s) \<in> set acc \<rbrakk> \<Longrightarrow> s \<subseteq> \<sigma>"
+  apply (induct arbitrary: acc m s rule: MessagePath.induct)
+  apply simp
+proof-
+  fix \<sigma> m \<sigma>' list acc ma s
+  assume "immediately_next_message (\<sigma>, m)" "\<sigma> \<union> {m} \<in> \<Sigma>" "MessagePath (\<sigma> \<union> {m}) \<sigma>' list"
+  and "(\<And>acc ma s. acc = accumulating_MessagePath (\<sigma> \<union> {m}) list \<Longrightarrow> (ma, s) \<in> set acc \<Longrightarrow> s \<subseteq> \<sigma>')" "acc = accumulating_MessagePath \<sigma> (m # list)" "(ma, s) \<in> set acc"
+
+  have "acc = (m, \<sigma> \<union> {m}) # accumulating_MessagePath (\<sigma> \<union> {m}) list"
+    by (simp add: \<open>acc = accumulating_MessagePath \<sigma> (m # list)\<close>)
+  hence "ma = m \<and> s = \<sigma> \<union> {m} \<or> (ma,s) \<in> set (accumulating_MessagePath (\<sigma> \<union> {m}) list)"
+    using \<open>(ma, s) \<in> set acc\<close> by auto
+
+  { assume "ma = m \<and> s = \<sigma> \<union> {m}"
+    hence "s \<subseteq> \<sigma>'"
+      using \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' list\<close> coherent_message_path_inclusive by auto
+  }
+  moreover hence "ma = m \<and> s = \<sigma> \<union> {m} \<Longrightarrow> s \<subseteq> \<sigma>'" by simp
+
+  { assume "(ma,s) \<in> set (accumulating_MessagePath (\<sigma> \<union> {m}) list)"
+    hence "s \<subseteq> \<sigma>'"
+      using \<open>\<And>s maa acc. \<lbrakk>acc = accumulating_MessagePath (\<sigma> \<union> {m}) list; (maa, s) \<in> set acc\<rbrakk> \<Longrightarrow> s \<subseteq> \<sigma>'\<close> by blast
+  }
+  moreover hence "(ma, s) \<in> set (accumulating_MessagePath (\<sigma> \<union> {m}) list) \<Longrightarrow> s \<subseteq> \<sigma>'" by simp
+  ultimately show "s \<subseteq> \<sigma>'"
+    using \<open>ma = m \<and> s = \<sigma> \<union> {m} \<or> (ma, s) \<in> set (accumulating_MessagePath (\<sigma> \<union> {m}) list)\<close> by auto
+qed
+
+lemma (in Protocol) acc_message_path_length: "length (accumulating_MessagePath \<sigma> ms) = length ms"
+  apply (induct ms arbitrary: \<sigma>)
+  apply simp
+  apply simp
+  done
 
 inductive (in Protocol) vMessagePath :: "validator \<Rightarrow> state \<Rightarrow> (message \<times> state) list \<Rightarrow> bool" where
   vMP_intro: "\<lbrakk> MessagePath \<emptyset> \<sigma> ms; vms = filter (\<lambda>(m,_). sender m = v) (accumulating_MessagePath \<emptyset> ms) \<rbrakk> \<Longrightarrow> vMessagePath v \<sigma> vms"
@@ -824,29 +892,103 @@ fun last_opt :: "'a list \<Rightarrow> 'a option" where
 inductive (in Protocol) latest_vMessage :: "state \<Rightarrow> validator \<Rightarrow> (message \<times> state) option \<Rightarrow> bool" where
   "\<lbrakk> vMessagePath v \<sigma> ms; v \<in> V \<rbrakk> \<Longrightarrow> latest_vMessage \<sigma> v (last_opt ms)"
 
-definition (in Protocol) mGraph :: "state \<Rightarrow> (validator \<times> state, message) digraph" where
-  "mGraph \<sigma> = \<lparr> vertices = V \<times> Pow \<sigma>, edges = \<sigma>, source = (\<lambda>m. (sender m, \<sigma>)), target = (\<lambda>m. {(v,s) \<in> V \<times> Pow \<sigma>. \<exists>u \<in> justification m. latest_vMessage \<sigma> v (Some (u,s))}) \<rparr>"
+fun map_from_graph_list where
+  "map_from_graph_list S = fold (\<lambda>(x,y) f z. if z = x then y else f z) S (\<lambda>_. undefined)"
 
-lemma (in Protocol) mGraph_is_digraph:
-  assumes "\<sigma> \<in> \<Sigma>"
-  shows "digraph (mGraph \<sigma>)"
-  apply (auto simp add: digraph_def mGraph_def)
-  using M_type assms message_in_state_is_valid apply blast
-  done
+inductive (in Protocol) state_indexed_messages :: "state \<Rightarrow> (message \<Rightarrow> state) \<Rightarrow> bool" where
+  "\<lbrakk> MessagePath \<emptyset> \<sigma> ms; acc = accumulating_MessagePath \<emptyset> ms; f = map_from_graph_list acc \<rbrakk> \<Longrightarrow> state_indexed_messages \<sigma> f"
 
-(*
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-*)
+lemma element_in_list:
+  assumes "x \<in> set xs"
+  obtains i where "xs ! i = x" "i < length xs"
+  using assms
+  apply (induct xs arbitrary: x)
+  apply simp
+  by (meson in_set_conv_nth)
+
+lemma (in Protocol) message_in_message_path:
+  assumes "MessagePath \<emptyset> \<sigma> ms" "m \<in> \<sigma>"
+  obtains i where "ms ! i = m" "i < length ms"
+  by (metis assms(1) assms(2) element_in_list recover_state_from_message_path sup_bot.left_neutral)
+
+lemma (in Protocol) element_in_message_path_message_path_acc:
+  "\<lbrakk> MessagePath \<emptyset> \<sigma> ms; ms ! i = m; i < length ms \<rbrakk> \<Longrightarrow> fst (accumulating_MessagePath \<emptyset> ms ! i) = m"
+  apply (induct arbitrary: i m rule: MessagePath.induct)
+  apply simp
+proof-
+  fix \<sigma> m \<sigma>' list i ma
+  assume "immediately_next_message (\<sigma>, m)" "\<sigma> \<union> {m} \<in> \<Sigma>" "MessagePath (\<sigma> \<union> {m}) \<sigma>' list"
+  and "(\<And>i ma. list ! i = ma \<Longrightarrow> i < length list \<Longrightarrow> fst (accumulating_MessagePath (\<sigma> \<union> {m}) list ! i) = ma)"
+  and "(m # list) ! i = ma" "i < length (m # list)"
+
+  { assume "i = 0"
+    hence "m = ma"
+      using \<open>(m # list) ! i = ma\<close> by auto
+    hence "fst (accumulating_MessagePath \<sigma> (m # list) ! i) = ma"
+      by (simp add: \<open>i = 0\<close>)
+  }
+  hence c1: "i = 0 \<Longrightarrow> fst (accumulating_MessagePath \<sigma> (m # list) ! i) = ma" by simp
+ 
+  { fix j
+    assume "i = Suc j"
+    hence "list ! j = ma"
+      using \<open>(m # list) ! i = ma\<close> by auto
+    moreover have "j < length list"
+      using \<open>i < length (m # list)\<close> \<open>i = Suc j\<close> by auto
+    ultimately have "fst (accumulating_MessagePath (\<sigma> \<union> {m}) list ! j) = ma"
+      using \<open>\<And>maa i. \<lbrakk>list ! i = maa; i < length list\<rbrakk> \<Longrightarrow> fst (accumulating_MessagePath (\<sigma> \<union> {m}) list ! i) = maa\<close> by blast
+    hence "fst (accumulating_MessagePath \<sigma> (m # list) ! i) = ma"
+      by (simp add: \<open>i = Suc j\<close>)
+  }
+  hence c2: "\<And>j. i = Suc j \<Longrightarrow> fst (accumulating_MessagePath \<sigma> (m # list) ! i) = ma" by simp
+
+  show "fst (accumulating_MessagePath \<sigma> (m # list) ! i) = ma"
+    using c1 c2
+    by (meson lessI less_Suc_eq_0_disj)
+qed
+
+lemma set_contains_nth_element: "\<lbrakk> xs ! i = x; i < length xs \<rbrakk> \<Longrightarrow> x \<in> set xs"
+  apply (induct xs arbitrary: i x, simp)
+  using nth_mem by blast
+
+lemma (in Protocol) message_in_dom:
+  assumes "MessagePath \<emptyset> \<sigma> ms" "m \<in> \<sigma>"
+  obtains s where "(m,s) \<in> set (accumulating_MessagePath \<emptyset> ms)"
+proof-
+  obtain i where "ms ! i = m" "i < length ms"
+    using assms(1) assms(2) message_in_message_path by blast
+  assume "(\<And>s. (m, s) \<in> set (accumulating_MessagePath \<emptyset> ms) \<Longrightarrow> thesis)"
+
+  have "fst (accumulating_MessagePath \<emptyset> ms ! i) = m"
+    apply (rule element_in_message_path_message_path_acc [of \<sigma>])
+    using assms(1) apply simp
+    apply (simp add: \<open>ms ! i = m\<close>)
+    apply (simp add: \<open>i < length ms\<close>)
+    done
+  then obtain s where "accumulating_MessagePath \<emptyset> ms ! i = (m,s)"
+    by (meson eq_fst_iff)
+  hence "(m,s) \<in> set (accumulating_MessagePath \<emptyset> ms)"
+    apply (rule set_contains_nth_element)
+    apply (subst acc_message_path_length)
+    by (simp add: \<open>i < length ms\<close>)
+  thus thesis
+    using that by blast
+qed
+
+lemma (in Protocol) state_indexed_messages_mapping: "\<lbrakk> state_indexed_messages \<sigma> f; m \<in> \<sigma> \<rbrakk> \<Longrightarrow> f m \<subseteq> \<sigma>"
+  apply (induct rule: state_indexed_messages.induct)
+  sorry
+
+inductive (in Protocol) mgraph_construction :: "state \<Rightarrow> (validator \<times> message set, message) tdigraph \<Rightarrow> bool" where
+  "state_indexed_messages \<sigma> f \<Longrightarrow> mgraph_construction \<sigma> \<lparr> vertices = V \<times> Pow \<sigma>, edges = \<sigma>, source = (\<lambda>m. (sender m, f m)), targets = (\<lambda>m. {(v,s) \<in> V \<times> Pow \<sigma>. \<exists>u \<in> justification m. latest_vMessage \<sigma> v (Some (u,s))}) \<rparr>"
+
+lemma (in Protocol) "\<lbrakk> mgraph_construction \<sigma> tg; \<sigma> \<in> \<Sigma> \<rbrakk> \<Longrightarrow> tdigraph tg"
+  apply (induct rule: mgraph_construction.induct)
+  apply (auto simp add: tdigraph_def)
+  using M_type message_in_state_is_valid apply blast
+  by (meson in_mono state_indexed_messages_mapping)
 
 definition (in Protocol) vinspector where
   "vinspector \<sigma> p = (\<exists>v \<subseteq> V. inspector (v,\<sigma>,p))"
-
-definition dg_inspector :: "('v,'e) digraph \<Rightarrow> bool" where
-  "dg_inspector G = (\<exists>vset \<subseteq> V. (\<forall>v \<in> vset. v \<in> ))"
 
 end

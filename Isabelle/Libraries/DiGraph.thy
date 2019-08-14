@@ -557,4 +557,24 @@ qed
 lemma (in msgraph) "\<lbrakk> mg_non_equivocating; n \<in> vertices G \<rbrakk> \<Longrightarrow> n \<in> targets \<or> latest n"
   sorry
 
+(* Multi-target directed graph *)
+record ('v,'e) tdigraph =
+  vertices :: "'v set"
+  edges :: "'e set"
+  source :: "'e \<Rightarrow> 'v"
+  targets :: "'e \<Rightarrow> 'v set"
+
+locale tdigraph =
+  fixes G :: "('v,'e) tdigraph"
+  assumes source_vertex [simp]: "e \<in> edges G \<Longrightarrow> source G e \<in> vertices G"
+  and target_vertex [simp]: "e \<in> edges G \<Longrightarrow> targets G e \<subseteq> vertices G"
+
+fun tdigraph_to_digraph :: "('v,'e) tdigraph \<Rightarrow> ('v, 'e \<times> 'v) digraph" where
+  "tdigraph_to_digraph tg = \<lparr> digraph.vertices = vertices tg, edges = {(e,t). e \<in> edges tg \<and> t \<in> targets tg e}, source = (\<lambda>(e,t). source tg e), target = (\<lambda>(e,t). t) \<rparr>"
+
+lemma "tdigraph tg \<Longrightarrow> digraph (tdigraph_to_digraph tg)"
+  apply (simp add: digraph_def, auto)
+  apply (simp add: tdigraph.source_vertex)
+  by (meson subsetD tdigraph.target_vertex)
+
 end
