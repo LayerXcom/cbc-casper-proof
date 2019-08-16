@@ -216,7 +216,6 @@ lemma (in Protocol) L_H_M_of_observed_non_equivocating_validator_is_singleton :
   using observed_non_equivocating_validators_have_one_latest_message 
   by (simp add: L_H_M_def observed_non_equivocating_validators_def)
 
-
 lemma (in Protocol) sender_of_L_H_M: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. sender (the_elem (L_H_M \<sigma> v)) = v" 
     using L_H_M_of_observed_non_equivocating_validator_is_singleton 

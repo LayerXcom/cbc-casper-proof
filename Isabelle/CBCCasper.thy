@@ -315,13 +315,20 @@ definition equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = {v \<in> observed \<sigma>. is_equivocating \<sigma> v}"
 
-lemma (in Protocol) equivocating_validators_type :
-  "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> \<subseteq> V"
+lemma (in Protocol) equivocating_validators_type [simp]:
+  "\<sigma> \<in> \<Sigma> \<Longrightarrow> equivocating_validators \<sigma> \<subseteq> V"
   using observed_type_for_state equivocating_validators_def by blast
 
 lemma (in Protocol) equivocating_validators_is_finite :
   "\<forall> \<sigma> \<in> \<Sigma>. finite (equivocating_validators \<sigma>)"
-  using V_type equivocating_validators_type rev_finite_subset by blast
+  using V_type equivocating_validators_type rev_finite_subset
+  by fastforce
+
+lemma (in Protocol) equivocating_validators_implies_either_justified:
+  "\<lbrakk> v \<notin> equivocating_validators \<sigma>; m1 \<in> \<sigma>; sender m1 = v; m2 \<in> \<sigma>; sender m2 = v \<rbrakk> \<Longrightarrow> m1 = m2 \<or> justified m1 m2 \<or> justified m2 m1"
+  apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def justified_def)
+  apply auto
+  done
 
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
@@ -345,7 +352,14 @@ lemma (in Protocol) equivocating_validators_preserved_over_honest_message :
   \<longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
   apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def)
   by auto
-  
+
+lemma (in Protocol) equivocating_validators_subset_of_validators:
+  "\<sigma> \<in> \<Sigma> \<Longrightarrow> equivocating_validators \<sigma> \<subseteq> V"
+  apply (simp add: equivocating_validators_def observed_def)
+  apply auto
+  apply (simp add: M_type message_in_state_is_valid)
+  done
+
 (* ###################################################### *)
 (* Weight measure *)
 (* ###################################################### *)
