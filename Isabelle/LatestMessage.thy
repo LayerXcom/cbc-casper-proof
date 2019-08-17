@@ -107,18 +107,16 @@ lemma (in Protocol) L_M_is_subset_of_the_state :
   by (simp add: L_M_def later_from_def from_sender_def) 
 
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
-definition observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
+abbreviation observed_non_equivocating_validators :: "state \<Rightarrow> validator set"
   where
-    "observed_non_equivocating_validators \<sigma> = observed \<sigma> - equivocating_validators \<sigma>"
+    "observed_non_equivocating_validators \<sigma> \<equiv> observed \<sigma> - equivocating_validators \<sigma>"
 
 lemma (in Protocol) observed_non_equivocating_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<in> Pow V"
-  apply (simp add: observed_non_equivocating_validators_def)
   using observed_type_for_state equivocating_validators_type by auto
 
 lemma (in Protocol) observed_non_equivocating_validators_are_not_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. observed_non_equivocating_validators \<sigma> \<inter> equivocating_validators \<sigma> = \<emptyset>"
-  unfolding observed_non_equivocating_validators_def
   by blast
 
 lemma (in Protocol) justification_is_well_founded_on_messages_from_validator:
@@ -161,7 +159,6 @@ lemma (in Protocol) latest_message_is_maximal_element_of_justification :
 (* Lemma 10: Observed non-equivocating validators have one latest message *)
 lemma (in Protocol) observed_non_equivocating_validators_have_one_latest_message:
   "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed_non_equivocating_validators \<sigma>. is_singleton (L_M \<sigma> v))"  
-  apply (simp add: observed_non_equivocating_validators_def)
 proof -
   have "\<forall> \<sigma> \<in> \<Sigma>. (\<forall> v \<in> observed \<sigma> - equivocating_validators \<sigma>. is_singleton {m. maximal_on (from_sender (v, \<sigma>)) message_justification m})"
     using 
@@ -175,7 +172,7 @@ proof -
     by (smt Collect_cong DiffD1 DiffD2 set_mp)
   then show "\<forall>\<sigma>\<in>\<Sigma>. \<forall>v\<in>observed \<sigma> - equivocating_validators \<sigma>. is_singleton (L_M \<sigma> v)"  
     using latest_message_is_maximal_element_of_justification
-          observed_non_equivocating_validators_def observed_non_equivocating_validators_type 
+          observed_non_equivocating_validators_type 
     by fastforce
 qed
 
@@ -214,19 +211,19 @@ lemma (in Protocol) L_H_M_of_observed_non_equivocating_validator_is_singleton :
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>.
       is_singleton (L_H_M \<sigma> v)"
   using observed_non_equivocating_validators_have_one_latest_message 
-  by (simp add: L_H_M_def observed_non_equivocating_validators_def)
+  by (simp add: L_H_M_def)
 
 lemma (in Protocol) sender_of_L_H_M: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. sender (the_elem (L_H_M \<sigma> v)) = v" 
     using L_H_M_of_observed_non_equivocating_validator_is_singleton 
         L_H_M_def L_M_def from_sender_def
-    by (smt Diff_iff is_singleton_the_elem mem_Collect_eq observed_non_equivocating_validators_def prod.simps(2) singletonI)
+    by (smt Diff_iff is_singleton_the_elem mem_Collect_eq prod.simps(2) singletonI)
 
 lemma (in Protocol) L_H_M_is_in_the_state: 
   "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. the_elem (L_H_M \<sigma> v) \<in> \<sigma>" 
     using L_H_M_of_observed_non_equivocating_validator_is_singleton 
         L_H_M_def L_M_is_subset_of_the_state
-    by (metis Diff_iff contra_subsetD insert_subset is_singleton_the_elem observed_non_equivocating_validators_def observed_type_for_state)
+    by (metis Diff_iff contra_subsetD insert_subset is_singleton_the_elem observed_type_for_state)
   
 (* Definition 4.12: Latest honest message driven estimator *)
 (* TODO *)
@@ -291,5 +288,7 @@ lemma (in Protocol) L_H_J_is_subset_of_the_state :
       message_in_state_is_strict_subset_of_the_state
   by blast
 
+lemma (in Protocol) L_H_J_empty_if_equivocating [simp]: "v \<in> equivocating_validators \<sigma> \<Longrightarrow> L_H_J \<sigma> v = \<emptyset>"
+  by (simp add: L_H_J_def L_H_M_def)
 
 end

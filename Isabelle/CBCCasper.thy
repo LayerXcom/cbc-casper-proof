@@ -330,6 +330,11 @@ lemma (in Protocol) equivocating_validators_implies_either_justified:
   apply auto
   done
 
+lemma (in Protocol) equivocating_validators_preserve_subset: "\<sigma>1 \<subseteq> \<sigma>2 \<Longrightarrow> equivocating_validators \<sigma>1 \<subseteq> equivocating_validators \<sigma>2"
+  apply (simp add: equivocating_validators_def observed_def is_equivocating_def)
+  apply auto
+  done
+
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators_paper \<sigma> = {v \<in> V. is_equivocating \<sigma> v}"
@@ -352,6 +357,15 @@ lemma (in Protocol) equivocating_validators_preserved_over_honest_message :
   \<longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
   apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def)
   by auto
+
+lemma (in Protocol) equivocating_validators_split_over_equivocating_message:
+  "sender m \<in> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> equivocating_validators (\<sigma> \<union> {m}) = equivocating_validators \<sigma> \<union> {sender m}"
+  apply (simp add: equivocating_validators_def)
+  apply auto
+  using observed_def apply auto[1]
+  apply (metis (mono_tags, lifting) equivocation_def insert_iff is_equivocating_def prod.simps(2))
+  using observed_def apply auto[1]
+  using is_equivocating_def by auto
 
 lemma (in Protocol) equivocating_validators_subset_of_validators:
   "\<sigma> \<in> \<Sigma> \<Longrightarrow> equivocating_validators \<sigma> \<subseteq> V"
@@ -456,7 +470,7 @@ definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
 definition (in Protocol) \<Sigma>t :: "state set"
-  where
+  where                           
     "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
 
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
