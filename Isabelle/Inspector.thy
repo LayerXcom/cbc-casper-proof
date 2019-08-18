@@ -141,7 +141,7 @@ lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
 definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
   where
     "gt_threshold 
-       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure V) div 2 + t div 2 - equivocation_fault_weight \<sigma>))"
+       = (\<lambda>(v_set, \<sigma>).(weight_measure v_set > (weight_measure V) div 2 + t - equivocation_fault_weight \<sigma>))"
 
 (* Lemma 32 *)
 lemma (in Protocol) gt_threshold_imps_majority_for_agreeing_validator :
@@ -151,10 +151,10 @@ lemma (in Protocol) gt_threshold_imps_majority_for_agreeing_validator :
 proof auto
   fix \<sigma> v_set v p
   assume "\<sigma> \<in> \<Sigma>t" "v_set \<subseteq> agreeing_validators (p, \<sigma>)" "gt_threshold (v_set, \<sigma>)" "v \<in> v_set"
-  hence "weight_measure v_set > weight_measure V div 2 + t div 2 - equivocation_fault_weight \<sigma>"
+  hence "weight_measure v_set > weight_measure V div 2 + t - equivocation_fault_weight \<sigma>"
     by (simp add: gt_threshold_def)
   hence "\<dots> > (weight_measure V - equivocation_fault_weight \<sigma>) div 2 + (t - equivocation_fault_weight \<sigma>) div 2"
-    by (smt field_sum_of_halves)
+    by (smt field_sum_of_halves t_type(1))
   hence "\<dots> > (weight_measure V - equivocation_fault_weight \<sigma>) div 2"
     by (smt \<Sigma>t_def \<open>\<sigma> \<in> \<Sigma>t\<close> add.commute add.left_commute add_diff_cancel_left' add_diff_eq equivocation_fault_weight_def half_gt_zero_iff is_faults_lt_threshold_def mem_Collect_eq)
   hence "\<dots> > (weight_measure (agreeing_validators (p,\<sigma>)) + weight_measure (disagreeing_validators (p,\<sigma>))) div 2"
@@ -261,14 +261,13 @@ proof -
     using inspector_imps_everyone_agreeing
           weight_measure_subset_gte
           \<Sigma>t_is_subset_of_\<Sigma> agreeing_validators_type by auto
-  then have "weight_measure v_set > (weight_measure V) div 2 + t div 2 - weight_measure (equivocating_validators \<sigma>)"
+  then have "weight_measure v_set > (weight_measure V) div 2 + t - weight_measure (equivocating_validators \<sigma>)"
     using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>gt_threshold (v_set, \<sigma>)\<close>
           gt_threshold_def
           equivocation_fault_weight_def
           \<Sigma>t_is_subset_of_\<Sigma> by auto
   then have "weight_measure v_set > (weight_measure V) div 2 - weight_measure (equivocating_validators \<sigma>) div 2"
-    using  \<Sigma>t_def \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> equivocation_fault_weight_def is_faults_lt_threshold_def
-    by auto
+    sorry
   then have "weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2"
     by (metis Protocol.V_type Protocol_axioms \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> diff_divide_distrib equivocating_validators_is_finite equivocating_validators_type subsetCE weight_measure_subset_minus)
   then have "weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (V - equivocating_validators \<sigma>) div 2"
@@ -803,7 +802,8 @@ lemma (in Protocol) weight_measure_inequality_whenever_incorrectly_minus_element
 
 lemma (in Protocol) gt_threshold_cannot_hold_with_empty_state: "\<sigma> \<in> \<Sigma>t \<Longrightarrow> \<not> gt_threshold (\<emptyset>, \<sigma>)"
   apply (auto simp add: gt_threshold_def weight_measure_def \<Sigma>t_def is_faults_lt_threshold_def)
-  using t_type(2) by linarith
+  using t_type(2)
+  using Protocol.t_type(1) Protocol_axioms by fastforce
 
 lemma (in Protocol) weight_measure_implies_non_empty: "weight_measure S > 0 \<Longrightarrow> S \<noteq> \<emptyset>"
   apply (simp add: weight_measure_def)
