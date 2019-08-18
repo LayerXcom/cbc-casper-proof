@@ -185,7 +185,7 @@ definition (in Params) inspector :: "(validator set * state * consensus_value_pr
     "inspector 
        = (\<lambda>(v_set, \<sigma>, p). v_set \<noteq> \<emptyset> \<and> v_set \<subseteq> V \<and>
             (\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma>)
-              \<and> (\<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) 
+              \<and> (\<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', \<sigma>) 
                     \<and> (\<forall> v' \<in> v_set'. 
                         v' \<in> agreeing_validators (p, (the_elem (L_H_J \<sigma> v)))
                         \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>))))"
@@ -229,31 +229,20 @@ proof -
   hence "v_set \<subseteq> V"
     by (simp add: inspector_def)
 
-  have "\<exists> v \<in> v_set. \<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v))"
+  have "\<exists> v \<in> v_set. \<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', \<sigma>)"
     using \<open>inspector (v_set, \<sigma>, p)\<close>
-    by (auto simp add: inspector_def)
-  hence "\<exists> v \<in> v_set.  gt_threshold(v_set, the_elem (L_H_J \<sigma> v))"
+    apply (simp add: inspector_def)
+    by blast
+  hence "\<exists> v \<in> v_set.  gt_threshold(v_set, \<sigma>)"
     apply (simp add: gt_threshold_def)
     using weight_measure_subset_gte
     by (smt \<open>v_set \<subseteq> V\<close>)
-  obtain v where "v \<in> v_set \<and>  gt_threshold(v_set, the_elem (L_H_J \<sigma> v))"
-    using \<open>\<exists>v\<in>v_set. gt_threshold (v_set, the_elem (L_H_J \<sigma> v))\<close> by blast
-  hence "\<forall> \<sigma>' \<in> L_H_J \<sigma> v. \<sigma>' \<subseteq> \<sigma>"
-    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma>\<close>
-    using \<open>v_set \<subseteq> V\<close> by blast
-  hence "is_singleton (L_H_J \<sigma> v) \<and> (\<forall> \<sigma>' \<in> L_H_J \<sigma> v. \<sigma>' \<subseteq> \<sigma>)"
-    using L_H_J_is_subset_of_the_state \<open>\<sigma> \<in> \<Sigma>\<close> L_H_J_of_observed_non_equivocating_validator_is_singleton
-          \<open>inspector (v_set, \<sigma>, p)\<close> 
-    apply (simp add: inspector_def agreeing_validators_def)
-    using \<open>v \<in> v_set \<and> gt_threshold (v_set, the_elem (L_H_J \<sigma> v))\<close> by auto  
-  hence "the_elem (L_H_J \<sigma> v) \<subseteq> \<sigma>"
-    by (metis insert_iff is_singleton_the_elem)
+  obtain v where "v \<in> v_set \<and>  gt_threshold(v_set, \<sigma>)"
+    using \<open>\<exists>v\<in>v_set. gt_threshold (v_set, \<sigma>)\<close> by blast
   then show "gt_threshold (v_set, \<sigma>)"
-    using \<open>v \<in> v_set \<and> gt_threshold(v_set, the_elem (L_H_J \<sigma> v))\<close> 
+    using \<open>v \<in> v_set \<and> gt_threshold(v_set, \<sigma>)\<close> 
     apply (simp add: gt_threshold_def)
-    using equivocation_fault_weight_is_monotonic          
-    apply (simp add: equivocation_fault_weight_def)
-    by (smt Protocol.equivocating_validators_subset_of_validators Protocol.weight_measure_subset_gte Protocol_axioms \<open>\<sigma> \<in> \<Sigma>\<close> equivocating_validators_preserve_subset)
+    done
 qed
 
 
@@ -426,10 +415,8 @@ proof -
     by blast
   (* 2. gt_threshold preserved *)
   moreover have "\<forall> v \<in> v_set. 
-                    (\<forall> v_set'. gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) \<longrightarrow> gt_threshold(v_set', the_elem (L_H_J (\<sigma> \<union> {m}) v)))"
-    using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> v_set\<close>
-          L_H_J_of_non_sender_not_affected_by_minimal_transitions
-    by fastforce
+                    (\<forall> v_set'. gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m}))"
+    sorry
   (* 3. v_set' preserved *)
   moreover have "\<forall> v \<in> v_set.
                     (\<forall> v_set'. v_set' \<subseteq> v_set \<and>
@@ -738,7 +725,7 @@ proof -
     by (simp add: \<Sigma>t_def)  
   (* 1. gt_threshold preserved *)
   then moreover have "\<forall> v \<in> v_set.
-                    (\<forall> v_set'.  v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J \<sigma> v)) \<longrightarrow> gt_threshold(v_set', the_elem (L_H_J (\<sigma> \<union> {m}) v)))"
+                    (\<forall> v_set'.  v_set' \<subseteq> v_set \<and> gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m}))"
     sorry
   (* 2. agreeing_validators preserved *)
   then moreover have "\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
@@ -751,9 +738,9 @@ proof -
       have "\<exists> v_set'. v_set' \<subseteq> v_set \<and> gt_threshold(v_set', the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)))"
         using \<open>inspector (v_set, \<sigma>, p)\<close>
         apply (simp add: inspector_def)
-        using \<open>\<forall>v\<in>v_set. \<forall>v_set'.  v_set' \<subseteq> v_set \<and> gt_threshold (v_set', the_elem (L_H_J \<sigma> v)) \<longrightarrow> gt_threshold (v_set', the_elem (L_H_J (\<sigma> \<union> {m}) v))\<close>
+        using \<open>\<forall>v\<in>v_set. \<forall>v_set'.  v_set' \<subseteq> v_set \<and> gt_threshold (v_set', \<sigma>) \<longrightarrow> gt_threshold (v_set', \<sigma> \<union> {m})\<close>
                 \<open>sender m \<in> v_set\<close>  \<open>the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)) = justification m\<close>
-        by (smt Un_insert_right \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> subsetCE subset_trans sup_bot.right_neutral)        
+        sorry
       then have "\<exists> v_set'. v_set' \<subseteq> V \<and> finite v_set' 
                 \<and> v_set' \<subseteq> agreeing_validators (p, the_elem (L_H_J (\<sigma> \<union> {m}) (sender m))) \<and> gt_threshold(v_set', the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)))"
         using \<open>finite v_set\<close> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>\<forall> v_set'. v_set' \<subseteq> v_set \<longrightarrow> v_set' \<subseteq> agreeing_validators (p, the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)))\<close>
@@ -843,14 +830,15 @@ proof-
     using \<open>vinspector_with \<sigma> p (\<lambda>v_set. sender m \<in> v_set \<and> finite v_set)\<close>
     apply (simp add: vinspector_with_def)
     by (metis \<open>\<sigma> \<in> \<Sigma>\<close> agreeing_validators_type equals0D inspector_imps_everyone_agreeing subset_trans)
-  hence "sender m \<in> agreeing_validators (p, \<sigma>) \<and> (\<exists>v_set'\<subseteq>v_set. gt_threshold (v_set', the_elem (L_H_J \<sigma> (sender m)))
+  hence "sender m \<in> agreeing_validators (p, \<sigma>) \<and> (\<exists>v_set'\<subseteq>v_set. gt_threshold (v_set', \<sigma>)
     \<and> (\<forall>v'\<in>v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m))) \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>))"
     by (simp add: inspector_def)
   then obtain v_set' where
-    "v_set' \<subseteq> v_set" "gt_threshold (v_set', the_elem (L_H_J \<sigma> (sender m)))"
+    "v_set' \<subseteq> v_set" "gt_threshold (v_set', \<sigma>)"
     "(\<forall>v'\<in>v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m))) \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>)"
     by auto
 
+(*
   have "gt_threshold (v_set' - {sender m}, \<sigma> \<union> {m})"
   proof-
     have "finite v_set'"
@@ -937,6 +925,7 @@ proof-
           by (metis (no_types, hide_lams) DiffI Diff_iff Un_commute \<open>\<sigma> \<in> \<Sigma>\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>m \<in> M\<close> \<open>v \<in> v_set - {sender m}\<close> agreeing_validatros_subset_of_validators in_mono)
       qed
     qed
+*)
 
 (*
     { fix v
@@ -1034,6 +1023,7 @@ proof-
 
     }
 *)
+(*
     { fix v
       assume "v \<in> v_set - {sender m}"
 
@@ -1078,6 +1068,7 @@ proof-
                 v' \<in> agreeing_validators (p, the_elem (L_H_J ({m} \<union> \<sigma>) v)) \<and>
                 later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J ({m} \<union> \<sigma>) v)) v'), v', {m} \<union> \<sigma>) = \<emptyset>))"
       sorry
+*)
 
 (*
 \<not> v_set \<subseteq> {sender m} \<and>
@@ -1087,11 +1078,9 @@ proof-
             gt_threshold (v_set', the_elem (L_H_J ({m} \<union> \<sigma>) v)) \<and>
             (\<forall>v'\<in>v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J ({m} \<union> \<sigma>) v)) \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J ({m} \<union> \<sigma>) v)) v'), v', {m} \<union> \<sigma>) = \<emptyset>)))
 *)
-    show "inspector (v_set - {sender m}, \<sigma> \<union> {m}, p)"
-      sorry
-  qed
   thus "vinspector (\<sigma> \<union> {m}) p"
-    using vinspector_def by blast
+    using vinspector_def
+    sorry
 qed
 
 (* Lemma 36 *)
