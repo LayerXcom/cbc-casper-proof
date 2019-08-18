@@ -220,11 +220,15 @@ lemma (in Protocol) sender_of_L_H_M:
     by (smt Diff_iff is_singleton_the_elem mem_Collect_eq prod.simps(2) singletonI)
 
 lemma (in Protocol) L_H_M_is_in_the_state: 
-  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>. the_elem (L_H_M \<sigma> v) \<in> \<sigma>" 
+  "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> the_elem (L_H_M \<sigma> v) \<in> \<sigma>" 
     using L_H_M_of_observed_non_equivocating_validator_is_singleton 
         L_H_M_def L_M_is_subset_of_the_state
     by (metis Diff_iff contra_subsetD insert_subset is_singleton_the_elem observed_type_for_state)
-  
+
+lemma (in Protocol) L_H_M_is_message_if_exists: 
+  "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> the_elem (L_H_M \<sigma> v) \<in> M" 
+  using L_H_M_is_in_the_state Params.message_in_state_is_valid by blast
+
 (* Definition 4.12: Latest honest message driven estimator *)
 (* TODO *)
 
@@ -290,5 +294,8 @@ lemma (in Protocol) L_H_J_is_subset_of_the_state :
 
 lemma (in Protocol) L_H_J_empty_if_equivocating [simp]: "v \<in> equivocating_validators \<sigma> \<Longrightarrow> L_H_J \<sigma> v = \<emptyset>"
   by (simp add: L_H_J_def L_H_M_def)
+
+lemma (in Protocol) L_H_J_is_state_if_exists [simp]: "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> the_elem (L_H_J \<sigma> v) \<in> \<Sigma>"
+  by (metis DiffD1 L_H_J_of_observed_non_equivocating_validator_is_singleton L_H_J_type in_mono is_singleton_the_elem observed_type_for_state singletonI)
 
 end
