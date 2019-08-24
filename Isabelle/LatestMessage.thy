@@ -52,6 +52,9 @@ lemma (in Protocol) messages_from_validator_is_finite :
   "\<forall> \<sigma> v. \<sigma> \<in> \<Sigma> \<and> v \<in> V\<sigma> \<longrightarrow> finite (from_sender (v, \<sigma>))"
   by (simp add: from_sender_def state_is_finite)
 
+lemma (in Protocol) from_sender_split: "from_sender (v, \<sigma> \<union> \<sigma>') = from_sender (v, \<sigma>) \<union> from_sender (v, \<sigma>')"
+  by (auto simp add: from_sender_def)
+
 (* Definition 4.4: Message From a Group *)
 definition from_group :: "(validator set * message set) \<Rightarrow> state"
   where
@@ -228,6 +231,20 @@ lemma (in Protocol) L_H_M_is_in_the_state:
 lemma (in Protocol) L_H_M_is_message_if_exists: 
   "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> the_elem (L_H_M \<sigma> v) \<in> M" 
   using L_H_M_is_in_the_state Params.message_in_state_is_valid by blast
+
+lemma (in Protocol) L_H_M_have_no_later_messages:
+  "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> later_from (the_elem (L_H_M \<sigma> v), v, \<sigma>) = \<emptyset>"
+proof-
+  assume "\<sigma> \<in> \<Sigma>" "v \<in> observed_non_equivocating_validators \<sigma>"
+  have "the_elem (L_H_M \<sigma> v) \<in> from_sender (v, \<sigma>)"
+    apply (auto simp add: from_sender_def)
+    apply (rule L_H_M_is_in_the_state)
+    apply (simp add: \<open>\<sigma> \<in> \<Sigma>\<close>)
+    using \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close> apply auto[1]
+    using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M by auto
+  thus "later_from (the_elem (L_H_M \<sigma> v), v, \<sigma>) = \<emptyset>"
+    by (smt DiffD2 L_H_M_def L_H_M_of_observed_non_equivocating_validator_is_singleton L_M_def \<open>\<sigma> \<in> \<Sigma>\<close> \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close> is_singleton_the_elem mem_Collect_eq singletonI)
+qed
 
 (* Definition 4.12: Latest honest message driven estimator *)
 (* TODO *)

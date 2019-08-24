@@ -586,25 +586,266 @@ proof-
 qed
 
 lemma (in Protocol) new_justification_is_L_H_J_of_sender :
-  "\<And>\<sigma> m v. \<lbrakk> \<sigma> \<in> \<Sigma>; m \<in> M; immediately_next_message (\<sigma>, m); sender m \<notin> equivocating_validators (\<sigma> \<union> {m}) \<rbrakk>
+  "\<And>\<sigma> m. \<lbrakk> \<sigma> \<in> \<Sigma>; m \<in> M; immediately_next_message (\<sigma>, m); sender m \<notin> equivocating_validators ({m} \<union> \<sigma>) \<rbrakk>
   \<Longrightarrow> the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)) = justification m"
-  using new_message_is_L_H_M_of_sender 
-  apply (simp add: L_H_J_def) 
-  using L_H_M_of_observed_non_equivocating_validator_is_singleton
-  sorry
+proof-
+  have "\<And>X x f. \<lbrakk> the_elem X = x; is_singleton X \<rbrakk> \<Longrightarrow> the_elem (f ` X) = f x"
+    by (simp add: is_singleton_the_elem)
 
-(* \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> *)
+  fix \<sigma> m
+  assume "\<sigma> \<in> \<Sigma>" "m \<in> M" "immediately_next_message (\<sigma>, m)" "sender m \<notin> equivocating_validators ({m} \<union> \<sigma>)"
+  have "m = the_elem (L_H_M ({m} \<union> \<sigma>) (sender m))"
+    using Protocol.new_message_is_L_H_M_of_sender Protocol_axioms \<open>\<sigma> \<in> \<Sigma>\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>m \<in> M\<close> \<open>sender m \<notin> equivocating_validators ({m} \<union> \<sigma>)\<close> by auto
+  moreover have "is_singleton (L_H_M ({m} \<union> \<sigma>) (sender m))"
+  proof-
+    have "sender m \<in> observed_non_equivocating_validators ({m} \<union> \<sigma>)"
+      apply (auto simp add: observed_def)
+      using \<open>sender m \<notin> equivocating_validators ({m} \<union> \<sigma>)\<close> by auto
+    thus ?thesis
+      using L_H_M_of_observed_non_equivocating_validator_is_singleton \<open>\<sigma> \<in> \<Sigma>\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>m \<in> M\<close> state_transition_by_immediately_next_message by auto
+  qed
+  ultimately show "the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)) = justification m"
+    unfolding L_H_J_def
+    by (metis \<open>\<And>x f X. \<lbrakk>the_elem X = x; is_singleton X\<rbrakk> \<Longrightarrow> the_elem (f ` X) = f x\<close> sup.commute)
+qed
 
 (* Lemma 20: Latest honest messages from non-equivocating messages are either the same as in their previous
 latest message, or later *)
 lemma (in Protocol) L_H_M_of_others_for_sender_is_the_previous_one_or_later:
-  "\<forall> \<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V 
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
-  \<longrightarrow> v \<notin> equivocating_validators \<sigma>
-  \<longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)
+  "\<And>\<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V 
+  \<Longrightarrow> immediately_next_message (\<sigma>, m)
+  \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
+  \<Longrightarrow> v \<notin> equivocating_validators \<sigma>
+  \<Longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)
         \<or> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))"
-  sorry
+proof-
+  fix \<sigma> m v
+  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V" "immediately_next_message (\<sigma>, m)" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})"
+  and "v \<notin> equivocating_validators \<sigma>"
+
+  have "sender m \<in> observed_non_equivocating_validators \<sigma>"
+    sorry
+  have "v \<in> observed (the_elem (L_H_J \<sigma> (sender m)))"
+    sorry
+  have "v \<in> observed_non_equivocating_validators (justification m)"
+    sorry
+
+  have "sender m \<in> observed_non_equivocating_validators (\<sigma> \<union> {m})"
+    apply (auto simp add: observed_def)
+    using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> by auto
+
+  have "v \<notin> equivocating_validators (justification m)"
+    by (meson \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>v \<notin> equivocating_validators \<sigma>\<close> equivocating_validators_preserve_subset in_mono state_transition_by_immediately_next_message state_transition_is_immediately_next_message)
+
+  have "the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m"
+  proof-
+    have "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})"
+      using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> by blast
+    hence "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "\<sigma> \<in> \<Sigma>" "\<sigma> \<subseteq> \<sigma> \<union> {m}" "{m} \<subseteq> \<sigma> \<union> {m}" "\<sigma> \<inter> {m} = \<emptyset>"
+      apply simp
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close>)
+      apply auto[1]
+      apply simp
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> state_transition_only_made_by_immediately_next_message by auto
+    hence "\<And>m1. \<lbrakk> m1 \<in> \<sigma>; sender m1 = sender m \<rbrakk> \<Longrightarrow> m1 \<in> justification m"
+      using later_messages_from_non_equivocating_validator_include_all_earlier_messages by force
+    hence "\<And>m1. \<lbrakk> m1 \<in> \<sigma>; sender m1 = sender m \<rbrakk> \<Longrightarrow> justification m1 \<subseteq> justification m"
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> justified_def monotonicity_of_justifications by blast
+    moreover have "the_elem (L_H_M \<sigma> (sender m)) \<in> \<sigma>" "sender (the_elem (L_H_M \<sigma> (sender m))) = sender m"
+      using L_H_M_is_in_the_state \<open>\<sigma> \<in> \<Sigma>\<close> \<open>sender m \<in> observed_non_equivocating_validators \<sigma>\<close> apply blast
+      using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>sender m \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M by blast
+    ultimately have "justification (the_elem (L_H_M \<sigma> (sender m))) \<subseteq> justification m"
+      by auto
+    moreover have "is_singleton (L_H_J \<sigma> (sender m))"
+      using L_H_J_of_observed_non_equivocating_validator_is_singleton \<open>\<sigma> \<in> \<Sigma>\<close> \<open>sender m \<in> observed_non_equivocating_validators \<sigma>\<close> by blast
+    ultimately show "the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m"
+    proof-
+      have "\<And>X Y f. \<lbrakk> is_singleton X; f (the_elem X) \<subseteq> Y \<rbrakk> \<Longrightarrow> the_elem (f ` X) \<subseteq> Y"
+        by (metis image_empty image_insert is_singleton_the_elem the_elem_eq)
+      thus ?thesis
+        by (smt L_H_J_def L_H_M_of_observed_non_equivocating_validator_is_singleton \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>justification (the_elem (L_H_M \<sigma> (sender m))) \<subseteq> justification m\<close> \<open>sender m \<in> observed_non_equivocating_validators \<sigma>\<close>)
+    qed
+  qed
+  hence "justification m = the_elem (L_H_J \<sigma> (sender m)) \<union> (justification m - the_elem (L_H_J \<sigma> (sender m)))"
+    by blast
+
+  define New where "New \<equiv> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m)))"
+
+  have set_split: "\<And>A B P. {x \<in> A \<union> B. P x} = {x \<in> A. P x} \<union> {x \<in> B. P x}"
+    by blast
+
+  { assume "New = \<emptyset>"
+
+    have "L_H_M (justification m) v
+        = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}
+        \<union> {m1 \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}"
+    proof-
+      have "v \<notin> equivocating_validators (justification m)"
+        by (simp add: \<open>v \<notin> equivocating_validators (justification m)\<close>)
+      hence "L_H_M (justification m) v = L_M (justification m) v"
+        by (simp add: L_H_M_def)
+      also have "\<dots> = {m1 \<in> from_sender (v, justification m). later_from (m1, v, justification m) = \<emptyset>}"
+        by (auto simp add: L_M_def)
+      also have "\<dots> = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m)) \<union> (justification m - the_elem (L_H_J \<sigma> (sender m)))). later_from (m1, v, justification m) = \<emptyset>}"
+        using \<open>justification m = the_elem (L_H_J \<sigma> (sender m)) \<union> (justification m - the_elem (L_H_J \<sigma> (sender m)))\<close> by auto
+      also have "\<dots> = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))) \<union> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}"
+        apply (subst from_sender_split)
+        apply simp
+        done
+      also have "\<dots> = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}
+                    \<union> {m1 \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}"
+        by (rule set_split)
+      finally show "L_H_M (justification m) v
+        = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}
+        \<union> {m1 \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}"
+        by simp
+    qed
+    moreover have "{m1 \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset> } = \<emptyset>"
+      using New_def \<open>New = \<emptyset>\<close> by blast
+    ultimately have "L_H_M (justification m) v = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}"
+      by (smt Diff_empty Diff_eq_empty_iff Diff_partition Un_commute empty_Diff)
+
+    { fix m1
+      have "later_from (m1, v, justification m) = {m' \<in> from_sender (v, justification m). justified m1 m'}"
+        by (simp add: later_from_def from_sender_def justified_def)
+      also have "\<dots> = {m' \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m)) \<union> (justification m - the_elem (L_H_J \<sigma> (sender m)))). justified m1 m'}"
+        using \<open>justification m = the_elem (L_H_J \<sigma> (sender m)) \<union> (justification m - the_elem (L_H_J \<sigma> (sender m)))\<close> by auto
+      also have "\<dots> = {m' \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))) \<union> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). justified m1 m'}"
+        apply (subst from_sender_split)
+        apply simp
+        done
+      also have "\<dots> = {m' \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). justified m1 m'} \<union> {m' \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))). justified m1 m'}"
+        by (rule set_split)
+      also have "\<dots> = {m' \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). justified m1 m'}"
+        using New_def \<open>New = \<emptyset>\<close> by blast
+      also have "\<dots> = later_from (m1, v, the_elem (L_H_J \<sigma> (sender m)))"
+        by (simp add: later_from_def from_sender_def)
+      finally have "later_from (m1, v, justification m) = later_from (m1, v, the_elem (L_H_J \<sigma> (sender m)))"
+        by simp
+    }
+    hence "\<And>m'. later_from (m', v, justification m) = later_from (m', v, the_elem (L_H_J \<sigma> (sender m)))"
+      by simp
+    hence "L_H_M (justification m) v = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, the_elem (L_H_J \<sigma> (sender m))) = \<emptyset>}"
+      by (smt Collect_cong \<open>L_H_M (justification m) v = {m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). later_from (m1, v, justification m) = \<emptyset>}\<close>)
+    also have "\<dots> = L_M (the_elem (L_H_J \<sigma> (sender m))) v"
+      by (simp add: L_M_def)
+    also have "\<dots> = L_H_M (the_elem (L_H_J \<sigma> (sender m))) v"
+      apply (auto simp add: L_H_M_def)
+      using \<open>the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m\<close> \<open>v \<notin> equivocating_validators (justification m)\<close> equivocating_validators_preserve_subset by blast
+    finally have "the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)"
+      by simp
+  }
+  hence "New = \<emptyset> \<Longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)" by simp
+
+  { assume "New \<noteq> \<emptyset>"
+    have "v \<notin> equivocating_validators (justification m)" "the_elem (L_H_J \<sigma> (sender m)) \<in> \<Sigma>" "the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m"
+      and "justification m - the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m" "the_elem (L_H_J \<sigma> (sender m)) \<inter> (justification m - the_elem (L_H_J \<sigma> (sender m))) = \<emptyset>"
+      apply (simp add: \<open>v \<notin> equivocating_validators (justification m)\<close>)
+      apply (rule L_H_J_is_state_if_exists)
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close>)
+      using \<open>sender m \<in> observed_non_equivocating_validators \<sigma>\<close> apply auto[1]
+      apply (simp add: \<open>the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m\<close>)
+      apply simp
+      apply simp
+      done
+    hence "\<And>m'1 m'2. \<lbrakk> m'1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))); m'2 \<in> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m))) \<rbrakk> \<Longrightarrow> m'1 \<in> justification m'2"
+      apply (simp add: from_sender_def)
+      apply (meson DiffI Diff_disjoint Diff_subset later_messages_from_non_equivocating_validator_include_all_earlier_messages)
+      done
+    hence "\<And>m'1 m'2. \<lbrakk> m'1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))); m'2 \<in> New \<rbrakk> \<Longrightarrow> m'1 \<in> justification m'2"
+      by (simp add: New_def)
+    hence "\<And>m'. m' \<in> New \<Longrightarrow> the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v) \<in> justification m'"
+    proof-
+      assume hyp: "\<And>m'1 m'2. m'1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))) \<Longrightarrow> m'2 \<in> New \<Longrightarrow> m'1 \<in> justification m'2"
+      have "the_elem (L_H_J \<sigma> (sender m)) \<subseteq> \<sigma>"
+        using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>the_elem (L_H_J \<sigma> (sender m)) \<subseteq> justification m\<close> state_transition_by_immediately_next_message state_transition_is_immediately_next_message by blast
+      hence "v \<notin> equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))"
+        using \<open>v \<notin> equivocating_validators \<sigma>\<close> equivocating_validators_preserve_subset by blast
+      have "the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v) \<in> the_elem (L_H_J \<sigma> (sender m))"
+        apply (rule L_H_M_is_in_the_state)
+        apply (simp add: \<open>the_elem (L_H_J \<sigma> (sender m)) \<in> \<Sigma>\<close>)
+        apply auto
+        apply (simp add: \<open>v \<in> observed (the_elem (L_H_J \<sigma> (sender m)))\<close>)
+        apply (simp add: \<open>v \<notin> equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))\<close>)
+        done
+      show "\<And>m'. m' \<in> New \<Longrightarrow> the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v) \<in> justification m'"
+        apply (rule hyp)
+        apply (simp add: from_sender_def, auto)
+        using \<open>the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v) \<in> the_elem (L_H_J \<sigma> (sender m))\<close> apply blast
+        using sender_of_L_H_M
+        using \<open>the_elem (L_H_J \<sigma> (sender m)) \<in> \<Sigma>\<close> \<open>v \<in> observed (the_elem (L_H_J \<sigma> (sender m)))\<close> \<open>v \<notin> equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))\<close> by blast
+    qed
+    hence "\<And>m'. m' \<in> New \<Longrightarrow> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) m'"
+      by (simp add: justified_def)
+
+    { assume "the_elem (L_H_M (justification m) v) \<notin> New" (is "?elem \<notin> New")
+      hence "?elem \<notin> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m)))"
+        by (simp add: New_def)
+      hence "?elem \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m)))"
+      proof-
+        assume "?elem \<notin> from_sender (v, justification m - the_elem (L_H_J \<sigma> (sender m)))"
+        moreover have "?elem \<in> justification m"
+          apply (rule L_H_M_is_in_the_state)
+          apply (simp add: M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close>)
+          using \<open>v \<in> observed_non_equivocating_validators (justification m)\<close> apply blast
+          done
+        moreover have "sender ?elem = v"
+          using M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>v \<in> observed_non_equivocating_validators (justification m)\<close> sender_of_L_H_M by blast
+        ultimately show ?thesis
+          by (simp add: from_sender_def)
+      qed
+
+      have "\<And>m1 m2. \<lbrakk> m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))); m2 \<in> New \<rbrakk> \<Longrightarrow> m1 \<in> justification m2"
+        using \<open>\<And>m'2 m'1. \<lbrakk>m'1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))); m'2 \<in> New\<rbrakk> \<Longrightarrow> m'1 \<in> justification m'2\<close> by blast
+      hence "\<forall>m1 \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m))). \<exists>m2 \<in> New. m1 \<in> justification m2"
+        apply auto
+        using \<open>New \<noteq> \<emptyset>\<close> by blast
+      hence "\<exists>m2 \<in> New. ?elem \<in> justification m2"
+        using \<open>the_elem (L_H_M (justification m) v) \<in> from_sender (v, the_elem (L_H_J \<sigma> (sender m)))\<close> by blast
+      then obtain n where "n \<in> New" "?elem \<in> justification n"
+        by auto
+      hence "justified ?elem n"
+        using justified_def by blast
+      hence "n \<in> {m \<in> from_sender (v, New). justified ?elem m}"
+      proof-
+        assume "justified ?elem n"
+        have "n \<in> from_sender (v, New)"
+          using \<open>n \<in> New\<close>
+          by (simp add: from_sender_def New_def)
+        thus ?thesis
+          using \<open>justified (the_elem (L_H_M (justification m) v)) n\<close> by blast
+      qed
+      hence "{m' \<in> from_sender (v, justification m). justified ?elem m'} \<noteq> \<emptyset>"
+      proof-
+        assume "n \<in> {m \<in> from_sender (v, New). justified ?elem m}"
+        moreover have "New \<subseteq> justification m"
+          by (simp add: New_def from_sender_def)
+        ultimately have "n \<in> {m' \<in> from_sender (v, justification m). justified ?elem m'}"
+          apply (simp add: from_sender_def)
+          apply auto
+          done
+        thus "{m' \<in> from_sender (v, justification m). justified ?elem m'} \<noteq> \<emptyset>"
+          by auto
+      qed
+      hence "later_from (?elem, v, justification m) \<noteq> \<emptyset>"
+        by (auto simp add: later_from_def from_sender_def)
+      hence False
+        using L_H_M_have_no_later_messages M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V\<close> \<open>v \<in> observed_non_equivocating_validators (justification m)\<close> by blast
+    }
+    hence "the_elem (L_H_M (justification m) v) \<in> New"
+      by blast
+
+    have "\<And>m'. m' \<in> New \<Longrightarrow> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) m'"
+      by (simp add: \<open>\<And>m'. m' \<in> New \<Longrightarrow> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) m'\<close>)
+    hence "justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))"
+      using \<open>the_elem (L_H_M (justification m) v) \<in> New\<close> by blast
+  }
+  hence "New \<noteq> \<emptyset> \<Longrightarrow> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))" by simp
+
+  show "the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v) \<or>
+       justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))"
+    using \<open>New = \<emptyset> \<Longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)\<close> \<open>New \<noteq> \<emptyset> \<Longrightarrow> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))\<close> by blast
+qed
 
 (* Lemma 21 *)
 lemma (in Protocol) justified_message_exists_in_later_from:
