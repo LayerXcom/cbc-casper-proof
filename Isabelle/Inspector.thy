@@ -209,11 +209,30 @@ definition (in Params) vinspector :: "state \<Rightarrow> consensus_value_proper
 definition (in Params) vinspector_with :: "state \<Rightarrow> consensus_value_property \<Rightarrow> (validator set \<Rightarrow> bool) \<Rightarrow> bool" where
   "vinspector_with \<sigma> p Q \<equiv> (\<exists>v_set. inspector (v_set,\<sigma>,p) \<and> Q v_set)"
 
+lemma (in Protocol) inspector_imps_belonging_validator_is_agreeing:
+  "\<lbrakk> inspector (v_set, \<sigma>, p); v \<in> v_set \<rbrakk> \<Longrightarrow> v \<in> agreeing_validators (p, \<sigma>)"
+  apply (simp add: inspector_def)
+  done
+
+(*
 lemma (in Protocol) validator_in_inspector_see_L_H_M_of_others_is_singleton : 
-  "\<forall> v_set p \<sigma>. \<sigma> \<in> \<Sigma> 
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> v v'. {v, v'} \<subseteq> v_set \<longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
-  oops
+  "\<sigma> \<in> \<Sigma> \<Longrightarrow> inspector (v_set, \<sigma>, p) \<Longrightarrow> (\<And>v v'. {v, v'} \<subseteq> v_set \<Longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
+proof-
+  assume "\<sigma> \<in> \<Sigma>" "inspector (v_set, \<sigma>, p)"
+  show "\<And>v v'. {v, v'} \<subseteq> v_set \<Longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v')"
+  proof-
+    fix v v'
+    assume "{v, v'} \<subseteq> v_set"
+    have "v \<in> observed_non_equivocating_validators \<sigma>"
+      using agreeing_validators_are_observed_non_equivocating_validators inspector_imps_belonging_validator_is_agreeing
+      using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>{v, v'} \<subseteq> v_set\<close> by blast
+
+    show "is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v')"
+      apply (rule L_H_M_of_observed_non_equivocating_validator_is_singleton)
+      apply (rule L_H_J_is_state_if_exists)
+      using \<open>\<sigma> \<in> \<Sigma>\<close> apply auto[1]
+      using \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close> apply blast
+*)
 
 lemma (in Protocol) inspector_imps_everyone_observed_non_equivocating :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> 
@@ -260,32 +279,42 @@ qed
 
 
 lemma (in Protocol) gt_threshold_imps_estimator_agreeing :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> finite v_set
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> v_set \<subseteq> agreeing_validators (p, \<sigma>)
-  \<longrightarrow> gt_threshold (v_set, \<sigma>) 
-  \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c)"
-  apply (rule, rule, rule, rule, rule, rule, rule, rule, rule)
-proof -
+  "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<Longrightarrow> finite v_set
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> v_set \<subseteq> agreeing_validators (p, \<sigma>)
+  \<Longrightarrow> gt_threshold (v_set, \<sigma>) 
+  \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma> \<Longrightarrow> p c)"
+proof-
   fix \<sigma> v_set p c
   assume "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V" "finite v_set" "majority_driven p"  "v_set \<subseteq> agreeing_validators (p, \<sigma>)" "gt_threshold (v_set, \<sigma>)" "c \<in> \<epsilon> \<sigma>"
-  then have "weight_measure v_set \<le> weight_measure (agreeing_validators (p, \<sigma>))"
-    using inspector_imps_everyone_agreeing
-          weight_measure_subset_gte
-          \<Sigma>t_is_subset_of_\<Sigma> agreeing_validators_type by auto
-  then have "weight_measure v_set > (weight_measure V) div 2 + t - weight_measure (equivocating_validators \<sigma>)"
-    using \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>gt_threshold (v_set, \<sigma>)\<close>
-          gt_threshold_def
-          equivocation_fault_weight_def
-          \<Sigma>t_is_subset_of_\<Sigma> by auto
-  then have "weight_measure v_set > (weight_measure V) div 2 - weight_measure (equivocating_validators \<sigma>) div 2"
-    sorry
-  then have "weight_measure v_set > (weight_measure (V - equivocating_validators \<sigma>)) div 2"
-    by (metis Protocol.V_type Protocol_axioms \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> diff_divide_distrib equivocating_validators_is_finite equivocating_validators_type subsetCE weight_measure_subset_minus)
-  then have "weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (V - equivocating_validators \<sigma>) div 2"
-    using \<open>weight_measure v_set \<le> weight_measure (agreeing_validators (p, \<sigma>))\<close>
-    by auto
+
+  have "t > equivocation_fault_weight \<sigma>"
+    using Params.is_faults_lt_threshold_def \<Sigma>t_def \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> by blast
+
+  have "weight_measure v_set > weight_measure V div 2 + t - equivocation_fault_weight \<sigma>"
+    using \<open>gt_threshold (v_set, \<sigma>)\<close>
+    by (simp add: gt_threshold_def)
+  moreover have "weight_measure V div 2 + t - equivocation_fault_weight \<sigma> > weight_measure (V - equivocating_validators \<sigma>) div 2"
+  proof auto
+    have "weight_measure (V - equivocating_validators \<sigma>) = weight_measure V - weight_measure (equivocating_validators \<sigma>)"
+      using V_type \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> equivocating_validators_is_finite weight_measure_subset_minus by auto
+    moreover have "t * 2 > equivocation_fault_weight \<sigma>"
+      using Protocol.t_type(1) Protocol_axioms \<open>equivocation_fault_weight \<sigma> < t\<close> by fastforce
+    ultimately show "weight_measure (V - equivocating_validators \<sigma>) < weight_measure V + t * 2 - equivocation_fault_weight \<sigma> * 2"
+      by (simp add: equivocation_fault_weight_def)
+  qed
+  ultimately have "weight_measure v_set > weight_measure (V - equivocating_validators \<sigma>) div 2"
+    by simp
+  hence "weight_measure (agreeing_validators (p, \<sigma>)) > weight_measure (V - equivocating_validators \<sigma>) div 2"
+  proof-
+    assume "weight_measure (V - equivocating_validators \<sigma>) / 2 < weight_measure v_set"
+
+    have "weight_measure (agreeing_validators (p, \<sigma>)) \<ge> weight_measure v_set"
+      using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> \<open>v_set \<subseteq> agreeing_validators (p, \<sigma>)\<close> weight_measure_subset_gte by auto
+    thus ?thesis
+      using \<open>weight_measure (V - equivocating_validators \<sigma>) / 2 < weight_measure v_set\<close> by linarith
+  qed
   then show "p c"
     using \<open>majority_driven p\<close> unfolding majority_driven_def majority_def gt_threshold_def
     using \<open>c \<in> \<epsilon> \<sigma>\<close> Mi.simps \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V\<close> non_justifying_message_exists_in_M_0
@@ -294,11 +323,11 @@ qed
 
 (* Lemma 38 *)
 lemma (in Protocol) inspector_imps_estimator_agreeing :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> finite v_set
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> c \<in> \<epsilon> \<sigma>. p c)"
+  "\<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
+  \<Longrightarrow> finite v_set
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma> \<Longrightarrow> p c)"
   by (simp add: gt_threshold_imps_estimator_agreeing inspector_imps_gt_threshold \<Sigma>t_def inspector_imps_everyone_agreeing)
 
 

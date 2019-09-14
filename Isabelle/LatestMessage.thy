@@ -211,8 +211,7 @@ lemma (in Protocol) L_H_M_type :
 
 
 lemma (in Protocol) L_H_M_of_observed_non_equivocating_validator_is_singleton :
-  "\<forall> \<sigma> \<in> \<Sigma>. \<forall> v \<in> observed_non_equivocating_validators \<sigma>.
-      is_singleton (L_H_M \<sigma> v)"
+  "\<sigma> \<in> \<Sigma> \<Longrightarrow> v \<in> observed_non_equivocating_validators \<sigma> \<Longrightarrow> is_singleton (L_H_M \<sigma> v)"
   using observed_non_equivocating_validators_have_one_latest_message 
   by (simp add: L_H_M_def)
 
