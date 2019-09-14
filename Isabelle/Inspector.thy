@@ -130,11 +130,15 @@ lemma (in Protocol) later_disagreeing_messages_type :
 (* NOTE: We use `the_elem` but is it return `undefined`?  *)
 
 lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
-  "\<forall> \<sigma> v \<sigma>'. v \<in> V \<and> {\<sigma>, \<sigma>'} \<subseteq> \<Sigma> \<and> is_future_state (\<sigma>', \<sigma>)
-  \<longrightarrow> v \<notin> equivocating_validators \<sigma>
-  \<longrightarrow> v \<notin> equivocating_validators \<sigma>'"
+  "\<lbrakk> v \<in> V; {\<sigma>, \<sigma>'} \<subseteq> \<Sigma>; is_future_state (\<sigma>, \<sigma>'); v \<notin> equivocating_validators \<sigma>' \<rbrakk> \<Longrightarrow> v \<notin> equivocating_validators \<sigma>"
   (* Will be proved by the monotonicity of equivocations. *)
-  oops
+proof-
+  assume "v \<in> V" "{\<sigma>, \<sigma>'} \<subseteq> \<Sigma>" "is_future_state (\<sigma>, \<sigma>')" "v \<notin> equivocating_validators \<sigma>'"
+  have "v \<in> equivocating_validators \<sigma> \<Longrightarrow> v \<in> equivocating_validators \<sigma>'"
+    using \<open>is_future_state (\<sigma>, \<sigma>')\<close> \<open>v \<in> V\<close> equivocation_is_monotonic by blast
+  show "v \<notin> equivocating_validators \<sigma>"
+    using \<open>v \<in> equivocating_validators \<sigma> \<Longrightarrow> v \<in> equivocating_validators \<sigma>'\<close> \<open>v \<notin> equivocating_validators \<sigma>'\<close> by blast
+qed
 
 (* Definition 7.18: Inspector threshold size *) 
 (* FIXME: Use equivocation_fault_weight *)
@@ -151,33 +155,42 @@ lemma (in Protocol) gt_threshold_imps_majority_for_agreeing_validator :
 proof auto
   fix \<sigma> v_set v p
   assume "\<sigma> \<in> \<Sigma>t" "v_set \<subseteq> agreeing_validators (p, \<sigma>)" "gt_threshold (v_set, \<sigma>)" "v \<in> v_set"
-  hence "weight_measure v_set > weight_measure V div 2 + t - equivocation_fault_weight \<sigma>"
-    by (simp add: gt_threshold_def)
-  hence "\<dots> > (weight_measure V - equivocation_fault_weight \<sigma>) div 2 + (t - equivocation_fault_weight \<sigma>) div 2"
-    by (smt field_sum_of_halves t_type(1))
-  hence "\<dots> > (weight_measure V - equivocation_fault_weight \<sigma>) div 2"
-    by (smt \<Sigma>t_def \<open>\<sigma> \<in> \<Sigma>t\<close> add.commute add.left_commute add_diff_cancel_left' add_diff_eq equivocation_fault_weight_def half_gt_zero_iff is_faults_lt_threshold_def mem_Collect_eq)
-  hence "\<dots> > (weight_measure (agreeing_validators (p,\<sigma>)) + weight_measure (disagreeing_validators (p,\<sigma>))) div 2"
-  proof-
-    have "weight_measure V - equivocation_fault_weight \<sigma> = weight_measure (agreeing_validators (p,\<sigma>)) + weight_measure (disagreeing_validators (p,\<sigma>))"
-      using agreeing_validators_weight_combined
-      using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t\<close> by auto
-    thus ?thesis
-      using \<open>(weight_measure V - equivocation_fault_weight \<sigma>) / 2 < weight_measure v_set\<close> by auto
-  qed
-  hence "weight_measure (agreeing_validators (p,\<sigma>)) > (weight_measure (agreeing_validators (p,\<sigma>)) + weight_measure (disagreeing_validators (p,\<sigma>))) div 2"
-  proof-
-    have "weight_measure v_set \<le> weight_measure (agreeing_validators (p, \<sigma>))"
-      using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t\<close> \<open>v_set \<subseteq> agreeing_validators (p, \<sigma>)\<close> weight_measure_subset_gte by auto
-    thus ?thesis
-      using \<open>(weight_measure (agreeing_validators (p, \<sigma>)) + weight_measure (disagreeing_validators (p, \<sigma>))) / 2 < weight_measure v_set\<close> by auto
-  qed
-  hence "weight_measure (agreeing_validators (p,\<sigma>)) > weight_measure (disagreeing_validators (p,\<sigma>))"
-    by simp
+  have "\<sigma> \<in> \<Sigma>"
+    using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t\<close> by blast
+  have "the_elem (L_H_J \<sigma> v) \<in> \<Sigma>"
+    apply (rule L_H_J_is_state_if_exists)
+    using \<open>\<sigma> \<in> \<Sigma>\<close> apply blast
+    using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>v \<in> v_set\<close> \<open>v_set \<subseteq> agreeing_validators (p, \<sigma>)\<close> agreeing_validators_are_observed_non_equivocating_validators by blast
 
-  show "majority (v_set, the_elem (L_H_J \<sigma> v))"
+  have "weight_measure v_set > weight_measure V div 2 + t - equivocation_fault_weight \<sigma>"
+    using \<open>gt_threshold (v_set, \<sigma>)\<close>
+    by (simp add: gt_threshold_def)
+  also have "\<dots> > weight_measure V div 2"
+  proof-
+    have "equivocation_fault_weight \<sigma> < t"
+      using \<open>\<sigma> \<in> \<Sigma>t\<close>
+      apply (simp add: \<Sigma>t_def is_faults_lt_threshold_def)
+      done
+    thus ?thesis
+      using calculation
+      by linarith
+  qed
+  moreover have "weight_measure V \<ge> weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> v)))"
+  proof-
+    have x: "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> v))) = weight_measure V - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> v)))"
+      apply (rule weight_measure_subset_minus [symmetric])
+      using \<open>the_elem (L_H_J \<sigma> v) \<in> \<Sigma>\<close> equivocating_validators_is_finite apply blast
+      apply (simp add: V_type)
+      by (simp add: \<open>the_elem (L_H_J \<sigma> v) \<in> \<Sigma>\<close>)
+    show ?thesis
+      apply (simp add: x)
+      by (simp add: \<open>the_elem (L_H_J \<sigma> v) \<in> \<Sigma>\<close> weight_positive)
+  qed
+  ultimately have "weight_measure v_set > weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> v))) div 2"
+    by linarith
+  thus "majority (v_set, the_elem (L_H_J \<sigma> v))"
     apply (simp add: majority_def)
-    sorry
+    done
 qed
 
 definition (in Params) inspector :: "(validator set * state * consensus_value_property) \<Rightarrow> bool"
