@@ -459,8 +459,8 @@ definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
     "equivocation_fault_weight \<sigma> = weight_measure (equivocating_validators \<sigma>)"
 
 lemma (in Protocol) equivocation_fault_weight_is_monotonic :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
-  \<longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
+  "\<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
+  \<Longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
   using equivocation_is_monotonic weight_measure_subset_gte 
   by (smt equivocating_validators_is_finite equivocating_validators_type equivocation_fault_weight_def subset_iff)
 

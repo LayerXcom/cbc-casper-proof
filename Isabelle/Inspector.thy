@@ -455,9 +455,30 @@ proof -
     using agreeing_status_of_non_sender_not_affected_by_minimal_transitions
     by blast
   (* 2. gt_threshold preserved *)
-  moreover have "\<forall> v \<in> v_set. 
-                    (\<forall> v_set'. gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m}))"
-    sorry
+  moreover have "\<forall> v_set'. gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m})"
+  proof-
+    have "equivocation_fault_weight ({m} \<union> \<sigma>) \<ge> equivocation_fault_weight \<sigma>"
+      apply (rule equivocation_fault_weight_is_monotonic)
+      apply auto
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> apply blast
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> state_transition_by_immediately_next_message by auto
+    hence "weight_measure V / 2 + t - equivocation_fault_weight \<sigma> \<ge> weight_measure V / 2 + t - equivocation_fault_weight ({m} \<union> \<sigma>)"
+      by simp
+
+    have p: "\<And>v_set'. weight_measure V / 2 + t - equivocation_fault_weight \<sigma> < weight_measure v_set' \<Longrightarrow> weight_measure V / 2 + t - equivocation_fault_weight ({m} \<union> \<sigma>) < weight_measure v_set'"
+    proof-
+      fix v_set'
+      assume "weight_measure V / 2 + t - equivocation_fault_weight \<sigma> < weight_measure v_set'"
+      thus "weight_measure V / 2 + t - equivocation_fault_weight ({m} \<union> \<sigma>) < weight_measure v_set'"
+        using \<open>equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight ({m} \<union> \<sigma>)\<close> by linarith
+    qed
+
+    show "\<forall> v_set'. gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m})"
+      apply (auto simp add: gt_threshold_def)
+      using p
+      apply simp
+      done
+  qed
   (* 3. v_set' preserved *)
   moreover have "\<forall> v \<in> v_set.
                     (\<forall> v_set'. v_set' \<subseteq> v_set \<and>
