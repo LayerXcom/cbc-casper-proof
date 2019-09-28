@@ -352,9 +352,9 @@ lemma (in Protocol) equivocation_is_monotonic :
   using observed_def by fastforce
 
 lemma (in Protocol) equivocating_validators_preserved_over_honest_message :
-  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M
-  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
-  \<longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
+  "\<sigma> \<in> \<Sigma> \<and> m \<in> M
+  \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
+  \<Longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
   apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def)
   by auto
 

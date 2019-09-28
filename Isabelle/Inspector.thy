@@ -1148,17 +1148,17 @@ qed
 (* 7.4.3 Non-equivocating messages from member agree *)
 
 (* Lemma 24: New messages from member is agreeing *)
-(*
 lemma (in Protocol) new_message_from_member_see_itself_agreeing :
-  "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
+  "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V
+  \<Longrightarrow> majority_driven p
   \<Longrightarrow> immediately_next_message (\<sigma>, m)
   \<Longrightarrow> sender m \<in> v_set
   \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<Longrightarrow> inspector (v_set, \<sigma>, p) 
   \<Longrightarrow> (\<And>v. v \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> v)))
-  \<Longrightarrow> sender m \<in> agreeing_validators (p, justification m)"
+  \<Longrightarrow> sender m \<in> agreeing_validators (p, \<sigma> \<union> {m})"
 proof-
-  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V" "immediately_next_message (\<sigma>, m)" "sender m \<in> v_set" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)"
+  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V" "majority_driven p" "immediately_next_message (\<sigma>, m)" "sender m \<in> v_set" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)"
   and "(\<And>v. v \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> v)))"
 
   have "(\<exists>v_set' \<subseteq> v_set. gt_threshold (v_set', \<sigma>) \<and>
@@ -1175,8 +1175,65 @@ proof-
         \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>) \<and> v_set' \<subseteq> agreeing_validators (p, justification m)"
     by auto
 
-  have "majority (v_set', justification m)"
-    sorry
+  have "weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) \<le> weight_measure (equivocating_validators (justification m))"
+  proof-
+    have "is_singleton (L_H_J \<sigma> (sender m))"
+      apply (rule L_H_J_of_observed_non_equivocating_validator_is_singleton)
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> inspector_imps_everyone_observed_non_equivocating by blast
+    hence "the_elem (L_H_J \<sigma> (sender m)) = justification (the_elem (L_H_M \<sigma> (sender m)))"
+      by (metis L_H_J_def L_H_M_of_observed_non_equivocating_validator_is_singleton \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> in_mono inspector_imps_everyone_observed_non_equivocating the_elem_commute)
+
+    have "justification (the_elem (L_H_M \<sigma> (sender m))) \<subseteq> justification m"
+      apply (rule monotonicity_of_justifications)
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+      apply (simp add: justified_def)
+      apply (rule latest_honest_message_is_in_justification)
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+      apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+      apply (meson \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> in_mono inspector_imps_everyone_observed_non_equivocating)
+      using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> by blast
+    hence "equivocating_validators (the_elem (L_H_J \<sigma> (sender m))) \<subseteq> equivocating_validators (justification m)"
+    proof-
+      have "\<And>x. x \<notin> equivocating_validators (justification m) \<Longrightarrow> x \<notin> equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))"
+        by (metis \<open>justification (the_elem (L_H_M \<sigma> (sender m))) \<subseteq> justification m\<close> \<open>the_elem (L_H_J \<sigma> (sender m)) = justification (the_elem (L_H_M \<sigma> (sender m)))\<close> equivocating_validators_preserve_subset in_mono)
+      thus ?thesis
+        by blast
+    qed
+    thus "weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) \<le> weight_measure (equivocating_validators (justification m))"
+      by (simp add: M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> weight_measure_subset_gte)
+  qed
+
+  have "majority (v_set, justification m)"
+  proof-
+    have "majority (v_set, the_elem (L_H_J \<sigma> (sender m)))"
+      by (simp add: \<open>\<And>va. va \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> va))\<close> \<open>sender m \<in> v_set\<close>)
+    hence "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set"
+      by (simp add: majority_def)
+    hence "weight_measure V div 2 - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set"
+    proof-
+      assume "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set"
+      have "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) = weight_measure V - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m))))"
+      apply (rule weight_measure_subset_minus [symmetric])
+        apply (meson Protocol.L_H_J_is_state_if_exists Protocol_axioms \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_is_finite in_mono inspector_imps_everyone_observed_non_equivocating)
+        apply (simp add: V_type)
+        using L_H_J_is_state_if_exists \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_type inspector_imps_everyone_observed_non_equivocating by blast
+      thus ?thesis
+        using \<open>weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set\<close> by linarith
+    qed
+    hence "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set"
+      using \<open>weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) \<le> weight_measure (equivocating_validators (justification m))\<close> by linarith
+    hence "weight_measure (V - equivocating_validators (justification m)) div 2 < weight_measure v_set"
+    proof-
+      assume "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set"
+      have "weight_measure (V - equivocating_validators (justification m)) = weight_measure V - weight_measure (equivocating_validators (justification m))"
+        by (simp add: M_type Params.weight_measure_def V_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> sum_diff)
+      thus ?thesis
+        by (simp add: \<open>weight_measure V / 2 - weight_measure (equivocating_validators (justification m)) / 2 < weight_measure v_set\<close> diff_divide_distrib)
+    qed
+    thus "majority (v_set, justification m)"
+      by (simp add: majority_def)
+  qed
 
   { have "v_set' \<subseteq> agreeing_validators (p, justification m)"
       by (simp add: \<open>(\<forall>v'\<in>v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m))) \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>) \<and> v_set' \<subseteq> agreeing_validators (p, justification m)\<close>)
@@ -1188,19 +1245,40 @@ proof-
         apply (simp add: M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
         by (simp add: \<open>v_set' \<subseteq> agreeing_validators (p, justification m)\<close>)
     qed
-    moreover have "weight_measure v_set' > weight_measure (V - equivocating_validators (justification m)) div 2"
-      using \<open>majority (v_set', justification m)\<close>
+    moreover have "weight_measure v_set > weight_measure (V - equivocating_validators (justification m)) div 2"
+      using \<open>majority (v_set, justification m)\<close>
       by (simp add: majority_def)
     ultimately have "weight_measure (agreeing_validators (p, justification m)) > weight_measure (V - equivocating_validators (justification m)) div 2"
-      by simp
+      sorry
     hence "majority (agreeing_validators (p, justification m), justification m)"
       by (simp add: majority_def)
     moreover have "\<And>\<sigma>'. \<lbrakk> \<sigma>' \<in> \<Sigma>; majority (agreeing_validators (p, \<sigma>'), \<sigma>') \<rbrakk> \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma>' \<Longrightarrow> p c)"
-      using \<open>(\<And>v. v \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> v)))\<close>
-      apply (simp add: majority_def)
+      using Protocol.majority_driven_def Protocol_axioms \<open>majority_driven p\<close> by blast
+    ultimately have "\<And>c. c \<in> \<epsilon> (justification m) \<Longrightarrow> p c"
+      using M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by blast
+    moreover have "est m \<in> \<epsilon> (justification m)"
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> immediately_next_message_exists_in_same_depth by auto
+    ultimately have "p (est m)"
+      by blast
+    hence "p (est (the_elem (L_H_M (\<sigma> \<union> {m}) (sender m))))"
+      using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> new_message_is_L_H_M_of_sender by auto
+    have "sender m \<in> agreeing_validators (p, \<sigma> \<union> {m})"
+    proof-
+      have "\<sigma> \<union> {m} \<in> \<Sigma>"
+        using \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> state_transition_only_made_by_immediately_next_message by blast
+      moreover have "sender m \<in> observed_non_equivocating_validators (\<sigma> \<union> {m})"
+        apply (rule)
+        apply (simp add: observed_def)
+        apply blast
+        using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> by auto
+      moreover have "p (est (the_elem (L_H_M (\<sigma> \<union> {m}) (sender m))))"
+        using \<open>p (est (the_elem (L_H_M (\<sigma> \<union> {m}) (sender m))))\<close> by blast
+      ultimately show ?thesis
+        using latest_honest_message_agreeing_validators_is_agreeing by blast
+    qed
   }
-*)
-
+  thus "sender m \<in> agreeing_validators (p, \<sigma> \<union> {m})" by simp
+qed
 
 (* 7.4.4 Honest messages from member do not break inspector *)
 
@@ -1404,19 +1482,17 @@ qed
 (* Lemma 34: Inspector preserved over message from non-equivocating member *)
 (* NOTE: Lemma 31 is not necessary*)
 lemma (in Protocol) inspector_preserved_over_message_from_non_equivocating_member :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
-  \<longrightarrow> finite v_set
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> sender m \<in> v_set
-  \<longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-  apply (rule+)
+  "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
+  \<Longrightarrow> finite v_set
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> immediately_next_message (\<sigma>, m)
+  \<Longrightarrow> sender m \<in> v_set
+  \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
+  \<Longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
 proof - 
-  fix \<sigma> m v_set p
   assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V" "finite v_set" "majority_driven p" "immediately_next_message (\<sigma>, m)" "sender m \<in> v_set" 
-        "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)" 
+        "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)"
   (* Useful lemmas *)
   then have "\<sigma> \<union> {m} \<in> \<Sigma>t"
     by (metis (no_types, lifting) \<Sigma>t_def equivocating_validators_preserved_over_honest_message equivocation_fault_weight_def is_faults_lt_threshold_def mem_Collect_eq state_transition_by_immediately_next_message)    
@@ -1428,14 +1504,73 @@ proof -
     using new_justification_is_L_H_J_of_sender
           \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close>
     by (simp add: \<Sigma>t_def)  
+
+  have "\<sigma> \<in> \<Sigma>"
+    using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by force
+
   (* 1. gt_threshold preserved *)
-  then moreover have "\<forall> v \<in> v_set.
-                    (\<forall> v_set'.  v_set' \<subseteq> v_set \<and> gt_threshold(v_set', \<sigma>) \<longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m}))"
-    sorry
+  have "\<And>v. v \<in> v_set \<Longrightarrow>
+                    (\<And>v_set'. v_set' \<subseteq> v_set \<Longrightarrow> gt_threshold(v_set', \<sigma>) \<Longrightarrow> gt_threshold(v_set', \<sigma> \<union> {m}))"
+  proof-
+    have "equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
+      apply (rule equivocating_validators_preserved_over_honest_message)
+      apply (simp add: \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+      using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> by auto
+    hence "equivocation_fault_weight (\<sigma> \<union> {m}) = equivocation_fault_weight \<sigma>"
+      by (simp add: equivocation_fault_weight_def)
+
+    thus "\<And>v. v \<in> v_set \<Longrightarrow> (\<And>v_set'. v_set' \<subseteq> v_set \<Longrightarrow> gt_threshold (v_set', \<sigma>) \<Longrightarrow> gt_threshold (v_set', \<sigma> \<union> {m}))"
+      by (simp add: gt_threshold_def)
+  qed
+
+  have "\<exists>v_set'\<subseteq>v_set.
+       gt_threshold (v_set', \<sigma>) \<and>
+       (\<forall>v'\<in>v_set'.
+           v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m))) \<and>
+           later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>) \<and>
+       v_set' \<subseteq> agreeing_validators (p, justification m)"
+    apply (rule new_message_see_all_members_agreeing)
+    apply (simp add: \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+    apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+    apply (simp add: \<open>sender m \<in> v_set\<close>)
+    using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> apply blast
+    by (simp add: \<open>inspector (v_set, \<sigma>, p)\<close>)
+  then obtain v_set' where "v_set' \<subseteq> v_set" "gt_threshold (v_set', \<sigma>)" "(\<forall>v'\<in>v_set'.
+           v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m))) \<and>
+           later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) =
+           \<emptyset>) \<and>
+       v_set' \<subseteq> agreeing_validators (p, justification m)"
+    by blast
+
+  have "inspector (v_set, \<sigma> \<union> {m}, p)"
+  proof-
+    have "v_set \<noteq> \<emptyset>"
+      using \<open>sender m \<in> v_set\<close> by blast
+    moreover have "v_set \<subseteq> V"
+      by (simp add: \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
+    moreover
+      have "\<forall>v\<in>v_set.
+        v \<in> agreeing_validators (p, {m} \<union> \<sigma>) \<and>
+        (\<exists>v_set'\<subseteq>v_set.
+            gt_threshold (v_set', {m} \<union> \<sigma>) \<and>
+            (\<forall>v'\<in>v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J ({m} \<union> \<sigma>) v)) \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J ({m} \<union> \<sigma>) v)) v'), v', {m} \<union> \<sigma>) = \<emptyset>))"
+      proof-
+        { fix v
+          assume "v \<in> v_set"
+
+          have "sender m \<in> agreeing_validators (p, {m} \<union> \<sigma>)"
+
+          have "v \<in> agreeing_validators (p, {m} \<union> \<sigma>)"
+        }
+    ultimately show ?thesis
+      by (simp add: inspector_def)
+  qed
+
   (* 2. agreeing_validators preserved *)
-  then moreover have "\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
+  moreover have "\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
   proof -
     have "sender m \<in> agreeing_validators (p, \<sigma> \<union> {m})"
+
     proof -
       have "\<forall> v_set'. v_set' \<subseteq> v_set \<longrightarrow> v_set' \<subseteq> agreeing_validators (p, the_elem (L_H_J (\<sigma> \<union> {m}) (sender m)))"  
         using new_message_see_all_members_agreeing
