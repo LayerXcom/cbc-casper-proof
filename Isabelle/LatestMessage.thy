@@ -293,8 +293,7 @@ lemma (in Protocol) L_H_J_type :
       L_H_J_def by auto
 
 lemma (in Protocol) L_H_J_of_observed_non_equivocating_validator_is_singleton : 
-  "\<forall> \<sigma> \<in> \<Sigma>. v \<in> observed_non_equivocating_validators \<sigma>
-    \<longrightarrow> is_singleton (L_H_J \<sigma> v)"
+  "\<lbrakk> \<sigma> \<in> \<Sigma>; v \<in> observed_non_equivocating_validators \<sigma> \<rbrakk> \<Longrightarrow> is_singleton (L_H_J \<sigma> v)"
   using L_H_M_of_observed_non_equivocating_validator_is_singleton
   apply (simp add: L_H_J_def)
   using image_of_singleton_is_singleton
