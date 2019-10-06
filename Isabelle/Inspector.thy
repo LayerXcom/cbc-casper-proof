@@ -204,7 +204,7 @@ definition (in Params) inspector :: "(validator set * state * consensus_value_pr
                         \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> v)) v'), v', \<sigma>) = \<emptyset>))))"
 
 definition (in Params) vinspector :: "state \<Rightarrow> consensus_value_property \<Rightarrow> bool" where
-  "vinspector \<sigma> p \<equiv> (\<exists>v. inspector (v,\<sigma>,p))"
+  "vinspector \<sigma> p \<equiv> (\<exists>v \<subseteq> V. inspector (v,\<sigma>,p))"
 
 definition (in Params) vinspector_with :: "state \<Rightarrow> consensus_value_property \<Rightarrow> (validator set \<Rightarrow> bool) \<Rightarrow> bool" where
   "vinspector_with \<sigma> p Q \<equiv> (\<exists>v_set. inspector (v_set,\<sigma>,p) \<and> Q v_set)"
@@ -330,6 +330,13 @@ lemma (in Protocol) inspector_imps_estimator_agreeing :
   \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma> \<Longrightarrow> p c)"
   by (simp add: gt_threshold_imps_estimator_agreeing inspector_imps_gt_threshold \<Sigma>t_def inspector_imps_everyone_agreeing)
 
+lemma (in Protocol) vinspector_imps_estimator_agreeing :
+  "\<sigma> \<in> \<Sigma>t
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> vinspector \<sigma> p 
+  \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma> \<Longrightarrow> p c)"
+  using inspector_imps_estimator_agreeing vinspector_def
+  by (meson V_type rev_finite_subset)
 
 (* ###################################################### *)
 (* Section 7.3: Inspector Survive Messages from Non-member *)
@@ -441,14 +448,12 @@ lemma (in Protocol) later_disagreeing_of_non_sender_not_affected_by_minimal_tran
 (* Lemma 33: Inspector preserved over message from non-member *)
 (* NOTE: Lemma 16 is not necessary *)
 lemma (in Protocol) inspector_preserved_over_message_from_non_member :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> sender m \<notin> v_set
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-  apply (rule, rule, rule, rule, rule, rule, rule, rule)
+  "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V 
+  \<Longrightarrow> immediately_next_message (\<sigma>, m)
+  \<Longrightarrow> sender m \<notin> v_set
+  \<Longrightarrow> inspector (v_set, \<sigma>, p) 
+  \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
 proof - 
-  fix \<sigma> m v_set p
   assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V" "immediately_next_message (\<sigma>, m)" "sender m \<notin> v_set" "inspector (v_set, \<sigma>, p)" 
   (* 1. agreeing_validators preserved *)
   then have "\<forall> v \<in> v_set. v \<in> agreeing_validators (p, \<sigma>) \<longrightarrow> v \<in> agreeing_validators (p, \<sigma> \<union> {m})"
@@ -1876,7 +1881,13 @@ lemma (in Protocol) gt_threshold_transitive: "\<lbrakk> v_set' \<subseteq> V; v_
 
 (* Lemma 35: Inspector preserved over message from equivocating member *)
 lemma (in Protocol) inspector_preserved_over_message_from_equivocating_member :
-  "\<lbrakk> \<sigma> \<in> \<Sigma>; m \<in> M; majority_driven p; immediately_next_message (\<sigma>, m); sender m \<in> equivocating_validators (\<sigma> \<union> {m}); \<sigma> \<union> {m} \<in> \<Sigma>t; vinspector_with \<sigma> p (\<lambda>v_set. sender m \<in> v_set \<and> finite v_set) \<rbrakk> 
+  "\<sigma> \<in> \<Sigma>
+  \<Longrightarrow> m \<in> M
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> immediately_next_message (\<sigma>, m)
+  \<Longrightarrow> sender m \<in> equivocating_validators (\<sigma> \<union> {m})
+  \<Longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
+  \<Longrightarrow> vinspector_with \<sigma> p (\<lambda>v_set. sender m \<in> v_set \<and> finite v_set)
   \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p"
   (* Since \<sigma> \<union> {m} \<in> \<Sigma>t, gt_threshold still holds  *)
 proof-
@@ -2028,35 +2039,123 @@ proof-
       done
   qed
   thus "vinspector (\<sigma> \<union> {m}) p"
-    by (auto simp add: vinspector_def)
+    using vinspector_def
+    by (meson Diff_subset \<open>v_set \<subseteq> V\<close> subset_trans)
 qed
 
 (* Lemma 36 *)
 lemma (in Protocol) inspector_preserved_over_immediately_next_message :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)"
-  using inspector_preserved_over_message_from_non_member
-        inspector_preserved_over_message_from_non_equivocating_member
-        inspector_preserved_over_message_from_equivocating_member
-  apply (simp add: \<Sigma>t_def)
-  sorry
+  "\<sigma> \<in> \<Sigma>t \<and> m \<in> M
+  \<Longrightarrow> \<sigma> \<union> {m} \<in> \<Sigma>t
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> immediately_next_message (\<sigma>, m)
+  \<Longrightarrow> vinspector \<sigma> p 
+  \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p"
+proof-
+  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M" "\<sigma> \<union> {m} \<in> \<Sigma>t" "majority_driven p"
+    and "immediately_next_message (\<sigma>, m)" "vinspector \<sigma> p"
+  have "\<sigma> \<in> \<Sigma>"
+    using \<Sigma>t_def
+    using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M\<close> by blast
+
+  { assume "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})"
+    obtain v_set where "v_set \<subseteq> V" "inspector (v_set, \<sigma>, p)"
+      using \<open>vinspector \<sigma> p\<close> vinspector_def
+      by blast
+
+    { assume "sender m \<in> v_set"
+      have "inspector (v_set, \<sigma> \<union> {m}, p)"
+        apply (rule inspector_preserved_over_message_from_non_equivocating_member)
+        apply (simp add: \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M\<close>)
+        using V_type \<open>v_set \<subseteq> V\<close> rev_finite_subset apply auto[1]
+        using \<open>majority_driven p\<close> apply auto[1]
+        apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+        apply (simp add: \<open>sender m \<in> v_set\<close>)
+        using \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m})\<close> apply auto[1]
+        by (simp add: \<open>inspector (v_set, \<sigma>, p)\<close>)
+    }
+    hence "sender m \<in> v_set \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)" by simp
+
+    { assume "sender m \<notin> v_set"
+      have "inspector (v_set, \<sigma> \<union> {m}, p)"
+        apply (rule inspector_preserved_over_message_from_non_member)
+        using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M\<close> \<open>v_set \<subseteq> V\<close> apply fastforce
+        apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+        apply (simp add: \<open>sender m \<notin> v_set\<close>)
+        using \<open>inspector (v_set, \<sigma>, p)\<close> by auto
+    }
+    hence "sender m \<notin> v_set \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)" by simp
+
+    have "inspector (v_set, \<sigma> \<union> {m}, p)"
+      using \<open>sender m \<in> v_set \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)\<close> \<open>sender m \<notin> v_set \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)\<close> by blast
+    hence "vinspector (\<sigma> \<union> {m}) p"
+      apply (simp add: vinspector_def)
+      using \<open>v_set \<subseteq> V\<close> by auto
+  }
+  hence "sender m \<notin> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p" by simp
+
+  { assume "sender m \<in> equivocating_validators (\<sigma> \<union> {m})"
+    obtain v_set where "v_set \<subseteq> V" "inspector (v_set, \<sigma>, p)"
+      using \<open>vinspector \<sigma> p\<close> vinspector_def
+      by blast
+    have "finite v_set"
+      using V_type \<open>v_set \<subseteq> V\<close> rev_finite_subset by blast
+
+    { assume "sender m \<notin> v_set"
+      have "inspector (v_set, \<sigma> \<union> {m}, p)"
+        apply (rule inspector_preserved_over_message_from_non_member)
+        using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M\<close> \<open>v_set \<subseteq> V\<close> apply fastforce
+        apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+        apply (simp add: \<open>sender m \<notin> v_set\<close>)
+        using \<open>inspector (v_set, \<sigma>, p)\<close> by auto
+    }
+    hence "sender m \<notin> v_set \<Longrightarrow> inspector (v_set, \<sigma> \<union> {m}, p)" by simp
+    hence "sender m \<notin> v_set \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p"
+      apply (simp add: vinspector_def)
+      using \<open>v_set \<subseteq> V\<close> by auto
+
+    { assume "sender m \<in> v_set"
+      have "vinspector_with \<sigma> p (\<lambda>v_set. sender m \<in> v_set \<and> finite v_set)"
+        apply (simp add: vinspector_with_def)
+        using \<open>finite v_set\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> by blast
+      have "vinspector (\<sigma> \<union> {m}) p"
+        apply (rule inspector_preserved_over_message_from_equivocating_member)
+        using \<open>\<sigma> \<in> \<Sigma>\<close> apply auto[1]
+        apply (simp add: \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M\<close>)
+        apply (simp add: \<open>majority_driven p\<close>)
+        apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+        using \<open>sender m \<in> equivocating_validators (\<sigma> \<union> {m})\<close> apply blast
+        using \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> apply blast
+        by (simp add: \<open>vinspector_with \<sigma> p (\<lambda>v_set. sender m \<in> v_set \<and> finite v_set)\<close>)
+    }
+    hence "sender m \<in> v_set \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p" by simp
+
+    have "vinspector (\<sigma> \<union> {m}) p"
+      using \<open>sender m \<in> v_set \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p\<close> \<open>sender m \<notin> v_set \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p\<close> by blast
+  }
+  hence "sender m \<in> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p" by simp
+
+  show ?thesis
+    using \<open>sender m \<in> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p\<close> \<open>sender m \<notin> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> vinspector (\<sigma> \<union> {m}) p\<close> by blast
+qed
 
 (* Lemma 39: Inspector exists in all future states *)
 lemma (in Protocol) inspector_preserved_in_future:
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<longrightarrow> (\<forall> \<sigma>' \<in> futures \<sigma>. inspector (v_set, \<sigma>', p))"
-proof auto
-  fix \<sigma> v_set p \<sigma>'
-  assume "\<sigma> \<in> \<Sigma>t" "v_set \<subseteq> V" "majority_driven p" "inspector (v_set, \<sigma>, p)" "\<sigma>' \<in> futures \<sigma>"
-  hence "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>"
-    unfolding \<Sigma>t_def futures_def
-    by auto
+  "\<sigma> \<in> \<Sigma>t
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> vinspector \<sigma> p 
+  \<Longrightarrow> (\<And>\<sigma>'. \<sigma>' \<in> futures \<sigma> \<Longrightarrow> vinspector \<sigma>' p)"
+proof-
+  assume "\<sigma> \<in> \<Sigma>t" "majority_driven p" "vinspector \<sigma> p"
+  fix \<sigma>'
+  assume "\<sigma>' \<in> futures \<sigma>"
+
+  have "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>"
+    using \<open>\<sigma> \<in> \<Sigma>t\<close>
+    apply (simp add: \<Sigma>t_def)
+    using \<open>\<sigma>' \<in> futures \<sigma>\<close>
+    apply (simp add: futures_def)
+    using \<Sigma>t_is_subset_of_\<Sigma> by blast
 
   have "\<sigma>' \<in> \<Sigma>t"
     using \<open>\<sigma>' \<in> futures \<sigma>\<close> futures_def by blast
@@ -2064,15 +2163,15 @@ proof auto
   obtain message_list where "MessagePath \<sigma> \<sigma>' message_list"
     using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> futures \<sigma>\<close> exist_message_path by blast
 
-  have "\<lbrakk> MessagePath \<sigma> \<sigma>' message_list; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>t; inspector (v_set, \<sigma>, p) \<rbrakk> \<Longrightarrow> inspector (v_set, \<sigma>', p)"
+  have "\<lbrakk> MessagePath \<sigma> \<sigma>' message_list; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>t; vinspector \<sigma> p \<rbrakk> \<Longrightarrow> vinspector \<sigma>' p"
     apply (induct "length message_list" arbitrary: message_list \<sigma> \<sigma>')
     apply (simp)
     using coherent_nil_message_path apply auto[1]
   proof-
     fix n message_list \<sigma> \<sigma>'
     assume "\<And>message_list \<sigma> \<sigma>'.
-           n = length message_list \<Longrightarrow> MessagePath \<sigma> \<sigma>' message_list \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> \<sigma>' \<in> \<Sigma> \<Longrightarrow> \<sigma>' \<in> \<Sigma>t \<Longrightarrow> inspector (v_set, \<sigma>, p) \<Longrightarrow> inspector (v_set, \<sigma>', p)"
-    and "Suc n = length message_list" "MessagePath \<sigma> \<sigma>' message_list" "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>t" "inspector (v_set, \<sigma>, p)"
+           n = length message_list \<Longrightarrow> MessagePath \<sigma> \<sigma>' message_list \<Longrightarrow> \<sigma> \<in> \<Sigma> \<Longrightarrow> \<sigma>' \<in> \<Sigma> \<Longrightarrow> \<sigma>' \<in> \<Sigma>t \<Longrightarrow> vinspector \<sigma> p \<Longrightarrow> vinspector \<sigma>' p"
+    and "Suc n = length message_list" "MessagePath \<sigma> \<sigma>' message_list" "\<sigma> \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>" "\<sigma>' \<in> \<Sigma>t" "vinspector \<sigma> p"
 
     obtain m ms where "message_list = m # ms" "MessagePath (\<sigma> \<union> {m}) \<sigma>' ms" "immediately_next_message (\<sigma>,m)" "\<sigma> \<union> {m} \<in> \<Sigma>"
       by (metis \<open>MessagePath \<sigma> \<sigma>' message_list\<close> \<open>Suc n = length message_list\<close> coherent_nonnil_message_path nat.distinct(1))
@@ -2080,8 +2179,13 @@ proof auto
       apply (meson \<open>MessagePath \<sigma> \<sigma>' message_list\<close> \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> coherent_message_path_inclusive is_future_state.simps past_state_of_\<Sigma>t_is_\<Sigma>t)
       apply (meson \<open>MessagePath (\<sigma> \<union> {m}) \<sigma>' ms\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> coherent_message_path_inclusive is_future_state.simps past_state_of_\<Sigma>t_is_\<Sigma>t)
       done
-    have "inspector (v_set, \<sigma> \<union> {m}, p)"
-      using \<open>\<sigma> \<in> \<Sigma>t\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> \<open>immediately_next_message (\<sigma>, m)\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>majority_driven p\<close> \<open>v_set \<subseteq> V\<close> inspector_preserved_over_immediately_next_message by blast
+    have "vinspector (\<sigma> \<union> {m}) p"
+      apply (rule inspector_preserved_over_immediately_next_message)
+      using UnI2 \<open>\<sigma> \<in> \<Sigma>t\<close> \<open>\<sigma> \<union> {m} \<in> \<Sigma>\<close> message_in_state_is_valid apply auto[1]
+      using \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> apply auto[1]
+      apply (simp add: \<open>majority_driven p\<close>)
+      apply (simp add: \<open>immediately_next_message (\<sigma>, m)\<close>)
+      by (simp add: \<open>vinspector \<sigma> p\<close>)
     moreover have "n = length ms"
       using \<open>Suc n = length message_list\<close> \<open>message_list = m # ms\<close> by auto
     moreover have "MessagePath (\<sigma> \<union> {m}) \<sigma>' ms"
@@ -2091,24 +2195,49 @@ proof auto
       by (simp add: \<open>\<sigma>' \<in> \<Sigma>\<close>)
     moreover have "\<sigma> \<union> {m} \<in> \<Sigma>t"
       using \<open>\<sigma> \<union> {m} \<in> \<Sigma>t\<close> by auto
-    ultimately show "inspector (v_set, \<sigma>', p)"
-      using \<open>\<And>message_list \<sigma>' \<sigma>. \<lbrakk>n = length message_list; MessagePath \<sigma> \<sigma>' message_list; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>t; inspector (v_set, \<sigma>, p)\<rbrakk> \<Longrightarrow> inspector (v_set, \<sigma>', p)\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> by blast
+    ultimately show "vinspector \<sigma>' p"
+      using \<open>\<And>message_list \<sigma>' \<sigma>. \<lbrakk>n = length message_list; MessagePath \<sigma> \<sigma>' message_list; \<sigma> \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>; \<sigma>' \<in> \<Sigma>t; vinspector \<sigma> p\<rbrakk> \<Longrightarrow> vinspector \<sigma>' p\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> by blast
   qed
   
-  thus "inspector (v_set, \<sigma>', p)"
-    using \<open>MessagePath \<sigma> \<sigma>' message_list\<close> \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> \<open>inspector (v_set, \<sigma>, p)\<close> by blast
+  thus "vinspector \<sigma>' p"
+    using \<open>MessagePath \<sigma> \<sigma>' message_list\<close> \<open>\<sigma> \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>\<close> \<open>\<sigma>' \<in> \<Sigma>t\<close> \<open>vinspector \<sigma> p\<close> by blast
 qed
 
 
 (* Lemma 40: Inspector is a safety oracle *)
 lemma (in Protocol) inspector_is_safety_oracle :
-  "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma>t \<and> v_set \<subseteq> V 
-  \<longrightarrow> finite v_set
-  \<longrightarrow> majority_driven p
-  \<longrightarrow> inspector (v_set, \<sigma>, p)
-  \<longrightarrow> state_property_is_decided (naturally_corresponding_state_property p, \<sigma>)"    
-  using inspector_preserved_in_future inspector_imps_estimator_agreeing
+  "\<sigma> \<in> \<Sigma>t
+  \<Longrightarrow> majority_driven p
+  \<Longrightarrow> vinspector \<sigma> p
+  \<Longrightarrow> state_property_is_decided (naturally_corresponding_state_property p, \<sigma>)"
   apply (simp add: naturally_corresponding_state_property_def futures_def state_property_is_decided_def)
-  by meson
+proof-
+  assume s: "\<sigma> \<in> \<Sigma>t" "majority_driven p" "vinspector \<sigma> p"
+  show "\<forall>x. x \<in> \<Sigma>t \<and> \<sigma> \<subseteq> x \<longrightarrow> (\<forall>x\<in>\<epsilon> x. p x)"
+  proof auto
+    fix x xa
+    assume hyp: "xa \<in> \<epsilon> x" "x \<in> \<Sigma>t" "\<sigma> \<subseteq> x"
+
+    show "p xa"
+      apply (rule vinspector_imps_estimator_agreeing)
+      apply rule
+      apply (rule hyp(2))
+      apply simp
+      apply (simp add: \<open>majority_driven p\<close>)
+      defer
+      apply (simp add: hyp(1))
+    proof-
+      have "x \<in> futures \<sigma>"
+        apply (simp add: futures_def)
+        by (simp add: hyp(2) hyp(3))
+      show "vinspector x p"
+        apply (rule inspector_preserved_in_future)
+        apply (rule s(1))
+        apply (simp add: \<open>majority_driven p\<close>)
+        apply (simp add: s(3))
+        by (simp add: \<open>x \<in> futures \<sigma>\<close>)
+    qed
+  qed
+qed
 
 end
