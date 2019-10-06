@@ -675,7 +675,7 @@ qed
 (* Lemma 20: Latest honest messages from non-equivocating messages are either the same as in their previous
 latest message, or later *)
 lemma (in Protocol) L_H_M_of_others_for_sender_is_the_previous_one_or_later:
-  "\<And>\<sigma> m v. \<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V
+  "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V
   \<Longrightarrow> immediately_next_message (\<sigma>, m)
   \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
   \<Longrightarrow> v \<in> observed_non_equivocating_validators \<sigma>
@@ -685,7 +685,6 @@ lemma (in Protocol) L_H_M_of_others_for_sender_is_the_previous_one_or_later:
   \<Longrightarrow> the_elem (L_H_M (justification m) v) = the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)
         \<or> justified (the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v)) (the_elem (L_H_M (justification m) v))"
 proof-
-  fix \<sigma> m v
   assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v \<in> V" "immediately_next_message (\<sigma>, m)" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})"
   and "v \<in> observed_non_equivocating_validators \<sigma>" "sender m \<in> observed_non_equivocating_validators \<sigma>" "v \<in> observed (the_elem (L_H_J \<sigma> (sender m)))" "v \<in> observed_non_equivocating_validators (justification m)"
   have "v \<notin> equivocating_validators \<sigma>"
@@ -1149,17 +1148,20 @@ qed
 
 (* Lemma 24: New messages from member is agreeing *)
 lemma (in Protocol) new_message_from_member_see_itself_agreeing :
-  "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V
+  "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V
   \<Longrightarrow> majority_driven p
   \<Longrightarrow> immediately_next_message (\<sigma>, m)
   \<Longrightarrow> sender m \<in> v_set
   \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
-  \<Longrightarrow> inspector (v_set, \<sigma>, p) 
-  \<Longrightarrow> (\<And>v. v \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> v)))
+  \<Longrightarrow> inspector (v_set, \<sigma>, p)
   \<Longrightarrow> sender m \<in> agreeing_validators (p, \<sigma> \<union> {m})"
 proof-
-  assume "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V" "majority_driven p" "immediately_next_message (\<sigma>, m)" "sender m \<in> v_set" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)"
-  and "(\<And>v. v \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> v)))"
+  assume "\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V" "majority_driven p" "immediately_next_message (\<sigma>, m)" "sender m \<in> v_set" "sender m \<notin> equivocating_validators (\<sigma> \<union> {m})" "inspector (v_set, \<sigma>, p)"
+
+  have "\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V"
+    using \<Sigma>t_is_subset_of_\<Sigma> \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by fastforce
+  have "\<sigma> \<in> \<Sigma>t"
+    using \<open>\<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V\<close> by blast
 
   have "(\<exists>v_set' \<subseteq> v_set. gt_threshold (v_set', \<sigma>) \<and>
       (\<forall>v' \<in> v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m)))
@@ -1174,6 +1176,39 @@ proof-
   then obtain v_set' where "v_set' \<subseteq> v_set" "gt_threshold (v_set', \<sigma>)" "(\<forall>v' \<in> v_set'. v' \<in> agreeing_validators (p, the_elem (L_H_J \<sigma> (sender m)))
         \<and> later_disagreeing_messages (p, the_elem (L_H_M (the_elem (L_H_J \<sigma> (sender m))) v'), v', \<sigma>) = \<emptyset>) \<and> v_set' \<subseteq> agreeing_validators (p, justification m)"
     by auto
+
+  have "majority (v_set', the_elem (L_H_J \<sigma> (sender m)))"
+  proof-
+    have "gt_threshold (v_set', \<sigma>)"
+      using \<open>gt_threshold (v_set', \<sigma>)\<close> by auto
+    hence "weight_measure V div 2 + t - equivocation_fault_weight \<sigma> < weight_measure v_set'"
+      by (simp add: gt_threshold_def)
+    moreover have "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure V div 2 + t - equivocation_fault_weight \<sigma>"
+    proof-
+      have h: "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) = weight_measure V - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m))))"
+        apply (rule weight_measure_subset_minus [symmetric])
+        using L_H_J_is_state_if_exists \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_is_finite inspector_imps_everyone_observed_non_equivocating apply blast
+        apply (simp add: V_type)
+        using L_H_J_is_state_if_exists \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_type inspector_imps_everyone_observed_non_equivocating by blast
+      have "equivocation_fault_weight \<sigma> < t"
+        using \<open>\<sigma> \<in> \<Sigma>t\<close>
+        by (simp add: \<Sigma>t_def is_faults_lt_threshold_def)
+      hence "equivocation_fault_weight \<sigma> * 2 < t * 2"
+        by simp
+      moreover have "equivocation_fault_weight \<sigma> * 2 - equivocation_fault_weight (the_elem (L_H_J \<sigma> (sender m))) \<le> equivocation_fault_weight \<sigma> * 2"
+        apply (simp add: equivocation_fault_weight_def)
+        by (meson L_H_J_is_state_if_exists \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_type in_mono inspector_imps_everyone_observed_non_equivocating weight_positive)
+      ultimately have "equivocation_fault_weight \<sigma> * 2 - equivocation_fault_weight (the_elem (L_H_J \<sigma> (sender m))) < t * 2"
+        by simp
+      thus ?thesis
+        apply auto
+        apply (simp add: h)
+        apply (simp add: equivocation_fault_weight_def [symmetric])
+        done
+    qed
+    ultimately show "majority (v_set', the_elem (L_H_J \<sigma> (sender m)))"
+      by (simp add: majority_def)
+  qed
 
   have "weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) \<le> weight_measure (equivocating_validators (justification m))"
   proof-
@@ -1204,34 +1239,34 @@ proof-
       by (simp add: M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> weight_measure_subset_gte)
   qed
 
-  have "majority (v_set, justification m)"
+  have "majority (v_set', justification m)"
   proof-
-    have "majority (v_set, the_elem (L_H_J \<sigma> (sender m)))"
-      by (simp add: \<open>\<And>va. va \<in> v_set \<Longrightarrow> majority (v_set, the_elem (L_H_J \<sigma> va))\<close> \<open>sender m \<in> v_set\<close>)
-    hence "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set"
+    have "majority (v_set', the_elem (L_H_J \<sigma> (sender m)))"
+      using \<open>majority (v_set', the_elem (L_H_J \<sigma> (sender m)))\<close> by blast
+    hence "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set'"
       by (simp add: majority_def)
-    hence "weight_measure V div 2 - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set"
+    hence "weight_measure V div 2 - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) div 2 < weight_measure v_set'"
     proof-
-      assume "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set"
+      assume "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set'"
       have "weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) = weight_measure V - weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m))))"
       apply (rule weight_measure_subset_minus [symmetric])
         apply (meson Protocol.L_H_J_is_state_if_exists Protocol_axioms \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_is_finite in_mono inspector_imps_everyone_observed_non_equivocating)
         apply (simp add: V_type)
         using L_H_J_is_state_if_exists \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>sender m \<in> v_set\<close> equivocating_validators_type inspector_imps_everyone_observed_non_equivocating by blast
       thus ?thesis
-        using \<open>weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set\<close> by linarith
+        using \<open>weight_measure (V - equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) / 2 < weight_measure v_set'\<close> by linarith
     qed
-    hence "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set"
+    hence "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set'"
       using \<open>weight_measure (equivocating_validators (the_elem (L_H_J \<sigma> (sender m)))) \<le> weight_measure (equivocating_validators (justification m))\<close> by linarith
-    hence "weight_measure (V - equivocating_validators (justification m)) div 2 < weight_measure v_set"
+    hence "weight_measure (V - equivocating_validators (justification m)) div 2 < weight_measure v_set'"
     proof-
-      assume "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set"
+      assume "weight_measure V div 2 - weight_measure (equivocating_validators (justification m)) div 2 < weight_measure v_set'"
       have "weight_measure (V - equivocating_validators (justification m)) = weight_measure V - weight_measure (equivocating_validators (justification m))"
         by (simp add: M_type Params.weight_measure_def V_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close> sum_diff)
       thus ?thesis
-        by (simp add: \<open>weight_measure V / 2 - weight_measure (equivocating_validators (justification m)) / 2 < weight_measure v_set\<close> diff_divide_distrib)
+        by (simp add: \<open>weight_measure V / 2 - weight_measure (equivocating_validators (justification m)) / 2 < weight_measure v_set'\<close> diff_divide_distrib)
     qed
-    thus "majority (v_set, justification m)"
+    thus "majority (v_set', justification m)"
       by (simp add: majority_def)
   qed
 
@@ -1245,11 +1280,11 @@ proof-
         apply (simp add: M_type \<open>\<sigma> \<in> \<Sigma> \<and> m \<in> M \<and> v_set \<subseteq> V\<close>)
         by (simp add: \<open>v_set' \<subseteq> agreeing_validators (p, justification m)\<close>)
     qed
-    moreover have "weight_measure v_set > weight_measure (V - equivocating_validators (justification m)) div 2"
-      using \<open>majority (v_set, justification m)\<close>
+    moreover have "weight_measure v_set' > weight_measure (V - equivocating_validators (justification m)) div 2"
+      using \<open>majority (v_set', justification m)\<close>
       by (simp add: majority_def)
     ultimately have "weight_measure (agreeing_validators (p, justification m)) > weight_measure (V - equivocating_validators (justification m)) div 2"
-      sorry
+      by linarith
     hence "majority (agreeing_validators (p, justification m), justification m)"
       by (simp add: majority_def)
     moreover have "\<And>\<sigma>'. \<lbrakk> \<sigma>' \<in> \<Sigma>; majority (agreeing_validators (p, \<sigma>'), \<sigma>') \<rbrakk> \<Longrightarrow> (\<And>c. c \<in> \<epsilon> \<sigma>' \<Longrightarrow> p c)"
