@@ -367,13 +367,6 @@ lemma (in Protocol) equivocating_validators_split_over_equivocating_message:
   using observed_def apply auto[1]
   using is_equivocating_def by auto
 
-lemma (in Protocol) equivocating_validators_subset_of_validators:
-  "\<sigma> \<in> \<Sigma> \<Longrightarrow> equivocating_validators \<sigma> \<subseteq> V"
-  apply (simp add: equivocating_validators_def observed_def)
-  apply auto
-  apply (simp add: M_type message_in_state_is_valid)
-  done
-
 (* ###################################################### *)
 (* Weight measure *)
 (* ###################################################### *)
