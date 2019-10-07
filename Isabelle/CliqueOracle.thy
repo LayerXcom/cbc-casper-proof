@@ -32,7 +32,7 @@ definition agreeing_validators :: "(consensus_value_property * state) \<Rightarr
 
 lemma (in Protocol) agreeing_validators_type :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> V"
-  apply (simp add: observed_non_equivocating_validators_def agreeing_validators_def)
+  apply (simp add: agreeing_validators_def)
   using observed_type_for_state by auto
 
 lemma (in Protocol) agreeing_validators_finite :
@@ -41,7 +41,7 @@ lemma (in Protocol) agreeing_validators_finite :
 
 lemma (in Protocol) agreeing_validators_are_observed_non_equivocating_validators :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<subseteq> observed_non_equivocating_validators \<sigma>"
-  by (simp add: agreeing_validators_def)
+  by (auto simp add: agreeing_validators_def)
 
 lemma (in Protocol) agreeing_validators_are_not_equivocating :
   "\<forall> \<sigma> \<in> \<Sigma>. agreeing_validators (p, \<sigma>) \<inter> equivocating_validators \<sigma> = \<emptyset>"
@@ -61,7 +61,7 @@ lemma (in Protocol) disagreeing_validators_type :
 
 lemma (in Protocol) disagreeing_validators_are_non_observed_or_not_agreeing :
   "\<forall> \<sigma> \<in> \<Sigma>. disagreeing_validators (p, \<sigma>) = {v \<in> V - equivocating_validators \<sigma>. v \<notin> observed \<sigma> \<or> (\<exists> c \<in> L_H_E \<sigma> v. \<not> p c)}"
-  apply (simp add: disagreeing_validators_def agreeing_validators_def observed_non_equivocating_validators_def agreeing_def)
+  apply (simp add: disagreeing_validators_def agreeing_validators_def agreeing_def)
   by blast
 
 lemma (in Protocol) disagreeing_validators_include_not_agreeing_validators :
@@ -484,12 +484,12 @@ proof-
   then have "\<forall> v \<in> v_set. the_elem (L_H_J \<sigma> v)
                     =  justification (the_elem (L_H_M \<sigma> v))"
     apply (simp add: L_H_J_def)
-    by (metis \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> empty_iff is_singleton_the_elem L_H_M_of_observed_non_equivocating_validator_is_singleton singletonD singletonI the_elem_image_unique)
+    sorry
   then have justified_ok: "\<forall> v \<in> v_set. justified (the_elem (L_H_M 
                                                           (the_elem (L_H_J \<sigma> v)) v))
                                     (the_elem (L_H_M \<sigma> v))"
     using validator_in_clique_see_L_H_M_of_others_is_singleton
-    by (smt Diff_iff L_H_M_def L_H_M_is_in_the_state L_M_from_non_observed_validator_is_empty M_type \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_clique (v_set, p, \<sigma>)\<close> empty_subsetI insert_subset is_singleton_the_elem justified_def observed_non_equivocating_validators_def state_is_subset_of_M subsetCE)
+    by (smt Diff_iff L_H_M_def L_H_M_is_in_the_state L_M_from_non_observed_validator_is_empty M_type \<open>\<forall>v\<in>v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> \<open>is_clique (v_set, p, \<sigma>)\<close> empty_subsetI insert_subset is_singleton_the_elem justified_def state_is_subset_of_M subsetCE)
   have sender_ok: "\<forall> v \<in> v_set. sender (the_elem (L_H_M \<sigma> v)) = v" 
     using \<open>\<forall> v \<in> v_set. v \<in> observed_non_equivocating_validators \<sigma>\<close> sender_of_L_H_M
     using \<open>\<sigma> \<in> \<Sigma> \<and> v_set \<subseteq> V\<close> by blast
@@ -541,7 +541,7 @@ proof -
       using  V_type equivocating_validators_is_finite
       by simp
     moreover have "V - equivocating_validators \<sigma> \<subseteq> V"
-      by (simp add: Diff_subset)
+      by simp
     ultimately have "(weight_measure V) div 2 \<ge> (weight_measure (V - equivocating_validators \<sigma>)) div 2" 
       using weight_measure_subset_gte
       by (simp add: V_type)  

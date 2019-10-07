@@ -60,8 +60,7 @@ lemma (in Protocol) justification_is_strict_partial_order_on_M :
   by (simp add: irreflexivity_of_justifications transitivity_of_justifications)
 
 lemma (in Protocol) monotonicity_of_justifications :
-  "\<forall> m m' \<sigma>. m \<in> M \<and> \<sigma> \<in> \<Sigma> \<and> justified m' m \<longrightarrow> justification m' \<subseteq> justification m"
-  apply simp
+  "m \<in> M \<Longrightarrow> justified m' m \<Longrightarrow> justification m' \<subseteq> justification m"
   by (meson M_type justified_def message_in_state_is_valid state_is_in_pow_Mi)
 
 lemma (in Protocol) strict_monotonicity_of_justifications :
