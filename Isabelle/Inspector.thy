@@ -131,7 +131,6 @@ lemma (in Protocol) later_disagreeing_messages_type :
 
 lemma (in Protocol) non_equivocating_validator_is_non_equivocating_in_past :
   "\<lbrakk> v \<in> V; {\<sigma>, \<sigma>'} \<subseteq> \<Sigma>; is_future_state (\<sigma>, \<sigma>'); v \<notin> equivocating_validators \<sigma>' \<rbrakk> \<Longrightarrow> v \<notin> equivocating_validators \<sigma>"
-  (* Will be proved by the monotonicity of equivocations. *)
 proof-
   assume "v \<in> V" "{\<sigma>, \<sigma>'} \<subseteq> \<Sigma>" "is_future_state (\<sigma>, \<sigma>')" "v \<notin> equivocating_validators \<sigma>'"
   have "v \<in> equivocating_validators \<sigma> \<Longrightarrow> v \<in> equivocating_validators \<sigma>'"
@@ -141,7 +140,6 @@ proof-
 qed
 
 (* Definition 7.18: Inspector threshold size *) 
-(* FIXME: Use equivocation_fault_weight *)
 definition (in Params) gt_threshold :: "(validator set * state) \<Rightarrow> bool"
   where
     "gt_threshold 
@@ -213,26 +211,6 @@ lemma (in Protocol) inspector_imps_belonging_validator_is_agreeing:
   "\<lbrakk> inspector (v_set, \<sigma>, p); v \<in> v_set \<rbrakk> \<Longrightarrow> v \<in> agreeing_validators (p, \<sigma>)"
   apply (simp add: inspector_def)
   done
-
-(*
-lemma (in Protocol) validator_in_inspector_see_L_H_M_of_others_is_singleton : 
-  "\<sigma> \<in> \<Sigma> \<Longrightarrow> inspector (v_set, \<sigma>, p) \<Longrightarrow> (\<And>v v'. {v, v'} \<subseteq> v_set \<Longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v'))"
-proof-
-  assume "\<sigma> \<in> \<Sigma>" "inspector (v_set, \<sigma>, p)"
-  show "\<And>v v'. {v, v'} \<subseteq> v_set \<Longrightarrow> is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v')"
-  proof-
-    fix v v'
-    assume "{v, v'} \<subseteq> v_set"
-    have "v \<in> observed_non_equivocating_validators \<sigma>"
-      using agreeing_validators_are_observed_non_equivocating_validators inspector_imps_belonging_validator_is_agreeing
-      using \<open>\<sigma> \<in> \<Sigma>\<close> \<open>inspector (v_set, \<sigma>, p)\<close> \<open>{v, v'} \<subseteq> v_set\<close> by blast
-
-    show "is_singleton (L_H_M (the_elem (L_H_J \<sigma> v)) v')"
-      apply (rule L_H_M_of_observed_non_equivocating_validator_is_singleton)
-      apply (rule L_H_J_is_state_if_exists)
-      using \<open>\<sigma> \<in> \<Sigma>\<close> apply auto[1]
-      using \<open>v \<in> observed_non_equivocating_validators \<sigma>\<close> apply blast
-*)
 
 lemma (in Protocol) inspector_imps_everyone_observed_non_equivocating :
   "\<forall> \<sigma> v_set p. \<sigma> \<in> \<Sigma> 
@@ -551,18 +529,6 @@ qed
 (* ###################################################### *)
 (* 7.4 Inspector Survives Honest Messages from Member *)
 (* ###################################################### *)
-
-(* TODO: This lemma must be redefined to consider threshold *)
-(* 7.4.1 New messages at least leaves a smaller clique behind *)
-(* Lemma 17: Free sub-clique *)
-(* lemma (in Protocol) free_sub_clique :
-  "\<forall> \<sigma> m v_set p. \<sigma> \<in> \<Sigma>t \<and> m \<in> M \<and> v_set \<subseteq> V 
-  \<longrightarrow> immediately_next_message (\<sigma>, m)
-  \<longrightarrow> sender m \<notin> v_set
-  \<longrightarrow> is_clique (v_set, p, \<sigma>) 
-  \<longrightarrow> is_clique (v_set - {sender m}, p, \<sigma> \<union> {m})"
-  oops
- *)
 
 (* 7.4.2 Non-equivocating messages from member see all members agreeing *)
 (* Lemma 18: Later messages from a non-equivocating validator include all earlier messages *)
