@@ -310,17 +310,30 @@ definition is_equivocating :: "state \<Rightarrow> validator \<Rightarrow> bool"
   where
     "is_equivocating \<sigma> v =  (\<exists> m1 \<in> \<sigma>. \<exists> m2 \<in> \<sigma>. equivocation (m1, m2) \<and> sender m1 = v)"
 
+(* Use "v \<in> equivocating_validators \<sigma>" instead of is_equivocating by default *)
 definition equivocating_validators :: "state \<Rightarrow> validator set"
   where
     "equivocating_validators \<sigma> = {v \<in> observed \<sigma>. is_equivocating \<sigma> v}"
 
-lemma (in Protocol) equivocating_validators_type :
-  "\<forall> \<sigma> \<in> \<Sigma>. equivocating_validators \<sigma> \<subseteq> V"
+lemma (in Protocol) equivocating_validators_type [simp]:
+  "\<sigma> \<in> \<Sigma> \<Longrightarrow> equivocating_validators \<sigma> \<subseteq> V"
   using observed_type_for_state equivocating_validators_def by blast
 
 lemma (in Protocol) equivocating_validators_is_finite :
   "\<forall> \<sigma> \<in> \<Sigma>. finite (equivocating_validators \<sigma>)"
-  using V_type equivocating_validators_type rev_finite_subset by blast
+  using V_type equivocating_validators_type rev_finite_subset
+  by fastforce
+
+lemma (in Protocol) equivocating_validators_implies_either_justified:
+  "\<lbrakk> v \<notin> equivocating_validators \<sigma>; m1 \<in> \<sigma>; sender m1 = v; m2 \<in> \<sigma>; sender m2 = v \<rbrakk> \<Longrightarrow> m1 = m2 \<or> justified m1 m2 \<or> justified m2 m1"
+  apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def justified_def)
+  apply auto
+  done
+
+lemma (in Protocol) equivocating_validators_preserve_subset: "\<sigma>1 \<subseteq> \<sigma>2 \<Longrightarrow> equivocating_validators \<sigma>1 \<subseteq> equivocating_validators \<sigma>2"
+  apply (simp add: equivocating_validators_def observed_def is_equivocating_def)
+  apply auto
+  done
 
 definition (in Params) equivocating_validators_paper :: "state \<Rightarrow> validator set"
   where
@@ -339,12 +352,21 @@ lemma (in Protocol) equivocation_is_monotonic :
   using observed_def by fastforce
 
 lemma (in Protocol) equivocating_validators_preserved_over_honest_message :
-  "\<forall> \<sigma> m. \<sigma> \<in> \<Sigma> \<and> m \<in> M
-  \<longrightarrow> \<not> is_equivocating (\<sigma> \<union> {m}) (sender m)
-  \<longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
+  "\<sigma> \<in> \<Sigma> \<and> m \<in> M
+  \<Longrightarrow> sender m \<notin> equivocating_validators (\<sigma> \<union> {m})
+  \<Longrightarrow> equivocating_validators \<sigma> = equivocating_validators (\<sigma> \<union> {m})"
   apply (simp add: equivocating_validators_def is_equivocating_def observed_def equivocation_def)
   by auto
-  
+
+lemma (in Protocol) equivocating_validators_split_over_equivocating_message:
+  "sender m \<in> equivocating_validators (\<sigma> \<union> {m}) \<Longrightarrow> equivocating_validators (\<sigma> \<union> {m}) = equivocating_validators \<sigma> \<union> {sender m}"
+  apply (simp add: equivocating_validators_def)
+  apply auto
+  using observed_def apply auto[1]
+  apply (metis (mono_tags, lifting) equivocation_def insert_iff is_equivocating_def prod.simps(2))
+  using observed_def apply auto[1]
+  using is_equivocating_def by auto
+
 (* ###################################################### *)
 (* Weight measure *)
 (* ###################################################### *)
@@ -430,8 +452,8 @@ definition (in Params) equivocation_fault_weight :: "state \<Rightarrow> real"
     "equivocation_fault_weight \<sigma> = weight_measure (equivocating_validators \<sigma>)"
 
 lemma (in Protocol) equivocation_fault_weight_is_monotonic :
-  "\<forall> \<sigma> \<sigma>'. \<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
-  \<longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
+  "\<sigma> \<in> \<Sigma> \<and> \<sigma>' \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
+  \<Longrightarrow> equivocation_fault_weight \<sigma> \<le> equivocation_fault_weight \<sigma>'"
   using equivocation_is_monotonic weight_measure_subset_gte 
   by (smt equivocating_validators_is_finite equivocating_validators_type equivocation_fault_weight_def subset_iff)
 
@@ -441,11 +463,23 @@ definition (in Params) is_faults_lt_threshold :: "state \<Rightarrow> bool"
     "is_faults_lt_threshold \<sigma> = (equivocation_fault_weight \<sigma> < t)"
 
 definition (in Protocol) \<Sigma>t :: "state set"
-  where
+  where                           
     "\<Sigma>t = {\<sigma> \<in> \<Sigma>. is_faults_lt_threshold \<sigma>}" 
 
 lemma (in Protocol) \<Sigma>t_is_subset_of_\<Sigma> : "\<Sigma>t \<subseteq> \<Sigma>"
   using \<Sigma>t_def by auto
+
+lemma (in Protocol) past_state_of_\<Sigma>t_is_\<Sigma>t :
+  "\<forall> \<sigma> \<sigma>'. \<sigma>' \<in> \<Sigma>t \<and> \<sigma> \<in> \<Sigma> \<and> is_future_state (\<sigma>, \<sigma>')
+  \<longrightarrow> \<sigma> \<in> \<Sigma>t"
+  using equivocation_fault_weight_is_monotonic
+  apply (simp add: \<Sigma>t_def is_faults_lt_threshold_def)
+  by fastforce 
+
+(* Definition 3.1 *)
+definition (in Protocol) futures :: "state \<Rightarrow> state set"
+  where
+    "futures \<sigma> = {\<sigma>' \<in> \<Sigma>t. is_future_state (\<sigma>, \<sigma>')}"
 
 (* Definition 3.2 *)
 type_synonym state_property = "state \<Rightarrow> bool"

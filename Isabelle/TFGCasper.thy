@@ -1,6 +1,6 @@
 theory TFGCasper
 
-imports Main HOL.Real CBCCasper LatestMessage CliqueOracle ConsensusSafety
+imports Main HOL.Real CBCCasper LatestMessage ConsensusSafety Inspector
 
 begin
 
@@ -91,7 +91,6 @@ lemma (in BlockchainParams) also_agreeing_on_ancestors :
   using BlockchainParams.transitivity_of_blockchain_membership by blast
 
 (* Definition 4.28: Children *)
-(* NOTE: Modified from the paper to include non-observed blocks so that (block_membership b) becomes max-driven for any b \<in> C *)
 definition (in BlockchainParams) children :: "consensus_value * state \<Rightarrow> consensus_value set"
   where
     "children = (\<lambda>(b, \<sigma>). {b' \<in> est `\<sigma>. b = prev b'})"
@@ -226,7 +225,7 @@ proof -
   have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
         \<longrightarrow> (v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<in> observed \<sigma> \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x))"
     using observed_non_equivocating_validators_have_one_latest_message
-    unfolding observed_non_equivocating_validators_def is_singleton_def
+    unfolding agreeing_validators_def is_singleton_def
     by (metis Diff_iff empty_iff insert_iff)
   moreover have "\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma> \<longrightarrow>  v \<notin> equivocating_validators \<sigma> 
         \<longrightarrow> (v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<in> observed \<sigma> \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x))"
@@ -239,7 +238,7 @@ proof -
         \<longrightarrow> (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x))"
     by blast
   show ?thesis
-    apply (simp add: agreeing_validators_def agreeing_def observed_non_equivocating_validators_def L_H_E_def L_H_M_def block_membership_def)
+    apply (simp add: agreeing_validators_def agreeing_def L_H_E_def L_H_M_def block_membership_def)
     using \<open>\<forall> v \<sigma>. v \<in> V \<and> \<sigma> \<in> \<Sigma>
         \<longrightarrow> (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> V \<and> (\<exists> x \<in>L_M \<sigma> v. b \<downharpoonright> est x)) = (v \<notin> equivocating_validators \<sigma> \<longrightarrow> v \<in> observed \<sigma> \<and> (\<forall> x \<in> L_M \<sigma> v. b \<downharpoonright> est x))\<close>
     observed_type_for_state
